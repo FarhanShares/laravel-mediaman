@@ -9,14 +9,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use FarhanShares\MediaMan\ImageManipulator;
-use FarhanShares\MediaMan\Models\File;
+use FarhanShares\MediaMan\Models\Media;
 
 class PerformConversions implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /** @var File */
-    protected $file;
+    /** @var Media */
+    protected $media;
 
     /** @var array */
     protected $conversions;
@@ -24,13 +24,13 @@ class PerformConversions implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param File $file
+     * @param Media $media
      * @param array $conversions
      * @return void
      */
-    public function __construct(File $file, array $conversions)
+    public function __construct(Media $media, array $conversions)
     {
-        $this->file = $file;
+        $this->media = $media;
 
         $this->conversions = $conversions;
     }
@@ -43,15 +43,15 @@ class PerformConversions implements ShouldQueue
     public function handle()
     {
         app(ImageManipulator::class)->manipulate(
-            $this->file,
+            $this->media,
             $this->conversions
         );
     }
 
-    /** @return File */
-    public function getFile()
+    /** @return media */
+    public function getMedia()
     {
-        return $this->file;
+        return $this->media;
     }
 
     /** @return array */
