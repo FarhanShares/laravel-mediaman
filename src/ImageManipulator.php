@@ -6,7 +6,7 @@ namespace FarhanShares\MediaMan;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Intervention\Image\ImageManager;
 use FarhanShares\MediaMan\Exceptions\InvalidConversion;
-use FarhanShares\MediaMan\Models\File;
+use FarhanShares\MediaMan\Models\Media;
 
 class ImageManipulator
 {
@@ -33,24 +33,26 @@ class ImageManipulator
     /**
      * Perform the specified conversions on the given media item.
      *
-     * @param File $file
+     * @param Media $media
      * @param array $conversions
      * @param bool $onlyIfMissing
      * @return void
      *
      * @throws InvalidConversion
      * @throws FileNotFoundException
+     *
+     * todo: resolve dependency model from config in __construct?
      */
-    public function manipulate(File $file, array $conversions, $onlyIfMissing = true)
+    public function manipulate(Media $media, array $conversions, $onlyIfMissing = true)
     {
-        if (!$file->isOfType('image')) {
+        if (!$media->isOfType('image')) {
             return;
         }
 
         foreach ($conversions as $conversion) {
-            $path = $file->getPath($conversion);
+            $path = $media->getPath($conversion);
 
-            $filesystem = $file->filesystem();
+            $filesystem = $media->filesystem();
 
             if ($onlyIfMissing && $filesystem->exists($path)) {
                 continue;
@@ -59,7 +61,7 @@ class ImageManipulator
             $converter = $this->conversionRegistry->get($conversion);
 
             $image = $converter($this->imageManager->make(
-                $filesystem->readStream($file->getPath())
+                $filesystem->readStream($media->getPath())
             ));
 
             $filesystem->put($path, $image->stream());
