@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class File extends Model
+class Media extends Model
 {
     /**
      * The attributes that are mass assignable.
