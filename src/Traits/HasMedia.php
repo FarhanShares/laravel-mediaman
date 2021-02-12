@@ -2,10 +2,11 @@
 
 namespace FarhanShares\MediaMan\Traits;
 
+use FarhanShares\MediaMan\MediaChannel;
+use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use FarhanShares\MediaMan\Jobs\PerformConversions;
-use FarhanShares\MediaMan\Models\File;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasMedia
 {
@@ -20,7 +21,7 @@ trait HasMedia
     public function media()
     {
         return $this
-            ->morphToMany(config('mediaman.models.file'), config('mediaman.models.mediable'))
+            ->morphToMany(config('mediaman.models.media'), config('mediaman.models.mediable'))
             ->withPivot('channel');
     }
 
@@ -97,7 +98,7 @@ trait HasMedia
         }
 
         if (!empty($conversions)) {
-            $model = config('mediaman.models.file');
+            $model = config('mediaman.models.media');
 
             $media = $model::findMany($ids);
 
@@ -126,7 +127,7 @@ trait HasMedia
             return $media->modelKeys();
         }
 
-        if ($media instanceof File) {
+        if ($media instanceof Media) {
             return [$media->getKey()];
         }
 
@@ -147,7 +148,7 @@ trait HasMedia
      * Register a new media group.
      *
      * @param string $name
-     * @return MediaGroup
+     * @return MediaChannel
      */
     protected function addMediaChannel(string $name)
     {
@@ -181,13 +182,13 @@ trait HasMedia
     }
 
     /**
-     * Detach all the media in the specified group.
+     * Detach all the media in the specified channel.
      *
-     * @param string $group
+     * @param string $channel
      * @return void
      */
-    public function clearMediaGroup(string $group = 'default')
+    public function clearMediaChannel(string $channel = 'default')
     {
-        $this->media()->wherePivot('group', $group)->detach();
+        $this->media()->wherePivot('channel', $channel)->detach();
     }
 }
