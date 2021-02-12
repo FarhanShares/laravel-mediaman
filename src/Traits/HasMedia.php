@@ -18,17 +18,17 @@ trait HasMedia
      *
      * @return MorphToMany
      */
-    public function media()
+    public function media(): MorphToMany
     {
         return $this
-            ->morphToMany(config('mediaman.models.media'), config('mediaman.models.mediable'))
+            ->morphToMany(config('mediaman.models.media'), 'mediable', config('mediaman.tables.mediables'))
             ->withPivot('channel');
     }
 
     /**
      * Determine if there is any media in the specified group.
      *
-     * @param string $group
+     * @param string $channel
      * @return mixed
      */
     public function hasMedia(string $channel = 'default')
@@ -84,11 +84,11 @@ trait HasMedia
      */
     public function attachMedia($media, string $channel = 'default', array $conversions = [])
     {
-        $this->registerMediaGroups();
+        $this->registerMediaChannels();
 
         $ids = $this->parseMediaIds($media);
 
-        $mediaGroup = $this->getMediaGroup($channel);
+        $mediaGroup = $this->getMediaChannel($channel);
 
         if ($mediaGroup && $mediaGroup->hasConversions()) {
             $conversions = array_merge(
@@ -154,7 +154,7 @@ trait HasMedia
     {
         $group = new MediaChannel();
 
-        $this->mediaGroups[$name] = $group;
+        $this->mediaChannels[$name] = $group;
 
         return $group;
     }
