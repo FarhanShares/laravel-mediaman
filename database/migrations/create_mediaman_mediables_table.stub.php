@@ -14,12 +14,12 @@ class CreateMediamanMediablesTable extends Migration
     public function up()
     {
         Schema::create(config('mediaman.tables.mediables'), function (Blueprint $table) {
-            $table->unsignedBigInteger('file_id')->index();
+            $table->unsignedBigInteger('media_id')->index();
             $table->unsignedBigInteger('mediable_id')->index();
             $table->string('mediable_type');
             $table->string('tag');
 
-            $table->foreign('file_id')
+            $table->foreign('media_id')
                 ->references('id')
                 ->on(config('mediaman.tables.files'))
                 ->onDelete('cascade');
