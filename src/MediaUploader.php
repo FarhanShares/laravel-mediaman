@@ -173,7 +173,7 @@ class MediaUploader
      */
     public function upload()
     {
-        $model = config('mediaman.model');
+        $model = config('mediaman.models.media');
 
         $media = new $model();
 
