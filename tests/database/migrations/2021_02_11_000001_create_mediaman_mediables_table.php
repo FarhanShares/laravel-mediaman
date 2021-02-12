@@ -14,6 +14,7 @@ class CreateMediamanMediablesTable extends Migration
     public function up()
     {
         Schema::create(config('mediaman.tables.mediables'), function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('media_id')->index();
             $table->unsignedBigInteger('mediable_id')->index();
             $table->string('mediable_type');
