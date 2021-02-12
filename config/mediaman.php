@@ -40,9 +40,9 @@ return [
     */
 
     'models' => [
-        'file'       => App\Models\MediaManFile::class,
-        'collection' => App\Models\MediaManCollection::class,
-        'mediable'   => App\Models\MediaManMediable::class,
+        'media'      => \FarhanShares\MediaMan\Models\Media::class,
+        'collection' => \FarhanShares\MediaMan\Models\MediaCollection::class,
+        'mediable'   => \FarhanShares\MediaMan\Models\Mediable::class,
     ],
 
     /*
@@ -53,9 +53,9 @@ return [
     */
 
     'tables' => [
-        'files'           => 'mediaman_files',
-        'collections'     => 'mediaman_collections',
-        'collection_file' => 'mediaman_collection_file',
-        'mediables'       => 'mediaman_mediables',
+        'media'            => 'mediaman_media',
+        'collections'      => 'mediaman_collections',
+        'collection_media' => 'mediaman_collection_media',
+        'mediables'        => 'mediaman_mediables',
     ],
 ];
