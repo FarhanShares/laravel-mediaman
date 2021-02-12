@@ -17,7 +17,7 @@ class CreateMediamanMediablesTable extends Migration
             $table->unsignedBigInteger('media_id')->index();
             $table->unsignedBigInteger('mediable_id')->index();
             $table->string('mediable_type');
-            $table->string('tag');
+            $table->string('channel');
 
             $table->foreign('media_id')
                 ->references('id')
