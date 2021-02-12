@@ -26,7 +26,7 @@ class Media extends Model
      */
     public function getTable()
     {
-        return config('mediaman.tables.files');
+        return config('mediaman.tables.media');
     }
 
     /**
