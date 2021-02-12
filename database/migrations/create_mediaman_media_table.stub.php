@@ -20,7 +20,7 @@ class CreateMediaManMediaTable extends Migration
             $table->string('name');
             $table->string('mime_type');
             $table->unsignedInteger('size');
-            $table->json('data');
+            $table->json('data')->nullable();
             $table->timestamps();
         });
     }
