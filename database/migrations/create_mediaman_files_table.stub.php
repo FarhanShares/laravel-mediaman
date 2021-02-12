@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMediaManFilesTable extends Migration
+class CreateMediaManMediaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateMediaManFilesTable extends Migration
      */
     public function up()
     {
-        Schema::create(config('mediaman.tables.files'), function (Blueprint $table) {
+        Schema::create(config('mediaman.tables.media'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('disk');
             $table->string('display_name');
@@ -32,6 +32,6 @@ class CreateMediaManFilesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config('mediaman.tables.files'));
+        Schema::dropIfExists(config('mediaman.tables.media'));
     }
 }
