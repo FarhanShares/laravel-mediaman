@@ -3,10 +3,11 @@
 namespace FarhanShares\MediaMan\Models;
 
 
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Support\Str;
+use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 class MediaCollection extends Model
 {
@@ -27,5 +28,13 @@ class MediaCollection extends Model
     public function getTable()
     {
         return config('mediaman.tables.collections');
+    }
+
+    /**
+     * The media that belong to the collection.
+     */
+    public function media()
+    {
+        return $this->belongsToMany(Media::class, config('mediaman.tables.media'), 'collection_id', 'media_id');
     }
 }
