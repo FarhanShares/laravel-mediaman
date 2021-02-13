@@ -10,7 +10,7 @@ class Subject extends Model
 {
     use HasMedia;
 
-    public function registerMediaGroups()
+    public function registerMediaChannels()
     {
         $this->addMediaChannel('converted-images')
             ->performConversions('conversion');
