@@ -48,6 +48,31 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_can_retrieve_media_of_a_collection()
+    {
+
+        MediaUploader::source($this->file)
+            ->useName('file-1')
+            ->useCollection('images')
+            ->upload();
+
+        MediaUploader::source($this->file)
+            ->useName('file-2')
+            ->useCollection('images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->findByName('images');
+
+        $two = $imageCollection->media[1];
+        $one = $imageCollection->media[0];
+
+        $this->assertEquals(2, $imageCollection->count());
+
+        $this->assertEquals('file-1', $one->name);
+        $this->assertEquals('file-2', $two->name);
+    }
+
+    /** @test */
     public function we_can_attach_media_to_a_collection()
     {
         $collection = $this->mediaCollection::firstOrCreate([
