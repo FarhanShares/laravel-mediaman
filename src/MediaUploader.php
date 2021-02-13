@@ -2,7 +2,7 @@
 
 namespace FarhanShares\MediaMan;
 
-
+use FarhanShares\MediaMan\Models\MediaCollection;
 use Illuminate\Http\UploadedFile;
 
 class MediaUploader
@@ -13,8 +13,8 @@ class MediaUploader
     /** @var string */
     protected $name;
 
-    /** @var string */
-    protected $collection;
+    /** @var array */
+    protected $collections = [];
 
     /** @var string */
     protected $fileName;
@@ -87,6 +87,28 @@ class MediaUploader
     public function useName(string $name)
     {
         return $this->setName($name);
+    }
+
+    /**
+     * Set the name of the media item.
+     *
+     * @param string $name
+     * @return MediaUploader
+     */
+    public function setCollection(string $name)
+    {
+        $this->collections[] = $name;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return MediaUploader
+     */
+    public function useCollection(string $name)
+    {
+        return $this->setCollection($name);
     }
 
     /**
@@ -192,6 +214,17 @@ class MediaUploader
             $this->file,
             $this->fileName
         );
+
+        if (count($this->collections) > 0) {
+            $collection = MediaCollection::firstOrCreate([
+                'name' => $this->collections[0]
+            ]);
+        } else {
+            // add to the default collection
+        }
+
+        // dump($collection);
+
 
         return $media->fresh();
     }
