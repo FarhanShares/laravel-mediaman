@@ -39,6 +39,6 @@ class MediaCollection extends Model
      */
     public function media()
     {
-        return $this->belongsToMany(Media::class, config('mediaman.tables.media'), 'collection_id', 'media_id');
+        return $this->belongsToMany(Media::class, config('mediaman.tables.collection_media'), 'media_id', 'collection_id');
     }
 }
