@@ -3,10 +3,11 @@
 namespace FarhanShares\MediaMan\Models;
 
 
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Support\Str;
+use FarhanShares\MediaMan\Casts\Json;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 class Media extends Model
 {
@@ -17,6 +18,10 @@ class Media extends Model
      */
     protected $fillable = [
         'disk', 'display_name', 'name', 'mime_type', 'size', 'data'
+    ];
+
+    protected $casts = [
+        'data' => Json::class
     ];
 
     /**
