@@ -82,7 +82,7 @@ class MediaCollectionTest extends TestCase
         MediaUploader::source($this->file)->upload();
         $media = $this->media::latest()->first();
 
-        $media->collections()->attach($collection->id);
+        $media->collections()->sync($collection->id);
 
         $this->assertEquals('my-collection', $media->collections()->first()->name);
     }
