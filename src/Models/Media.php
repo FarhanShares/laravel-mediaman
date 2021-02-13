@@ -8,6 +8,7 @@ use FarhanShares\MediaMan\Casts\Json;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use FarhanShares\MediaMan\Models\MediaCollection;
 
 class Media extends Model
 {
@@ -126,5 +127,11 @@ class Media extends Model
     public function filesystem()
     {
         return Storage::disk($this->disk);
+    }
+
+
+    public function collections()
+    {
+        return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
     }
 }
