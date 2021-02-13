@@ -216,11 +216,15 @@ class MediaUploader
         );
 
         if (count($this->collections) > 0) {
+            // todo: support multiple collections
             $collection = MediaCollection::firstOrCreate([
                 'name' => $this->collections[0]
             ]);
+
+            $media->collections()->attach($collection->id);
         } else {
             // add to the default collection
+            $media->collections()->attach(1);
         }
 
         // dump($collection);
