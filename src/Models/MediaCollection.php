@@ -30,6 +30,10 @@ class MediaCollection extends Model
         return config('mediaman.tables.collections');
     }
 
+    public function findByName(string $name)
+    {
+        return $this->where('name', $name)->first();
+    }
     /**
      * The media that belong to the collection.
      */
