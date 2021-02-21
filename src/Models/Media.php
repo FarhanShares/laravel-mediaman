@@ -155,10 +155,13 @@ class Media extends Model
 
     public function syncCollections(array $collections, $detaching = false)
     {
-        $res = [];
-        foreach ($collections as $collection) {
-            $res[] = $this->syncCollection($collection, $detaching);
+        if (is_numeric($collections[0])) {
+            $fetchCollections = MediaCollection::find($collections);
+        } else {
+            $fetchCollections = MediaCollection::findByName($collections);
         }
-        return $res;
+
+        $ids = $fetchCollections->pluck('id');
+        return $this->collections()->sync($ids, $detaching);
     }
 }
