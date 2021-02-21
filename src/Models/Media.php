@@ -204,4 +204,43 @@ class Media extends Model
 
         return false;
     }
+
+    public function detachCollection($collection)
+    {
+        if (is_string($collection) && $fetch = MediaCollection::findByName($collection)) {
+            return $this->collections()->detach($fetch->id);
+        }
+
+        $id = is_numeric($collection)
+            ? $collection
+            : (is_object($collection)
+                ? $collection->id
+                : null);
+
+        if ($id) {
+            return $this->collections()->detach($id);
+        }
+
+        return false;
+    }
+
+    public function detachCollections($collections)
+    {
+        if (is_object($collections)) {
+            $ids = $collections->pluck('id');
+            return $this->collections()->detach($ids);
+        }
+
+        if (is_array($collections) && is_numeric($collections[0])) {
+            return $this->collections()->detach($collections);
+        }
+
+        if (is_array($collections) && is_string($collections[0])) {
+            $fetchCollections = MediaCollection::findByName($collections);
+            $ids = $fetchCollections->pluck('id');
+            return $this->collections()->detach($ids);
+        }
+
+        return false;
+    }
 }
