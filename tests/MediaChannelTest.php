@@ -2,8 +2,8 @@
 
 namespace FarhanShares\MediaMan\Tests;
 
-use FarhanShares\MediaMan\MediaChannel;
 
+use FarhanShares\MediaMan\MediaChannel;
 
 class MediaChannelTest extends TestCase
 {

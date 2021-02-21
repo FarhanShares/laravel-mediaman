@@ -2,8 +2,8 @@
 
 namespace FarhanShares\MediaMan\Tests;
 
-use FarhanShares\MediaMan\MediaUploader;
 
+use FarhanShares\MediaMan\MediaUploader;
 
 class MediaCollectionTest extends TestCase
 {
