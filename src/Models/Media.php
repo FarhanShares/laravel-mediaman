@@ -134,4 +134,22 @@ class Media extends Model
     {
         return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
     }
+
+    public function syncCollection($collectionName, $detaching = false)
+    {
+        $collection = MediaCollection::findByName($collectionName);
+        if ($collection) {
+            return $this->collections()->sync($collection->id, $detaching);
+        }
+        return false;
+    }
+
+    public function syncCollections($collectionNames, $detaching = false)
+    {
+        $res = [];
+        foreach ($collectionNames as $collection) {
+            $res[] = $this->syncCollection($collection, $detaching);
+        }
+        return $res;
+    }
 }
