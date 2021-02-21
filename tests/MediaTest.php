@@ -130,22 +130,38 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_a_collection()
+    public function it_can_sync_a_collection_by_id()
     {
-        $this->mediaCollection::firstOrCreate([
+        $collection = $this->mediaCollection::firstOrCreate([
             'name' => 'Test Collection'
         ]);
 
         $media = $this->media;
         $media->id = 1;
-        $media->syncCollection('Test Collection');
+        $media->syncCollection($collection->id);
 
         $this->assertEquals(1, $media->collections()->count());
-        $this->assertEquals('Test Collection', $media->collections[0]->name);
+        $this->assertEquals($collection->name, $media->collections[0]->name);
+    }
+
+
+    /** @test */
+    public function it_can_sync_a_collection_by_name()
+    {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollection($collection->name);
+
+        $this->assertEquals(1, $media->collections()->count());
+        $this->assertEquals($collection->name, $media->collections[0]->name);
     }
 
     /** @test */
-    public function it_can_sync_multiple_collections()
+    public function it_can_sync_multiple_collections_by_name()
     {
         $this->mediaCollection::firstOrCreate([
             'name' => 'Test Collection'
@@ -154,6 +170,22 @@ class MediaTest extends TestCase
         $media = $this->media;
         $media->id = 1;
         $media->syncCollections(['Default', 'Test Collection']);
+
+        $this->assertEquals(2, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('Test Collection', $media->collections[1]->name);
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_collections_by_id()
+    {
+        $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollections([1, 2]);
 
         $this->assertEquals(2, $media->collections()->count());
         $this->assertEquals('Default', $media->collections[0]->name);
