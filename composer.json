@@ -1,5 +1,5 @@
 {
-    "name": "farhanshares/mediaman",
+    "name": "farhanshares/laravel-mediaman",
     "license": "MIT",
     "authors": [
         {
@@ -8,8 +8,7 @@
         }
     ],
     "require": {
-        "php": "^7.3",
-        "laravel/framework": "~5.8.0|^6.0|^7.0|^8.0",
+        "php": "^8.0|^7.3",
         "intervention/image": "^2.5"
     },
     "require-dev": {

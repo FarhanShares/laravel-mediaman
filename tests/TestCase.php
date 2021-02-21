@@ -2,14 +2,24 @@
 
 namespace FarhanShares\MediaMan\Tests;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use FarhanShares\MediaMan\MediaManServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TestCase extends BaseTestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
+
+    const DEFAULT_DISK = 'default';
+
+    protected $file;
+
+    protected $media;
+
+    protected $mediaCollection;
 
     protected function setUp(): void
     {
@@ -17,6 +27,20 @@ class TestCase extends BaseTestCase
 
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->withFactories(__DIR__ . '/database/factories');
+
+        // Use a test disk as the default disk...
+        Config::set('mediaman.disk', self::DEFAULT_DISK);
+
+        // Create a test filesystem for the default disk...
+        Storage::fake(self::DEFAULT_DISK);
+
+        // Media & MediaCollection models
+        $this->media = resolve(config('mediaman.models.media'));
+        $this->mediaCollection = resolve(config('mediaman.models.collection'));
+
+        // Fake uploaded files
+        $this->fileOne = UploadedFile::fake()->image('file-one.jpg');
+        $this->fileTwo = UploadedFile::fake()->image('file-two.jpg');
     }
 
     protected function getPackageProviders($app)

@@ -5,6 +5,7 @@ namespace FarhanShares\MediaMan\Tests;
 use Mockery;
 use Illuminate\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\Media;
+use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Tests\TestCase;
 
 class MediaTest extends TestCase
@@ -126,5 +127,102 @@ class MediaTest extends TestCase
         $media->shouldReceive('filesystem')->once()->andReturn($filesystem);
 
         $this->assertEquals('url', $media->getUrl('thumbnail'));
+    }
+
+    /** @test */
+    public function it_can_sync_a_collection_by_id()
+    {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollection($collection->id);
+
+        $this->assertEquals(1, $media->collections()->count());
+        $this->assertEquals($collection->name, $media->collections[0]->name);
+    }
+
+
+    /** @test */
+    public function it_can_sync_a_collection_by_name()
+    {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollection($collection->name);
+
+        $this->assertEquals(1, $media->collections()->count());
+        $this->assertEquals($collection->name, $media->collections[0]->name);
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_collections_by_name()
+    {
+        $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollections(['Default', 'Test Collection']);
+
+        $this->assertEquals(2, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('Test Collection', $media->collections[1]->name);
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_collections_by_id()
+    {
+        $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollections([1, 2]);
+
+        $this->assertEquals(2, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('Test Collection', $media->collections[1]->name);
+    }
+
+    /** @test */
+    public function we_can_attach_media_to_a_collection()
+    {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'my-collection'
+        ]);
+
+        MediaUploader::source($this->fileOne)->upload();
+        $media = $this->media::latest()->first();
+
+        $media->collections()->sync($collection->id);
+
+        $this->assertEquals('my-collection', $media->collections()->first()->name);
+    }
+
+    /** @test */
+    public function we_can_sync_a_collection_of_media()
+    {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'another-collection'
+        ]);
+
+        MediaUploader::source($this->fileOne)->upload();
+        $media = $this->media::latest()->first();
+
+        $media->collections()->sync([]);
+
+        $this->assertEquals(null, $media->collections()->first());
+
+        $media->syncCollection("another-collection");
+
+        $this->assertEquals("another-collection", $media->collections[0]->name);
     }
 }

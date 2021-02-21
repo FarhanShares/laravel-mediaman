@@ -134,4 +134,34 @@ class Media extends Model
     {
         return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
     }
+
+
+    public function syncCollection($collection, $detaching = false)
+    {
+        if (is_numeric($collection)) {
+            $fetch = MediaCollection::find($collection);
+        } else if (is_string($collection)) {
+            $fetch = MediaCollection::findByName($collection);
+        } else {
+            return false;
+        }
+
+        if ($fetch) {
+            return $this->collections()->sync($fetch->id, $detaching);
+        }
+        return false;
+    }
+
+
+    public function syncCollections(array $collections, $detaching = false)
+    {
+        if (is_numeric($collections[0])) {
+            $fetchCollections = MediaCollection::find($collections);
+        } else {
+            $fetchCollections = MediaCollection::findByName($collections);
+        }
+
+        $ids = $fetchCollections->pluck('id');
+        return $this->collections()->sync($ids, $detaching);
+    }
 }
