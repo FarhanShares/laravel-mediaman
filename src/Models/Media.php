@@ -164,4 +164,43 @@ class Media extends Model
         $ids = $fetchCollections->pluck('id');
         return $this->collections()->sync($ids, $detaching);
     }
+
+    public function attachCollection($collection)
+    {
+        if (is_string($collection) && $fetch = MediaCollection::findByName($collection)) {
+            return $this->collections()->attach($fetch->id);
+        }
+
+        $id = is_numeric($collection)
+            ? $collection
+            : (is_object($collection)
+                ? $collection->id
+                : null);
+
+        if ($id) {
+            return $this->collections()->attach($id);
+        }
+
+        return false;
+    }
+
+    public function attachCollections($collections)
+    {
+        if (is_numeric($collections[0])) {
+            return $this->collections()->attach($collections);
+            // $fetchCollections = MediaCollection::find($collections);
+        }
+
+        if (is_object($collections[0])) {
+            $ids = $collections->pluck('id');
+            return $this->collections()->attach($ids);
+        }
+
+        $fetchCollections = MediaCollection::findByName($collections);
+        $ids = $fetchCollections->pluck('id');
+        if ($ids) {
+            return $this->collections()->attach($ids);
+        }
+        return false;
+    }
 }
