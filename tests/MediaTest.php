@@ -127,4 +127,35 @@ class MediaTest extends TestCase
 
         $this->assertEquals('url', $media->getUrl('thumbnail'));
     }
+
+    /** @test */
+    public function it_can_sync_a_collection()
+    {
+        $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollection('Test Collection');
+
+        $this->assertEquals(1, $media->collections()->count());
+        $this->assertEquals('Test Collection', $media->collections[0]->name);
+    }
+
+    /** @test */
+    public function it_can_sync_multiple_collections()
+    {
+        $this->mediaCollection::firstOrCreate([
+            'name' => 'Test Collection'
+        ]);
+
+        $media = $this->media;
+        $media->id = 1;
+        $media->syncCollections(['Default', 'Test Collection']);
+
+        $this->assertEquals(2, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('Test Collection', $media->collections[1]->name);
+    }
 }
