@@ -9,11 +9,18 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.0, 7.4, 7.3, 7.2]
-        laravel: [8.*, 7.*, 6.*, 5.*]
+        laravel: [8.*, 7.*, 6.*]
         dependency-versions: [prefer-stable]
+        include:
+          - laravel: 8.*
+            testbench: 6.*
+          - laravel: 7.*
+            testbench: 5.*
+          - laravel: 6.*
+            testbench: 4.*
         exclude:
-          - php: 7.2
-            laravel: 8.*
+          - laravel: 8.*
+            php: 7.2
 
     name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }} / ${{ matrix.dependency-versions }}
 
@@ -45,5 +52,5 @@ jobs:
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update --dev
           composer update --${{ matrix.dependency-versions }} --prefer-dist --no-interaction --no-suggest
 
-      - name: Run Unit tests
-        run: vendor/bin/phpunit --testsuite Unit
+      - name: Run tests
+        run: vendor/bin/phpunit
