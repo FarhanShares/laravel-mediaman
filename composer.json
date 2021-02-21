@@ -1,18 +1,36 @@
 {
     "name": "farhanshares/laravel-mediaman",
     "license": "MIT",
+    "description": "MediaMan - Elegant & Powerful media management package for Laravel!",
+    "keywords": [
+        "laravel package",
+        "laravel media",
+        "laravel mediaman",
+        "laravel media collection",
+        "laravel media management",
+        "laravel file management",
+        "laravel media manager",
+        "laravel file manager"
+    ],
+	"homepage": "https://github.com/FarhanShares/laravel-mediaman",
     "authors": [
         {
             "name": "Farhan Israq",
-            "email": "farhanshares@outlook.com"
+            "email": "farhanshares@outlook.com",
+            "homepage": "https://farhanshares.com",
+            "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.0|^7.3",
+        "illuminate/support": "^7.0|^8.0",
+        "illuminate/database": "^7.0|^8.0",
+        "illuminate/validation": "^7.0|^8.0",
         "intervention/image": "^2.5"
     },
     "require-dev": {
-        "orchestra/testbench": "~3.8.6|^4.8|^5.2|^6.0",
+        "laravel/framework": "^7.0|^8.0",
+        "orchestra/testbench": "^5.0|^6.0",
         "mockery/mockery": "^1.2.3",
         "laravel/legacy-factories": "^1.0.4"
     },
@@ -32,5 +50,7 @@
                 "FarhanShares\\MediaMan\\MediaManServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
