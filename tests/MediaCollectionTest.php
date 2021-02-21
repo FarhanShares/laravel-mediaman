@@ -63,8 +63,8 @@ class MediaCollectionTest extends TestCase
 
         $imageCollection = $this->mediaCollection->findByName('images');
 
-        $two = $imageCollection->media[1];
         $one = $imageCollection->media[0];
+        $two = $imageCollection->media[1];
 
         $this->assertEquals(2, $imageCollection->count());
 
