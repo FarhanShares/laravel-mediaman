@@ -23,10 +23,7 @@ class MediaUploader
     protected $disk;
 
     /** @var string */
-    protected $data;
-
-    /** @var array */
-    protected $attributes = [];
+    protected $data = [];
 
     /**
      * Create a new uploader instance.
@@ -112,6 +109,15 @@ class MediaUploader
     }
 
     /**
+     * @param string $name
+     * @return MediaUploader
+     */
+    public function toCollection(string $name)
+    {
+        return $this->setCollection($name);
+    }
+
+    /**
      * Set the name of the file.
      *
      * @param string $fileName
@@ -167,25 +173,21 @@ class MediaUploader
     }
 
     /**
-     * Set any custom attributes to be saved to the media item.
+     * Set any custom data to be saved to the media item.
      *
-     * @param array $attributes
+     * @param array $data
      * @return MediaUploader
      */
-    public function withAttributes(array $attributes)
+    public function withData(array $data)
     {
-        $this->attributes = $attributes;
+        $this->data = $data;
 
         return $this;
     }
 
-    /**
-     * @param array $properties
-     * @return MediaUploader
-     */
-    public function withProperties(array $properties)
+    public function useData(array $data)
     {
-        return $this->withAttributes($properties);
+        return $this->withData($data);
     }
 
     /**
@@ -204,8 +206,7 @@ class MediaUploader
         $media->disk = $this->disk ?: config('mediaman.disk');
         $media->mime_type = $this->file->getMimeType();
         $media->size = $this->file->getSize();
-
-        $media->forceFill($this->attributes);
+        $media->data = $this->data;
 
         $media->save();
 
