@@ -15,6 +15,12 @@ class TestCase extends BaseTestCase
 
     const DEFAULT_DISK = 'default';
 
+    protected $file;
+
+    protected $media;
+
+    protected $mediaCollection;
+
     protected function setUp(): void
     {
         parent::setUp();
