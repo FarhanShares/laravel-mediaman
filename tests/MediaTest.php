@@ -297,6 +297,42 @@ class MediaTest extends TestCase
     }
 
     /** @test */
+    public function it_can_detach_a_media_to_a_collection_using_collection_id()
+    {
+        $collection = $this->mediaCollection::first(); // default collection
+
+        $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
+        $this->assertEquals(1, $media->collections()->count());
+
+        $media->detachCollection($collection->id);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_detach_a_collection_from_a_media_using_collection_name()
+    {
+        $collection = $this->mediaCollection::first(); // default collection
+
+        $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
+        $this->assertEquals(1, $media->collections()->count());
+
+        $media->detachCollection($collection->name);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_detach_a_collection_from_a_media_using_collection_object()
+    {
+        $collection = $this->mediaCollection::first(); // default collection
+
+        $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
+        $this->assertEquals(1, $media->collections()->count());
+
+        $media->detachCollection($collection);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
     public function we_can_sync_a_collection_of_media()
     {
         $collection = $this->mediaCollection::firstOrCreate([
