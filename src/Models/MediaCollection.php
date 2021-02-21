@@ -30,9 +30,13 @@ class MediaCollection extends Model
         return config('mediaman.tables.collections');
     }
 
-    public  function scopeFindByName($query, string $name, array $columns = ['*'])
+    public  function scopeFindByName($query, $names, array $columns = ['*'])
     {
-        return $query->select($columns)->where('name', $name)->first();
+        if (is_array($names)) {
+            return $query->select($columns)->whereIn('name', $names)->get();
+        }
+
+        return $query->select($columns)->where('name', $names)->first();
     }
     /**
      * The media that belong to the collection.
