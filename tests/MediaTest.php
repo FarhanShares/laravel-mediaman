@@ -5,6 +5,7 @@ namespace FarhanShares\MediaMan\Tests;
 use Mockery;
 use Illuminate\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\Media;
+use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Tests\TestCase;
 
 class MediaTest extends TestCase
@@ -157,5 +158,39 @@ class MediaTest extends TestCase
         $this->assertEquals(2, $media->collections()->count());
         $this->assertEquals('Default', $media->collections[0]->name);
         $this->assertEquals('Test Collection', $media->collections[1]->name);
+    }
+
+    /** @test */
+    public function we_can_attach_media_to_a_collection()
+    {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'my-collection'
+        ]);
+
+        MediaUploader::source($this->fileOne)->upload();
+        $media = $this->media::latest()->first();
+
+        $media->collections()->sync($collection->id);
+
+        $this->assertEquals('my-collection', $media->collections()->first()->name);
+    }
+
+    /** @test */
+    public function we_can_sync_a_collection_of_media()
+    {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'another-collection'
+        ]);
+
+        MediaUploader::source($this->fileOne)->upload();
+        $media = $this->media::latest()->first();
+
+        $media->collections()->sync([]);
+
+        $this->assertEquals(null, $media->collections()->first());
+
+        $media->syncCollection("another-collection");
+
+        $this->assertEquals("another-collection", $media->collections[0]->name);
     }
 }
