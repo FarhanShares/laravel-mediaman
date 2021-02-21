@@ -135,19 +135,28 @@ class Media extends Model
         return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
     }
 
-    public function syncCollection($collectionName, $detaching = false)
+
+    public function syncCollection($collection, $detaching = false)
     {
-        $collection = MediaCollection::findByName($collectionName);
-        if ($collection) {
-            return $this->collections()->sync($collection->id, $detaching);
+        if (is_numeric($collection)) {
+            $fetch = MediaCollection::find($collection);
+        } else if (is_string($collection)) {
+            $fetch = MediaCollection::findByName($collection);
+        } else {
+            return false;
+        }
+
+        if ($fetch) {
+            return $this->collections()->sync($fetch->id, $detaching);
         }
         return false;
     }
 
-    public function syncCollections($collectionNames, $detaching = false)
+
+    public function syncCollections(array $collections, $detaching = false)
     {
         $res = [];
-        foreach ($collectionNames as $collection) {
+        foreach ($collections as $collection) {
             $res[] = $this->syncCollection($collection, $detaching);
         }
         return $res;
