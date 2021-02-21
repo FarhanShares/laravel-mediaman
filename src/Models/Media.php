@@ -155,6 +155,7 @@ class Media extends Model
 
     public function syncCollections(array $collections, $detaching = false)
     {
+        // todo: allow empty array to remove all collection
         if (is_numeric($collections[0])) {
             $fetchCollections = MediaCollection::find($collections);
         } else {
@@ -186,21 +187,21 @@ class Media extends Model
 
     public function attachCollections($collections)
     {
-        if (is_numeric($collections[0])) {
-            return $this->collections()->attach($collections);
-            // $fetchCollections = MediaCollection::find($collections);
-        }
-
-        if (is_object($collections[0])) {
+        if (is_object($collections)) {
             $ids = $collections->pluck('id');
             return $this->collections()->attach($ids);
         }
 
-        $fetchCollections = MediaCollection::findByName($collections);
-        $ids = $fetchCollections->pluck('id');
-        if ($ids) {
+        if (is_array($collections) && is_numeric($collections[0])) {
+            return $this->collections()->attach($collections);
+        }
+
+        if (is_array($collections) && is_string($collections[0])) {
+            $fetchCollections = MediaCollection::findByName($collections);
+            $ids = $fetchCollections->pluck('id');
             return $this->collections()->attach($ids);
         }
+
         return false;
     }
 }
