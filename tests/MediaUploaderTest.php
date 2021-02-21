@@ -96,16 +96,14 @@ class MediaUploaderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_save_custom_data_to_the_media_model()
+    public function it_can_save_data_to_the_media_model()
     {
         $file = UploadedFile::fake()->image('image.jpg');
 
         $media = MediaUploader::source($file)
-            ->withAttributes([
-                'data' => [
-                    'test-01' => 'test data 01',
-                    'test-02' => 'test data 02'
-                ],
+            ->withData([
+                'test-01' => 'test data 01',
+                'test-02' => 'test data 02'
             ])
             ->upload();
 
