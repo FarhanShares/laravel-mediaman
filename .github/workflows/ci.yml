@@ -8,9 +8,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [7.4, 7.3]
+        php: [8.0, 7.4, 7.3]
         laravel: [^8.0, ^7.0, ^6.0, ~5.8.0]
-        dependency-versions: [prefer-lowest, prefer-stable]
+        dependency-versions: [prefer-stable]
         include:
           - laravel: ^8.0
             testbench: ^6.0
@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.composer/cache/files
           key: dependencies-composer-${{ hashFiles('composer.json') }}-php-${{ matrix.php }}-laravel-${{ matrix.laravel }}
