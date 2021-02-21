@@ -15,7 +15,7 @@ class CreateMediaManCollectionsTable extends Migration
     public function up()
     {
         Schema::create(config('mediaman.tables.collections'), function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('name');
             $table->timestamps();
         });
