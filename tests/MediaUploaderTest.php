@@ -2,28 +2,14 @@
 
 namespace FarhanShares\MediaMan\Tests;
 
+
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Config;
 use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Support\Facades\Storage;
-
 use FarhanShares\MediaMan\MediaUploader;
 
 class MediaUploaderTest extends TestCase
 {
-    const DEFAULT_DISK = 'default';
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // Use a test disk as the default disk...
-        Config::set('mediaman.disk', self::DEFAULT_DISK);
-
-        // Create a test filesystem for the default disk...
-        Storage::fake(self::DEFAULT_DISK);
-    }
-
     /** @test */
     public function it_can_upload_a_file_to_the_default_disk()
     {

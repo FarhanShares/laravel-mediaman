@@ -2,13 +2,8 @@
 
 namespace FarhanShares\MediaMan\Tests;
 
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Config;
-use FarhanShares\MediaMan\MediaChannel;
-use Illuminate\Support\Facades\Storage;
-use FarhanShares\MediaMan\MediaUploader;
-use FarhanShares\MediaMan\Models\MediaCollection;
 
+use FarhanShares\MediaMan\MediaUploader;
 
 class MediaCollectionTest extends TestCase
 {

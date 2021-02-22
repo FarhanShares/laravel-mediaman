@@ -2,6 +2,7 @@
 
 namespace FarhanShares\MediaMan\Tests;
 
+
 use Mockery;
 use Illuminate\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\Media;
@@ -193,36 +194,194 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function we_can_attach_media_to_a_collection()
+    public function it_can_attach_a_media_to_a_collection_using_collection_id()
     {
-        $collection = $this->mediaCollection::firstOrCreate([
-            'name' => 'my-collection'
-        ]);
+        $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $collectionTwo = $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
 
-        MediaUploader::source($this->fileOne)->upload();
-        $media = $this->media::latest()->first();
+        $media = MediaUploader::source($this->fileOne)->upload();
 
-        $media->collections()->sync($collection->id);
+        $media->attachCollection($collection->id);
+        $media->attachCollection($collectionTwo->id);
 
-        $this->assertEquals('my-collection', $media->collections()->first()->name);
+        $this->assertEquals(3, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('my-collection', $media->collections[1]->name);
+        $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
     /** @test */
-    public function we_can_sync_a_collection_of_media()
+    public function it_can_attach_a_media_to_a_collection_using_collection_name()
     {
-        $collection = $this->mediaCollection::firstOrCreate([
-            'name' => 'another-collection'
-        ]);
+        $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $collectionTwo = $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
 
-        MediaUploader::source($this->fileOne)->upload();
-        $media = $this->media::latest()->first();
+        $media = MediaUploader::source($this->fileOne)->upload();
 
-        $media->collections()->sync([]);
+        $media->attachCollection($collection->name);
+        $media->attachCollection($collectionTwo->name);
 
-        $this->assertEquals(null, $media->collections()->first());
+        $this->assertEquals(3, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('my-collection', $media->collections[1]->name);
+        $this->assertEquals('another-collection', $media->collections[2]->name);
+    }
 
-        $media->syncCollection("another-collection");
+    /** @test */
+    public function it_can_attach_a_media_to_a_collection_using_collection_object()
+    {
+        $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $collectionTwo = $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
 
-        $this->assertEquals("another-collection", $media->collections[0]->name);
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        $media->attachCollection($collection);
+        $media->attachCollection($collectionTwo);
+
+        $this->assertEquals(3, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('my-collection', $media->collections[1]->name);
+        $this->assertEquals('another-collection', $media->collections[2]->name);
+    }
+
+    /** @test */
+    public function it_can_attach_a_media_to_multiple_collections_using_collection_ids()
+    {
+        $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+        $collections = $this->mediaCollection->all();
+
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        $media->attachCollections([$collections[1]->id, $collections[2]->id]);
+
+        $this->assertEquals(3, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('my-collection', $media->collections[1]->name);
+        $this->assertEquals('another-collection', $media->collections[2]->name);
+    }
+
+    /** @test */
+    public function it_can_attach_a_media_to_multiple_collections_using_collection_names()
+    {
+        $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+        $collections = $this->mediaCollection->all();
+
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        $media->attachCollections([$collections[1]->name, $collections[2]->name]);
+
+        $this->assertEquals(3, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('my-collection', $media->collections[1]->name);
+        $this->assertEquals('another-collection', $media->collections[2]->name);
+    }
+
+    /** @test */
+    public function it_can_attach_a_media_to_multiple_collections_using_collection_object()
+    {
+        $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+        $collections = $this->mediaCollection->all();
+
+        $media = MediaUploader::source($this->fileOne)->upload();
+        // $media->syncCollections([]); // remove the default collection
+        $media->attachCollections($collections);
+
+        $this->assertEquals(4, $media->collections()->count());
+        $this->assertEquals('Default', $media->collections[0]->name);
+        $this->assertEquals('Default', $media->collections[1]->name);
+        $this->assertEquals('my-collection', $media->collections[2]->name);
+        $this->assertEquals('another-collection', $media->collections[3]->name);
+    }
+
+    /** @test */
+    public function it_can_detach_a_media_to_a_collection_using_collection_id()
+    {
+        $collection = $this->mediaCollection::first(); // default collection
+
+        $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
+        $this->assertEquals(1, $media->collections()->count());
+
+        $media->detachCollection($collection->id);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_detach_a_collection_from_a_media_using_collection_name()
+    {
+        $collection = $this->mediaCollection::first(); // default collection
+
+        $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
+        $this->assertEquals(1, $media->collections()->count());
+
+        $media->detachCollection($collection->name);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_detach_a_collection_from_a_media_using_collection_object()
+    {
+        $collection = $this->mediaCollection::first(); // default collection
+
+        $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
+        $this->assertEquals(1, $media->collections()->count());
+
+        $media->detachCollection($collection);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_detach_multiple_collections_from_a_media_using_collection_ids()
+    {
+        $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+        $collections = $this->mediaCollection->all();
+
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        $media->attachCollections([$collections[1]->id, $collections[2]->id]);
+        $this->assertEquals(3, $media->collections()->count());
+
+        $media->detachCollections([$collections[0]->id, $collections[1]->id, $collections[2]->id]);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_detach_multiple_collections_from_a_media_using_collection_names()
+    {
+        $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+
+        $collections = $this->mediaCollection->all();
+        $this->assertEquals(3, $collections->count());
+
+        // default collection
+        $media = MediaUploader::source($this->fileOne)->upload();
+        $this->assertEquals(1, $media->collections()->count());
+
+        // add to more collections
+        $media->attachCollections([$collections[1]->name, $collections[2]->name]);
+        $this->assertEquals(3, $media->collections()->count());
+
+        // detach from all collections
+        $media->detachCollections([$collections[0]->id, $collections[1]->id, $collections[2]->id]);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_detach_multiple_collections_from_a_media_using_collection_object()
+    {
+        $collections = $this->mediaCollection->all();
+        $this->assertEquals(1, $collections->count());
+
+        // default collection
+        $media = MediaUploader::source($this->fileOne)->upload();
+        $this->assertEquals(1, $media->collections()->count());
+
+        // detach from all collections
+        $media->detachCollections($collections);
+        $this->assertEquals(0, $media->collections()->count());
     }
 }
