@@ -144,19 +144,10 @@ class Media extends Model
             return $this->collections()->sync([]);
         }
 
-        if (is_numeric($collection)) {
-            $fetch = MediaCollection::find($collection);
-        } else if (is_object($collection)) {
-            $fetch = MediaCollection::find($collection->id);
-        } else if (is_string($collection)) {
-            $fetch = MediaCollection::findByName($collection);
-        } else {
-            return false;
-        }
-
-        if ($fetch) {
+        if ($fetch = $this->fetchCollections($collection)) {
             return $this->collections()->sync($fetch->id, $detaching);
         }
+
         return false;
     }
 
@@ -167,22 +158,12 @@ class Media extends Model
             return $this->collections()->sync([]);
         }
 
-        // fetch collections based on the first item type
-        // to verify the collection really exists
-        // todo: throw exception?
-        // todo: improve it (instance of Model or Collection checking)
-        if (is_numeric($collections[0])) {
-            $fetchCollections = MediaCollection::find($collections);
-        } else {
-            $fetchCollections = MediaCollection::findByName($collections);
-        }
-
-        // perform synchronization
-        if ($fetchCollections) {
-            $ids = $fetchCollections->pluck('id');
+        $fetch = $this->fetchCollections($collections);
+        if (count($fetch) > 0) {
+            $ids = $fetch->pluck('id');
             return $this->collections()->sync($ids, $detaching);
         }
-        // todo: throw exception?
+
         return false;
     }
 
