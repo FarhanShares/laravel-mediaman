@@ -188,18 +188,8 @@ class Media extends Model
 
     public function attachCollection($collection)
     {
-        if (is_string($collection) && $fetch = MediaCollection::findByName($collection)) {
+        if ($fetch = $this->fetchCollections($collection)) {
             return $this->collections()->attach($fetch->id);
-        }
-
-        $id = is_numeric($collection)
-            ? $collection
-            : (is_object($collection)
-                ? $collection->id
-                : null);
-
-        if ($id) {
-            return $this->collections()->attach($id);
         }
 
         return false;
@@ -207,18 +197,9 @@ class Media extends Model
 
     public function attachCollections($collections)
     {
-        if (is_object($collections)) {
-            $ids = $collections->pluck('id');
-            return $this->collections()->attach($ids);
-        }
-
-        if (is_array($collections) && is_numeric($collections[0])) {
-            return $this->collections()->attach($collections);
-        }
-
-        if (is_array($collections) && is_string($collections[0])) {
-            $fetchCollections = MediaCollection::findByName($collections);
-            $ids = $fetchCollections->pluck('id');
+        $fetch = $this->fetchCollections($collections);
+        if (count($fetch) > 0) {
+            $ids = $fetch->pluck('id');
             return $this->collections()->attach($ids);
         }
 
@@ -244,18 +225,8 @@ class Media extends Model
             return $this->collections()->detach();
         }
 
-        if (is_object($collections)) {
-            $ids = $collections->pluck('id');
-            return $this->collections()->detach($ids);
-        }
-
-        if (is_array($collections) && is_numeric($collections[0])) {
-            return $this->collections()->detach($collections);
-        }
-
-        if (is_array($collections) && is_string($collections[0])) {
-            $fetchCollections = MediaCollection::findByName($collections);
-            $ids = $fetchCollections->pluck('id');
+        if ($fetch = $this->fetchCollections($collections)) {
+            $ids = $fetch->pluck('id')->all();
             return $this->collections()->detach($ids);
         }
 
