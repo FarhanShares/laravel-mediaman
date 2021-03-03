@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\Media;
 use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Tests\TestCase;
+use Illuminate\Database\Eloquent\Collection as ElCollection;
 
 class MediaTest extends TestCase
 {
@@ -281,19 +282,26 @@ class MediaTest extends TestCase
     /** @test */
     public function it_can_attach_a_media_to_multiple_collections_using_collection_object()
     {
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        // detach all collections
+        $media->syncCollections([]);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // create collections
         $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
         $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+
+        // retrieve all collections
         $collections = $this->mediaCollection->all();
+        $this->assertEquals(3, $collections->count());
 
-        $media = MediaUploader::source($this->fileOne)->upload();
-        // $media->syncCollections([]); // remove the default collection
+        // attach all collections
         $media->attachCollections($collections);
-
-        $this->assertEquals(4, $media->collections()->count());
+        $this->assertEquals(3, $media->collections()->count());
         $this->assertEquals('Default', $media->collections[0]->name);
-        $this->assertEquals('Default', $media->collections[1]->name);
-        $this->assertEquals('my-collection', $media->collections[2]->name);
-        $this->assertEquals('another-collection', $media->collections[3]->name);
+        $this->assertEquals('my-collection', $media->collections[1]->name);
+        $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
     /** @test */
