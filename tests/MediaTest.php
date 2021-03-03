@@ -379,6 +379,47 @@ class MediaTest extends TestCase
     }
 
     /** @test */
+    public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_sync_collection()
+    {
+        $media = MediaUploader::source($this->fileOne)->upload();
+        $collection = $this->mediaCollection->first();
+
+        // sync with bool true resets back to zero collection
+        $media->syncCollection(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach a collections
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // sync with bool false resets back to zero collection
+        $media->syncCollection(false);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach a collection again
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // sync with null resets back to zero collection
+        $media->syncCollections(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach a collection again
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // sync with empty-string resets back to zero collection
+        $media->syncCollections('');
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach all collections again
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // sync with empty-array resets back to zero collection
+        $media->syncCollection([]);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
     public function it_can_detach_multiple_collections_from_a_media_using_collection_object()
     {
         $collections = $this->mediaCollection->all();
@@ -390,6 +431,147 @@ class MediaTest extends TestCase
 
         // detach from all collections
         $media->detachCollections($collections);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_sync()
+    {
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        // create collections
+        $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+        // retrieve all collections
+        $collections = $this->mediaCollection->all();
+        $this->assertEquals(3, $collections->count());
+
+
+        // default collection
+        $this->assertEquals(1, $media->collections()->count());
+        // sync with bool true resets back to zero collection
+        $media->syncCollections(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach all collections
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // sync with bool false resets back to zero collection
+        $media->syncCollections(false);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach all collections again
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // sync with null resets back to zero collection
+        $media->syncCollections(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach all collections again
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // sync with empty-string resets back to zero collection
+        $media->syncCollections('');
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach all collections again
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // sync with empty-array resets back to zero collection
+        $media->syncCollections([]);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_detach_collection()
+    {
+        $media = MediaUploader::source($this->fileOne)->upload();
+        $collection = $this->mediaCollection->first();
+
+        // detach with bool true resets back to zero collection
+        $media->detachCollection(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach a collections
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // detach with bool false resets back to zero collection
+        $media->detachCollection(false);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach a collection again
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // detach with null resets back to zero collection
+        $media->detachCollections(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach a collection again
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // detach with empty-string resets back to zero collection
+        $media->detachCollections('');
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach all collections again
+        $media->attachCollection($collection);
+        $this->assertEquals(1, $media->collections()->count());
+        // detach with empty-array resets back to zero collection
+        $media->detachCollection([]);
+        $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_detach_collections()
+    {
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        // create collections
+        $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
+        $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
+        // retrieve all collections
+        $collections = $this->mediaCollection->all();
+        $this->assertEquals(3, $collections->count());
+
+
+        // default collection
+        $this->assertEquals(1, $media->collections()->count());
+        // detach with bool true resets back to zero collection
+        $media->detachCollections(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach all collections
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // detach with bool false resets back to zero collection
+        $media->detachCollections(false);
+        $this->assertEquals(0, $media->collections()->count());
+
+        // attach all collections again
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // detach with null resets back to zero collection
+        $media->detachCollections(true);
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach all collections again
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // detach with empty-string resets back to zero collection
+        $media->detachCollections('');
+        $this->assertEquals(0, $media->collections()->count());
+
+
+        // attach all collections again
+        $media->attachCollections($collections);
+        $this->assertEquals(3, $media->collections()->count());
+        // detach with empty-array resets back to zero collection
+        $media->detachCollections([]);
         $this->assertEquals(0, $media->collections()->count());
     }
 }
