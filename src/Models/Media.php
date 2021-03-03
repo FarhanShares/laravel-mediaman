@@ -2,10 +2,12 @@
 
 namespace FarhanShares\MediaMan\Models;
 
-
+use Countable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection as BaseCollection;
 use FarhanShares\MediaMan\Casts\Json;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\MediaCollection;
@@ -136,10 +138,16 @@ class Media extends Model
     }
 
 
-    public function syncCollection($collection, $detaching = false)
+    public function syncCollection($collection, $detaching = true)
     {
+        if ($this->shouldDetachAll($collection)) {
+            return $this->collections()->sync([]);
+        }
+
         if (is_numeric($collection)) {
             $fetch = MediaCollection::find($collection);
+        } else if (is_object($collection)) {
+            $fetch = MediaCollection::find($collection->id);
         } else if (is_string($collection)) {
             $fetch = MediaCollection::findByName($collection);
         } else {
@@ -153,17 +161,29 @@ class Media extends Model
     }
 
 
-    public function syncCollections(array $collections, $detaching = false)
+    public function syncCollections($collections, $detaching = true)
     {
-        // todo: allow empty array to remove all collection
+        if ($this->shouldDetachAll($collections)) {
+            return $this->collections()->sync([]);
+        }
+
+        // fetch collections based on the first item type
+        // to verify the collection really exists
+        // todo: throw exception?
+        // todo: improve it (instance of Model or Collection checking)
         if (is_numeric($collections[0])) {
             $fetchCollections = MediaCollection::find($collections);
         } else {
             $fetchCollections = MediaCollection::findByName($collections);
         }
 
-        $ids = $fetchCollections->pluck('id');
-        return $this->collections()->sync($ids, $detaching);
+        // perform synchronization
+        if ($fetchCollections) {
+            $ids = $fetchCollections->pluck('id');
+            return $this->collections()->sync($ids, $detaching);
+        }
+        // todo: throw exception?
+        return false;
     }
 
     public function attachCollection($collection)
@@ -207,6 +227,10 @@ class Media extends Model
 
     public function detachCollection($collection)
     {
+        if ($this->shouldDetachAll($collection)) {
+            return $this->collections()->detach();
+        }
+
         if (is_string($collection) && $fetch = MediaCollection::findByName($collection)) {
             return $this->collections()->detach($fetch->id);
         }
@@ -226,6 +250,10 @@ class Media extends Model
 
     public function detachCollections($collections)
     {
+        if ($this->shouldDetachAll($collections)) {
+            return $this->collections()->detach();
+        }
+
         if (is_object($collections)) {
             $ids = $collections->pluck('id');
             return $this->collections()->detach($ids);
@@ -239,6 +267,20 @@ class Media extends Model
             $fetchCollections = MediaCollection::findByName($collections);
             $ids = $fetchCollections->pluck('id');
             return $this->collections()->detach($ids);
+        }
+
+        return false;
+    }
+
+    // bool|null|empty-string|empty-array to detach all collections
+    private function shouldDetachAll($collections)
+    {
+        if (is_bool($collections) || is_null($collections) || empty($collections)) {
+            return true;
+        }
+
+        if (is_countable($collections) && count($collections) === 0) {
+            return true;
         }
 
         return false;
