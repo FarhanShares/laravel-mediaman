@@ -231,18 +231,8 @@ class Media extends Model
             return $this->collections()->detach();
         }
 
-        if (is_string($collection) && $fetch = MediaCollection::findByName($collection)) {
+        if ($fetch = $this->fetchCollections($collection)) {
             return $this->collections()->detach($fetch->id);
-        }
-
-        $id = is_numeric($collection)
-            ? $collection
-            : (is_object($collection)
-                ? $collection->id
-                : null);
-
-        if ($id) {
-            return $this->collections()->detach($id);
         }
 
         return false;
@@ -281,6 +271,42 @@ class Media extends Model
 
         if (is_countable($collections) && count($collections) === 0) {
             return true;
+        }
+
+        return false;
+    }
+
+    // returns single collection for single item
+    // and multiple collections for multiple items
+    private function fetchCollections($collections)
+    {
+
+
+        if ($collections instanceof BaseCollection || $collections instanceof EloquentCollection) {
+            $ids = $collections->pluck('id')->all();
+            return $this->collections()->find($ids);
+        }
+
+        if (is_object($collections)) {
+            return $this->collections()->find($collections->id);
+        }
+
+        if (is_numeric($collections)) {
+            return $this->collections()->find($collections);
+        }
+
+        if (is_string($collections)) {
+            return $this->collections()->findByName($collections);
+        }
+
+        if (is_array($collections) && count($collections) > 0) {
+            if (is_numeric($collections[0])) {
+                return $this->collections()->find($collections);
+            }
+
+            if (is_string($collections[0])) {
+                return $this->collections()->findByName($collections);
+            }
         }
 
         return false;
