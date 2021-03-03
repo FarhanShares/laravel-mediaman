@@ -2,10 +2,12 @@
 
 namespace FarhanShares\MediaMan\Models;
 
-
+use Countable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection as BaseCollection;
 use FarhanShares\MediaMan\Casts\Json;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\MediaCollection;
@@ -136,50 +138,39 @@ class Media extends Model
     }
 
 
-    public function syncCollection($collection, $detaching = false)
+    public function syncCollection($collection, $detaching = true)
     {
-        if (is_numeric($collection)) {
-            $fetch = MediaCollection::find($collection);
-        } else if (is_string($collection)) {
-            $fetch = MediaCollection::findByName($collection);
-        } else {
-            return false;
+        if ($this->shouldDetachAll($collection)) {
+            return $this->collections()->sync([]);
         }
 
-        if ($fetch) {
+        if ($fetch = $this->fetchCollections($collection)) {
             return $this->collections()->sync($fetch->id, $detaching);
         }
+
         return false;
     }
 
 
-    public function syncCollections(array $collections, $detaching = false)
+    public function syncCollections($collections, $detaching = true)
     {
-        // todo: allow empty array to remove all collection
-        if (is_numeric($collections[0])) {
-            $fetchCollections = MediaCollection::find($collections);
-        } else {
-            $fetchCollections = MediaCollection::findByName($collections);
+        if ($this->shouldDetachAll($collections)) {
+            return $this->collections()->sync([]);
         }
 
-        $ids = $fetchCollections->pluck('id');
-        return $this->collections()->sync($ids, $detaching);
+        $fetch = $this->fetchCollections($collections);
+        if (count($fetch) > 0) {
+            $ids = $fetch->pluck('id');
+            return $this->collections()->sync($ids, $detaching);
+        }
+
+        return false;
     }
 
     public function attachCollection($collection)
     {
-        if (is_string($collection) && $fetch = MediaCollection::findByName($collection)) {
+        if ($fetch = $this->fetchCollections($collection)) {
             return $this->collections()->attach($fetch->id);
-        }
-
-        $id = is_numeric($collection)
-            ? $collection
-            : (is_object($collection)
-                ? $collection->id
-                : null);
-
-        if ($id) {
-            return $this->collections()->attach($id);
         }
 
         return false;
@@ -187,18 +178,9 @@ class Media extends Model
 
     public function attachCollections($collections)
     {
-        if (is_object($collections)) {
-            $ids = $collections->pluck('id');
-            return $this->collections()->attach($ids);
-        }
-
-        if (is_array($collections) && is_numeric($collections[0])) {
-            return $this->collections()->attach($collections);
-        }
-
-        if (is_array($collections) && is_string($collections[0])) {
-            $fetchCollections = MediaCollection::findByName($collections);
-            $ids = $fetchCollections->pluck('id');
+        $fetch = $this->fetchCollections($collections);
+        if (count($fetch) > 0) {
+            $ids = $fetch->pluck('id');
             return $this->collections()->attach($ids);
         }
 
@@ -207,18 +189,12 @@ class Media extends Model
 
     public function detachCollection($collection)
     {
-        if (is_string($collection) && $fetch = MediaCollection::findByName($collection)) {
-            return $this->collections()->detach($fetch->id);
+        if ($this->shouldDetachAll($collection)) {
+            return $this->collections()->detach();
         }
 
-        $id = is_numeric($collection)
-            ? $collection
-            : (is_object($collection)
-                ? $collection->id
-                : null);
-
-        if ($id) {
-            return $this->collections()->detach($id);
+        if ($fetch = $this->fetchCollections($collection)) {
+            return $this->collections()->detach($fetch->id);
         }
 
         return false;
@@ -226,19 +202,70 @@ class Media extends Model
 
     public function detachCollections($collections)
     {
-        if (is_object($collections)) {
-            $ids = $collections->pluck('id');
+        if ($this->shouldDetachAll($collections)) {
+            return $this->collections()->detach();
+        }
+
+        if ($fetch = $this->fetchCollections($collections)) {
+            $ids = $fetch->pluck('id')->all();
             return $this->collections()->detach($ids);
         }
 
-        if (is_array($collections) && is_numeric($collections[0])) {
-            return $this->collections()->detach($collections);
+        return false;
+    }
+
+    // bool|null|empty-string|empty-array to detach all collections
+    private function shouldDetachAll($collections)
+    {
+        if (is_bool($collections) || is_null($collections) || empty($collections)) {
+            return true;
         }
 
-        if (is_array($collections) && is_string($collections[0])) {
-            $fetchCollections = MediaCollection::findByName($collections);
-            $ids = $fetchCollections->pluck('id');
-            return $this->collections()->detach($ids);
+        if (is_countable($collections) && count($collections) === 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // returns single collection for single item
+    // and multiple collections for multiple items
+    // todo: exception / strict return types
+    private function fetchCollections($collections)
+    {
+        // eloquent collection doesn't need to be fetched again
+        // it's treated as a valid source of MediaCollection resource
+        if ($collections instanceof EloquentCollection) {
+            return $collections;
+        }
+
+        if ($collections instanceof BaseCollection) {
+            $ids = $collections->pluck('id')->all();
+            return MediaCollection::find($ids);
+        }
+
+        if (is_object($collections) && isset($collections->id)) {
+            return MediaCollection::find($collections->id);
+        }
+
+        if (is_numeric($collections)) {
+            return MediaCollection::find($collections);
+        }
+
+        if (is_string($collections)) {
+            return MediaCollection::findByName($collections);
+        }
+
+        // all array items should be of same type
+        // find by id or name based on the type of first item in the array
+        if (is_array($collections) && isset($collections[0])) {
+            if (is_numeric($collections[0])) {
+                return MediaCollection::find($collections);
+            }
+
+            if (is_string($collections[0])) {
+                return MediaCollection::findByName($collections);
+            }
         }
 
         return false;
