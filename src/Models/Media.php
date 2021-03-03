@@ -280,32 +280,38 @@ class Media extends Model
     // and multiple collections for multiple items
     private function fetchCollections($collections)
     {
-
-
-        if ($collections instanceof BaseCollection || $collections instanceof EloquentCollection) {
-            $ids = $collections->pluck('id')->all();
-            return $this->collections()->find($ids);
+        // eloquent collection doesn't need to be fetched again
+        // it's treated as a valid source of MediaCollection resource
+        if ($collections instanceof EloquentCollection) {
+            return $collections;
         }
 
-        if (is_object($collections)) {
-            return $this->collections()->find($collections->id);
+        if ($collections instanceof BaseCollection) {
+            $ids = $collections->pluck('id')->all();
+            return MediaCollection::find($ids);
+        }
+
+        if (is_object($collections) && isset($collections->id)) {
+            return MediaCollection::find($collections->id);
         }
 
         if (is_numeric($collections)) {
-            return $this->collections()->find($collections);
+            return MediaCollection::find($collections);
         }
 
         if (is_string($collections)) {
-            return $this->collections()->findByName($collections);
+            return MediaCollection::findByName($collections);
         }
 
-        if (is_array($collections) && count($collections) > 0) {
+        // all array items should be of same type
+        // find by id or name based on the type of first item in the array
+        if (is_array($collections) && isset($collections[0])) {
             if (is_numeric($collections[0])) {
-                return $this->collections()->find($collections);
+                return MediaCollection::find($collections);
             }
 
             if (is_string($collections[0])) {
-                return $this->collections()->findByName($collections);
+                return MediaCollection::findByName($collections);
             }
         }
 
