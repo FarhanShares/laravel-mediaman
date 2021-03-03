@@ -230,6 +230,7 @@ class Media extends Model
 
     // returns single collection for single item
     // and multiple collections for multiple items
+    // todo: exception / strict return types
     private function fetchCollections($collections)
     {
         // eloquent collection doesn't need to be fetched again
