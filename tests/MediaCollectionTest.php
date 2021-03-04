@@ -206,4 +206,101 @@ class MediaCollectionTest extends TestCase
         $imageCollection->detachMedia($allMedia);
         $this->assertEquals(0, $imageCollection->media()->count());
     }
+
+    // public function it_does_not_attach_detach_or_sync_non_existing_media_of_a_collection()
+    /** @test */
+    public function it_returns_false_for_non_existing_or_already_attached_media_when_attaching()
+    {
+        MediaUploader::source($this->fileOne)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+
+        $a1 = $imageCollection->attachMedia(5);
+        $this->assertEquals(false, $a1);
+        $a2 = $imageCollection->attachMedia([1, 7]);
+        $this->assertEquals(false, $a2);
+    }
+
+
+    /** @test */
+    public function it_returns_number_of_attached_media_if_at_least_one_of_these_is_existing_media_and_not_already_attached_when_attaching()
+    {
+        MediaUploader::source($this->fileOne)
+            ->useName('others-1')
+            ->useCollection('Others')
+            ->upload();
+        MediaUploader::source($this->fileOne)
+            ->useName('others-2')
+            ->useCollection('Others')
+            ->upload();
+        MediaUploader::source($this->fileOne)
+            ->useName('others-3')
+            ->useCollection('Others')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')
+            ->firstOrCreate(['name' => 'Images']);
+
+
+        $a1 = $imageCollection->attachMedia(1);
+        $this->assertEquals(1, $a1);
+        $a2 = $imageCollection->attachMedia([2, 3]);
+        $this->assertEquals(2, $a2);
+
+        $imageCollection->syncMedia([1]);
+        $this->assertEquals(1, $imageCollection->media()->count());
+        $a3 = $imageCollection->attachMedia([1, 2, 3]);
+        $this->assertEquals(2, $a3);
+    }
+
+    /** @test */
+    public function it_returns_false_if_all_are_non_existing_media_when_detaching()
+    {
+        MediaUploader::source($this->fileOne)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+
+        // if all are non existing media it will return false
+        $b1 = $imageCollection->detachMedia(5);
+        $this->assertEquals(false, $b1);
+        $b2 = $imageCollection->detachMedia([10, 15]);
+        $this->assertEquals(false, $b2);
+    }
+
+    /** @test */
+    public function it_returns_number_of_detached_media_if_at_least_one_of_these_is_existing_media_and_not_already_detached_when_detaching()
+    {
+        MediaUploader::source($this->fileOne)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+        MediaUploader::source($this->fileOne)
+            ->useName('image-2')
+            ->useCollection('Images')
+            ->upload();
+        MediaUploader::source($this->fileOne)
+            ->useName('image-3')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+
+        $b1 = $imageCollection->detachMedia(1);
+        $this->assertEquals(1, $b1);
+        $b2 = $imageCollection->detachMedia([1, 2, 3, 10]);
+        $this->assertEquals(2, $b2);
+    }
+    // if all are non existing / already attached media
+    // it will return false
+    // $c = $imageCollection->syncMedia(5);
+    // $this->assertEquals(false, $c);
+    // $c = $imageCollection->syncMedia([5, 10]);
+    // dd($c);
+    // $this->assertEquals(false, $c);
 }
