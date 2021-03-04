@@ -173,6 +173,15 @@ class MediaUploader
     }
 
     /**
+     * @param string $disk
+     * @return MediaUploader
+     */
+    public function useDisk(string $disk)
+    {
+        return $this->setDisk($disk);
+    }
+
+    /**
      * Set any custom data to be saved to the media item.
      *
      * @param array $data
