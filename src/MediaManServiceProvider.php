@@ -69,7 +69,7 @@ class MediaManServiceProvider extends ServiceProvider
     protected function getMigrationFileDestination(string $name, string $ext = '.php')
     {
         return database_path(
-            'migrations/mediaman/' . date('Y_m_d_His', time()) . $name . $ext
+            'migrations/' . date('Y_m_d_His', time()) . '_' . $name . $ext
         );
     }
 
