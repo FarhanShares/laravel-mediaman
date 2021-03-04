@@ -22,12 +22,35 @@ class MediaCollectionTest extends TestCase
     /** @test */
     public function it_can_update_a_collection()
     {
+        $collection = $this->mediaCollection::firstOrCreate([
+            'name' => 'test-collection'
+        ]);
+
+        $collection->name = 'new name';
+        $collection->save();
+        $this->assertEquals('new name', $collection->name);
     }
 
     /** @test */
-    public function it_can_delete_a_collection()
+    public function it_can_delete_a_collection_with_associated_pivot_table_data()
     {
-        // pivot should be deleted as well
+        $mediaOne = MediaUploader::source($this->fileOne)
+            ->useName('images-1')
+            ->useCollection('images')
+            ->upload();
+        $mediaTwo = MediaUploader::source($this->fileOne)
+            ->useName('images-2')
+            ->useCollection('images')
+            ->upload();
+
+        $collection = $this->mediaCollection::with('media')->findByName('images');
+        $this->assertEquals(2, $collection->media()->count());
+
+        $isDeleted = $collection->delete();
+        $this->assertEquals(true, $isDeleted);
+
+        $this->assertEquals(0, $mediaOne->collections()->count());
+        $this->assertEquals(0, $mediaTwo->collections()->count());
     }
 
     /** @test */
