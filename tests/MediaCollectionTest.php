@@ -155,4 +155,55 @@ class MediaCollectionTest extends TestCase
         $imageCollection->attachMedia([$mediaTwo->name]);
         $this->assertEquals(2, $imageCollection->media()->count());
     }
+
+    /** @test */
+    public function it_can_detach_media_from_a_collection()
+    {
+        $mediaOne = MediaUploader::source($this->fileOne)
+            ->useName('image-0')
+            ->useCollection('Images')
+            ->upload();
+
+        $mediaTwo = MediaUploader::source($this->fileTwo)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $mediaThree = MediaUploader::source($this->fileTwo)
+            ->useName('image-2')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+        $this->assertEquals(3, $imageCollection->media()->count());
+        // detach all media by boolean true
+        $imageCollection->detachMedia(true);
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $imageCollection->attachMedia($mediaOne);
+        $this->assertEquals(1, $imageCollection->media()->count());
+        $imageCollection->detachMedia($mediaOne->id);
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $imageCollection->attachMedia([$mediaOne->id, $mediaTwo->id]);
+        $this->assertEquals(2, $imageCollection->media()->count());
+        $imageCollection->detachMedia([$mediaOne->id, $mediaTwo->id]);
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $imageCollection->attachMedia([$mediaOne->name, $mediaTwo->name]);
+        $this->assertEquals(2, $imageCollection->media()->count());
+        $imageCollection->detachMedia([$mediaOne->name, $mediaTwo->name]);
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $imageCollection->attachMedia(collect([$mediaOne, $mediaTwo]));
+        $this->assertEquals(2, $imageCollection->media()->count());
+        $imageCollection->detachMedia(collect([$mediaOne, $mediaTwo]));
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $allMedia = Media::all();
+        $imageCollection->attachMedia($allMedia);
+        $this->assertEquals($allMedia->count(), $imageCollection->media()->count());
+        $imageCollection->detachMedia($allMedia);
+        $this->assertEquals(0, $imageCollection->media()->count());
+    }
 }
