@@ -20,6 +20,22 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_can_update_a_collection()
+    {
+    }
+
+    /** @test */
+    public function it_can_delete_a_collection()
+    {
+        // pivot should be deleted as well
+    }
+
+    /** @test */
+    public function it_can_count_media_of_a_collection()
+    {
+    }
+
+    /** @test */
     public function it_can_retrieve_media_of_a_collection()
     {
 
