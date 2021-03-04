@@ -15,6 +15,23 @@ class MediaTest extends TestCase
     /** @test */
     public function it_can_create_a_media_record_with_media_uploader()
     {
+        // use api
+        $mediaOne = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->useFileName('image.jpg')
+            ->useCollection('one')
+            ->useCollection('two')
+            ->useDisk('default')
+            ->useData([
+                'extraData'       => 'extra data value',
+                'additional_data' => 'additional data value',
+                'something-else'  => 'anything else?'
+            ])
+            ->upload();
+
+        $fetch = Media::find($mediaOne->id);
+
+        $this->assertEquals($fetch->id, $mediaOne->id);
     }
 
     /** @test */
