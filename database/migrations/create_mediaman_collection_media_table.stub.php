@@ -13,10 +13,9 @@ class CreateMediaManCollectionMediaTable extends Migration
      */
     public function up()
     {
-        Schema::table(config('mediaman.tables.collection_media'), function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('collection_id');
-            $table->integer('media_id');
+        Schema::create(config('mediaman.tables.collection_media'), function (Blueprint $table) {
+            $table->unsignedBigInteger('collection_id');
+            $table->unsignedBigInteger('media_id');
 
             $table->foreign('collection_id')
                 ->references('id')

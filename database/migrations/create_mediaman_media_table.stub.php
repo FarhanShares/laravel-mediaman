@@ -16,8 +16,8 @@ class CreateMediaManMediaTable extends Migration
         Schema::create(config('mediaman.tables.media'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('disk');
-            $table->string('display_name');
             $table->string('name');
+            $table->string('file_name');
             $table->string('mime_type');
             $table->unsignedInteger('size');
             $table->json('data')->nullable();
