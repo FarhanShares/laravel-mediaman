@@ -20,7 +20,6 @@ trait HasMedia
      */
     public function media(): MorphToMany
     {
-        // todo: with('collections')
         return $this
             ->morphToMany(config('mediaman.models.media'), 'mediable', config('mediaman.tables.mediables'))
             ->withPivot('channel');
@@ -43,10 +42,13 @@ trait HasMedia
      * @param string $group
      * @return mixed
      */
-    public function getMedia(string $channel = 'default')
+    public function getMedia(?string $channel = 'default')
     {
-        // todo: if channel is false/null -> exclude where clause
-        return $this->media->where('pivot.channel', $channel);
+        if ($channel) {
+            return $this->media->where('pivot.channel', $channel);
+        }
+
+        return $this->media;
     }
 
     /**
@@ -55,9 +57,8 @@ trait HasMedia
      * @param string $channel
      * @return mixed
      */
-    public function getFirstMedia(string $channel = 'default')
+    public function getFirstMedia(?string $channel = 'default')
     {
-        // todo: with('collections')
         return $this->getMedia($channel)->first();
     }
 
@@ -68,7 +69,7 @@ trait HasMedia
      * @param string $conversion
      * @return string
      */
-    public function getFirstMediaUrl(string $channel = 'default', string $conversion = '')
+    public function getFirstMediaUrl(?string $channel = 'default', string $conversion = '')
     {
         if (!$media = $this->getFirstMedia($channel)) {
             return '';
