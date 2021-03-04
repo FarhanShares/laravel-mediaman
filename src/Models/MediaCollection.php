@@ -142,6 +142,10 @@ class MediaCollection extends Model
         // all array items should be of same type
         // find by id or name based on the type of first item in the array
         if (is_array($media) && isset($media[0])) {
+            if ($media[0] instanceof BaseCollection || $media[0] instanceof EloquentCollection) {
+                return $media;
+            }
+
             if (is_numeric($media[0])) {
                 return Media::find($media);
             }
