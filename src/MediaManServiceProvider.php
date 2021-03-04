@@ -28,6 +28,7 @@ class MediaManServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // the order is important for the migrations to complete
         $migrations = [
             [
                 'class_name'      => 'CreateMediaManCollectionsTable',
