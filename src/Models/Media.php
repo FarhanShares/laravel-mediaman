@@ -137,21 +137,6 @@ class Media extends Model
         return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
     }
 
-
-    public function syncCollection($collection, $detaching = true)
-    {
-        if ($this->shouldDetachAll($collection)) {
-            return $this->collections()->sync([]);
-        }
-
-        if ($fetch = $this->fetchCollections($collection)) {
-            return $this->collections()->sync($fetch->id, $detaching);
-        }
-
-        return false;
-    }
-
-
     public function syncCollections($collections, $detaching = true)
     {
         if ($this->shouldDetachAll($collections)) {
@@ -159,18 +144,11 @@ class Media extends Model
         }
 
         $fetch = $this->fetchCollections($collections);
-        if (count($fetch) > 0) {
-            $ids = $fetch->pluck('id');
+        if (is_countable($fetch)) {
+            $ids = $fetch->pluck('id')->all();
             return $this->collections()->sync($ids, $detaching);
-        }
-
-        return false;
-    }
-
-    public function attachCollection($collection)
-    {
-        if ($fetch = $this->fetchCollections($collection)) {
-            return $this->collections()->attach($fetch->id);
+        } else {
+            return $this->collections()->sync($fetch->id, $detaching);
         }
 
         return false;
@@ -179,22 +157,11 @@ class Media extends Model
     public function attachCollections($collections)
     {
         $fetch = $this->fetchCollections($collections);
-        if (count($fetch) > 0) {
+        if (is_countable($fetch)) {
             $ids = $fetch->pluck('id');
             return $this->collections()->attach($ids);
-        }
-
-        return false;
-    }
-
-    public function detachCollection($collection)
-    {
-        if ($this->shouldDetachAll($collection)) {
-            return $this->collections()->detach();
-        }
-
-        if ($fetch = $this->fetchCollections($collection)) {
-            return $this->collections()->detach($fetch->id);
+        } else {
+            return $this->collections()->attach($fetch->id);
         }
 
         return false;
@@ -206,9 +173,12 @@ class Media extends Model
             return $this->collections()->detach();
         }
 
-        if ($fetch = $this->fetchCollections($collections)) {
+        $fetch = $this->fetchCollections($collections);
+        if (is_countable($fetch)) {
             $ids = $fetch->pluck('id')->all();
             return $this->collections()->detach($ids);
+        } else {
+            return $this->collections()->detach($fetch->id);
         }
 
         return false;
