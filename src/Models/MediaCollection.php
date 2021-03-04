@@ -56,11 +56,16 @@ class MediaCollection extends Model
             return $this->media()->sync([]);
         }
 
-        $fetch = $this->fetchMedia($media);
+        if (!$fetch = $this->fetchMedia($media)) {
+            return false;
+        }
+
         if (is_countable($fetch)) {
             $ids = $fetch->pluck('id')->all();
             return $this->media()->sync($ids, $detaching);
-        } else {
+        }
+
+        if (isset($fetch->id)) {
             return $this->media()->sync($fetch->id);
         }
 
@@ -70,11 +75,26 @@ class MediaCollection extends Model
     public function attachMedia($media)
     {
         $fetch = $this->fetchMedia($media);
+
+        if (!$fetch = $this->fetchMedia($media)) {
+            return false;
+        }
+
+        // to be consistent with the return type of detach method
+        // which returns number of detached model, we're using sync without detachment
         if (is_countable($fetch)) {
             $ids = $fetch->pluck('id')->all();
-            return $this->media()->attach($ids);
-        } else {
-            return $this->media()->attach($fetch->id);
+            $res = $this->media()->sync($ids, false);
+
+            $attached  = count($res['attached']);
+            return $attached > 0 ? $attached : false;
+        }
+
+        if (isset($fetch->id)) {
+            $res = $this->media()->sync($fetch->id, false);
+
+            $attached  = count($res['attached']);
+            return $attached > 0 ? $attached : false;
         }
 
         return false;
@@ -86,11 +106,16 @@ class MediaCollection extends Model
             return $this->media()->detach();
         }
 
-        $fetch = $this->fetchMedia($media);
+        if (!$fetch = $this->fetchMedia($media)) {
+            return false;
+        }
+
         if (is_countable($fetch)) {
             $ids = $fetch->pluck('id')->all();
             return $this->media()->detach($ids);
-        } else {
+        }
+
+        if (isset($fetch->id)) {
             return $this->media()->detach($fetch->id);
         }
 
