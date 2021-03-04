@@ -61,7 +61,7 @@ class MediaManServiceProvider extends ServiceProvider
      *
      */
 
-    protected function getMigrationFileSource(string $name, string $ext = '.stub.php')
+    protected function getMigrationFileSource(string $name, string $ext = '.stub')
     {
         return __DIR__ . '/../database/migrations/' . $name . $ext;
     }
