@@ -42,4 +42,64 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals('file-1', $one->name);
         $this->assertEquals('file-2', $two->name);
     }
+
+    /** @test */
+    public function it_can_sync_media_of_a_collection()
+    {
+        $mediaOne = MediaUploader::source($this->fileOne)
+            ->useName('video-1')
+            ->useCollection('Videos')
+            ->upload();
+
+        $mediaTwo = MediaUploader::source($this->fileTwo)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $mediaThree = MediaUploader::source($this->fileTwo)
+            ->useName('image-2')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+        $this->assertEquals(2, $imageCollection->media()->count());
+
+        // detach all media by boolean true
+        $imageCollection->syncMedia(true);
+        $this->assertEquals(0, $imageCollection->media()->count());
+        // sync media by media id, name or model object
+        $imageCollection->syncMedia($mediaOne->id);
+        $this->assertEquals(1, $imageCollection->media()->count());
+        $imageCollection->syncMedia($mediaTwo->name);
+        $this->assertEquals(1, $imageCollection->media()->count());
+        $imageCollection->syncMedia($mediaThree);
+        $this->assertEquals(1, $imageCollection->media()->count());
+
+        // detach all media by boolean false
+        $imageCollection->syncMedia(false);
+        $this->assertEquals(0, $imageCollection->media()->count());
+        // sync media by array of media id, name or media model
+        $imageCollection->syncMedia([$mediaTwo->id, $mediaThree->id]);
+        $this->assertEquals(2, $imageCollection->media()->count());
+        $imageCollection->syncMedia([$mediaTwo->name, $mediaThree->name]);
+        $this->assertEquals(2, $imageCollection->media()->count());
+        // $imageCollection->syncMedia([$mediaOne, $mediaTwo, $mediaThree]);
+        // $this->assertEquals(3, $imageCollection->media()->count());
+        // detach all media by null value
+        $imageCollection->syncMedia(null);
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $videoCollection = $this->mediaCollection->with('media')->findByName('Videos');
+        $this->assertEquals(1, $videoCollection->media()->count());
+        // detach all media by empty-string
+        $videoCollection->syncMedia('');
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        // sync media with id
+        $videoCollection->syncMedia($mediaOne->id);
+        $this->assertEquals(1, $videoCollection->media()->count());
+        // detach all media by empty-array
+        $videoCollection->syncMedia([]);
+        $this->assertEquals(0, $videoCollection->media()->count());
+    }
 }
