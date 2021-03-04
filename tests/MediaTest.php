@@ -37,6 +37,25 @@ class MediaTest extends TestCase
     /** @test */
     public function it_can_update_a_media_record()
     {
+        $mediaOne = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->upload();
+
+        $this->assertEquals('image', $mediaOne->name);
+
+        $mediaOne->name = 'new-name';
+        $mediaOne->data = ['newData' => 'new value'];
+        $mediaOne->save();
+
+        $this->assertEquals('new-name', $mediaOne->name);
+        $this->assertEquals(['newData' => 'new value'], $mediaOne->data);
+
+        // todo: make a fluent api like the following?
+        // $mediaOne->rename('new-file')
+        //     ->renameFile('new-file.ext')
+        //     ->moveTo('disk')
+        //     ->syncData(['new-data' => 'new new'])
+        //     ->store();
     }
 
     /** @test */
