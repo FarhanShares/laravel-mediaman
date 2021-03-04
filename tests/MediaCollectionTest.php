@@ -109,4 +109,50 @@ class MediaCollectionTest extends TestCase
         $videoCollection->syncMedia([]);
         $this->assertEquals(0, $videoCollection->media()->count());
     }
+
+    /** @test */
+    public function it_can_attach_media_to_a_collection()
+    {
+        $mediaOne = MediaUploader::source($this->fileOne)
+            ->useName('image-0')
+            ->useCollection('Images')
+            ->upload();
+
+        $mediaTwo = MediaUploader::source($this->fileTwo)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $mediaThree = MediaUploader::source($this->fileTwo)
+            ->useName('image-2')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+        $this->assertEquals(3, $imageCollection->media()->count());
+        $imageCollection->syncMedia([]);
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $imageCollection->attachMedia($mediaOne);
+        $imageCollection->attachMedia($mediaTwo->id);
+        $imageCollection->attachMedia($mediaThree->name);
+        $this->assertEquals(3, $imageCollection->media()->count());
+        $imageCollection->syncMedia([]);
+        $this->assertEquals(0, $imageCollection->media()->count());
+
+        $allMedia = Media::all();
+        $imageCollection->attachMedia($allMedia);
+        $this->assertEquals($allMedia->count(), $imageCollection->media()->count());
+
+        $imageCollection->syncMedia([]);
+        $this->assertEquals(0, $imageCollection->media()->count());
+        $imageCollection->attachMedia(collect([$mediaOne, $mediaTwo, $mediaThree]));
+        $this->assertEquals(3, $imageCollection->media()->count());
+
+        $imageCollection->syncMedia([]);
+        $this->assertEquals(0, $imageCollection->media()->count());
+        $imageCollection->attachMedia([$mediaOne->id]);
+        $imageCollection->attachMedia([$mediaTwo->name]);
+        $this->assertEquals(2, $imageCollection->media()->count());
+    }
 }
