@@ -42,7 +42,6 @@ return [
     'models' => [
         'media'      => \FarhanShares\MediaMan\Models\Media::class,
         'collection' => \FarhanShares\MediaMan\Models\MediaCollection::class,
-        'mediable'   => \FarhanShares\MediaMan\Models\Mediable::class,
     ],
 
     /*
