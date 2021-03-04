@@ -207,7 +207,6 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(0, $imageCollection->media()->count());
     }
 
-    // public function it_does_not_attach_detach_or_sync_non_existing_media_of_a_collection()
     /** @test */
     public function it_returns_false_for_non_existing_or_already_attached_media_when_attaching()
     {
@@ -223,7 +222,6 @@ class MediaCollectionTest extends TestCase
         $a2 = $imageCollection->attachMedia([1, 7]);
         $this->assertEquals(false, $a2);
     }
-
 
     /** @test */
     public function it_returns_number_of_attached_media_if_at_least_one_of_these_is_existing_media_and_not_already_attached_when_attaching()
