@@ -257,7 +257,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_false_if_all_are_non_existing_media_when_detaching()
+    public function it_returns_false_if_all_are_non_existing_or_already_detached_media_when_detaching()
     {
         MediaUploader::source($this->fileOne)
             ->useName('image-1')
@@ -274,7 +274,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_number_of_detached_media_if_at_least_one_of_these_is_existing_media_and_not_already_detached_when_detaching()
+    public function it_returns_number_of_detached_media_if_at_least_one_of_these_is_existing_attached_media_and_not_already_detached_when_detaching()
     {
         MediaUploader::source($this->fileOne)
             ->useName('image-1')
