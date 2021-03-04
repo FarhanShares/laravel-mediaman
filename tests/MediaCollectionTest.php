@@ -296,11 +296,49 @@ class MediaCollectionTest extends TestCase
         $b2 = $imageCollection->detachMedia([1, 2, 3, 10]);
         $this->assertEquals(2, $b2);
     }
-    // if all are non existing / already attached media
-    // it will return false
-    // $c = $imageCollection->syncMedia(5);
-    // $this->assertEquals(false, $c);
-    // $c = $imageCollection->syncMedia([5, 10]);
-    // dd($c);
-    // $this->assertEquals(false, $c);
+
+    /** @test */
+    public function it_returns_false_if_it_is_a_non_existing_media_when_synchronizing()
+    {
+        MediaUploader::source($this->fileOne)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+
+        // if all are non existing media it will return false
+        $b1 = $imageCollection->syncMedia(5);
+        $this->assertEquals(false, $b1);
+    }
+
+    /** @test */
+    public function it_returns_detailed_array_when_synchronizing_with_existing_non_existing_and_already_attached_media_array()
+    {
+        MediaUploader::source($this->fileOne)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+
+
+        // all are non existing
+        $a1 = $imageCollection->syncMedia([10, 15]);
+        $b1 = [
+            "attached" => [],
+            "detached" => [1],
+            "updated" => []
+        ];
+        $this->assertEquals($a1, $b1);
+
+        // existing / already attached media
+        $a1 = $imageCollection->syncMedia([1, 2]);
+        $b1 = [
+            "attached" => [1],
+            "detached" => [],
+            "updated" => []
+        ];
+        $this->assertEquals($b1, $a1);
+    }
 }
