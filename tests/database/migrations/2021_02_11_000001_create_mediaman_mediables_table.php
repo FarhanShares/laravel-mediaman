@@ -22,7 +22,7 @@ class CreateMediamanMediablesTable extends Migration
 
             $table->foreign('media_id')
                 ->references('id')
-                ->on(config('mediaman.tables.files'))
+                ->on(config('mediaman.tables.media'))
                 ->onDelete('cascade');
         });
     }

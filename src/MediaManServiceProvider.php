@@ -28,11 +28,8 @@ class MediaManServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // the order is important for the migrations to complete
         $migrations = [
-            [
-                'class_name'      => 'CreateMediaManCollectionMediaTable',
-                'file_name'       => 'create_mediaman_collection_media_table'
-            ],
             [
                 'class_name'      => 'CreateMediaManCollectionsTable',
                 'file_name'       => 'create_mediaman_collections_table'
@@ -40,6 +37,10 @@ class MediaManServiceProvider extends ServiceProvider
             [
                 'class_name'      => 'CreateMediaManMediaTable',
                 'file_name'       => 'create_mediaman_media_table'
+            ],
+            [
+                'class_name'      => 'CreateMediaManCollectionMediaTable',
+                'file_name'       => 'create_mediaman_collection_media_table'
             ],
             [
                 'class_name'      => 'CreateMediamanMediablesTable',
@@ -66,20 +67,20 @@ class MediaManServiceProvider extends ServiceProvider
         return __DIR__ . '/../database/migrations/' . $name . $ext;
     }
 
-    protected function getMigrationFileDestination(string $name, string $ext = '.php')
+    protected function getMigrationFileDestination(string $name, int $index, string $ext = '.php')
     {
         return database_path(
-            'migrations/mediaman/' . date('Y_m_d_His', time()) . $name . $ext
+            'migrations/' . date('Y_m_d_His', (time() + $index)) . '_' . $name . $ext
         );
     }
 
     protected function publishMigrations(array $migrations, string $tag = 'migrations')
     {
-        foreach ($migrations as $migration) {
+        foreach ($migrations as $index => $migration) {
             if (!class_exists($migration['class_name'])) {
                 $this->publishes([
                     $this->getMigrationFileSource($migration['file_name']) =>
-                    $this->getMigrationFileDestination($migration['file_name'])
+                    $this->getMigrationFileDestination($migration['file_name'], $index)
                 ], $tag);
             }
         }
