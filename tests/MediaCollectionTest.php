@@ -3,6 +3,7 @@
 namespace FarhanShares\MediaMan\Tests;
 
 
+use FarhanShares\MediaMan\Models\Media;
 use FarhanShares\MediaMan\MediaUploader;
 
 class MediaCollectionTest extends TestCase
@@ -78,13 +79,19 @@ class MediaCollectionTest extends TestCase
         // detach all media by boolean false
         $imageCollection->syncMedia(false);
         $this->assertEquals(0, $imageCollection->media()->count());
-        // sync media by array of media id, name or media model
+        // sync media by array of media id or name
         $imageCollection->syncMedia([$mediaTwo->id, $mediaThree->id]);
         $this->assertEquals(2, $imageCollection->media()->count());
         $imageCollection->syncMedia([$mediaTwo->name, $mediaThree->name]);
         $this->assertEquals(2, $imageCollection->media()->count());
-        // $imageCollection->syncMedia([$mediaOne, $mediaTwo, $mediaThree]);
-        // $this->assertEquals(3, $imageCollection->media()->count());
+
+        // sync media by collection of media model
+        $allMedia = Media::all();
+        $imageCollection->syncMedia($allMedia);
+        $this->assertEquals($allMedia->count(), $imageCollection->media()->count());
+        $imageCollection->syncMedia(collect([$mediaTwo, $mediaThree]));
+        $this->assertEquals(2, $imageCollection->media()->count());
+
         // detach all media by null value
         $imageCollection->syncMedia(null);
         $this->assertEquals(0, $imageCollection->media()->count());
