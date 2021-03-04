@@ -140,7 +140,7 @@ class MediaTest extends TestCase
 
         $media = $this->media;
         $media->id = 1;
-        $media->syncCollection($collection->id);
+        $media->syncCollections($collection->id);
 
         $this->assertEquals(1, $media->collections()->count());
         $this->assertEquals($collection->name, $media->collections[0]->name);
@@ -156,7 +156,7 @@ class MediaTest extends TestCase
 
         $media = $this->media;
         $media->id = 1;
-        $media->syncCollection($collection->name);
+        $media->syncCollections($collection->name);
 
         $this->assertEquals(1, $media->collections()->count());
         $this->assertEquals($collection->name, $media->collections[0]->name);
@@ -202,8 +202,8 @@ class MediaTest extends TestCase
 
         $media = MediaUploader::source($this->fileOne)->upload();
 
-        $media->attachCollection($collection->id);
-        $media->attachCollection($collectionTwo->id);
+        $media->attachCollections($collection->id);
+        $media->attachCollections($collectionTwo->id);
 
         $this->assertEquals(3, $media->collections()->count());
         $this->assertEquals('Default', $media->collections[0]->name);
@@ -219,8 +219,8 @@ class MediaTest extends TestCase
 
         $media = MediaUploader::source($this->fileOne)->upload();
 
-        $media->attachCollection($collection->name);
-        $media->attachCollection($collectionTwo->name);
+        $media->attachCollections($collection->name);
+        $media->attachCollections($collectionTwo->name);
 
         $this->assertEquals(3, $media->collections()->count());
         $this->assertEquals('Default', $media->collections[0]->name);
@@ -236,8 +236,8 @@ class MediaTest extends TestCase
 
         $media = MediaUploader::source($this->fileOne)->upload();
 
-        $media->attachCollection($collection);
-        $media->attachCollection($collectionTwo);
+        $media->attachCollections($collection);
+        $media->attachCollections($collectionTwo);
 
         $this->assertEquals(3, $media->collections()->count());
         $this->assertEquals('Default', $media->collections[0]->name);
@@ -312,7 +312,7 @@ class MediaTest extends TestCase
         $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
         $this->assertEquals(1, $media->collections()->count());
 
-        $media->detachCollection($collection->id);
+        $media->detachCollections($collection->id);
         $this->assertEquals(0, $media->collections()->count());
     }
 
@@ -324,7 +324,7 @@ class MediaTest extends TestCase
         $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
         $this->assertEquals(1, $media->collections()->count());
 
-        $media->detachCollection($collection->name);
+        $media->detachCollections($collection->name);
         $this->assertEquals(0, $media->collections()->count());
     }
 
@@ -336,7 +336,7 @@ class MediaTest extends TestCase
         $media = MediaUploader::source($this->fileOne)->upload(); // added to the default collection
         $this->assertEquals(1, $media->collections()->count());
 
-        $media->detachCollection($collection);
+        $media->detachCollections($collection);
         $this->assertEquals(0, $media->collections()->count());
     }
 
@@ -385,18 +385,18 @@ class MediaTest extends TestCase
         $collection = $this->mediaCollection->first();
 
         // sync with bool true resets back to zero collection
-        $media->syncCollection(true);
+        $media->syncCollections(true);
         $this->assertEquals(0, $media->collections()->count());
 
         // attach a collections
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // sync with bool false resets back to zero collection
-        $media->syncCollection(false);
+        $media->syncCollections(false);
         $this->assertEquals(0, $media->collections()->count());
 
         // attach a collection again
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // sync with null resets back to zero collection
         $media->syncCollections(true);
@@ -404,7 +404,7 @@ class MediaTest extends TestCase
 
 
         // attach a collection again
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // sync with empty-string resets back to zero collection
         $media->syncCollections('');
@@ -412,10 +412,10 @@ class MediaTest extends TestCase
 
 
         // attach all collections again
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // sync with empty-array resets back to zero collection
-        $media->syncCollection([]);
+        $media->syncCollections([]);
         $this->assertEquals(0, $media->collections()->count());
     }
 
@@ -491,18 +491,18 @@ class MediaTest extends TestCase
         $collection = $this->mediaCollection->first();
 
         // detach with bool true resets back to zero collection
-        $media->detachCollection(true);
+        $media->detachCollections(true);
         $this->assertEquals(0, $media->collections()->count());
 
         // attach a collections
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // detach with bool false resets back to zero collection
-        $media->detachCollection(false);
+        $media->detachCollections(false);
         $this->assertEquals(0, $media->collections()->count());
 
         // attach a collection again
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // detach with null resets back to zero collection
         $media->detachCollections(true);
@@ -510,7 +510,7 @@ class MediaTest extends TestCase
 
 
         // attach a collection again
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // detach with empty-string resets back to zero collection
         $media->detachCollections('');
@@ -518,10 +518,10 @@ class MediaTest extends TestCase
 
 
         // attach all collections again
-        $media->attachCollection($collection);
+        $media->attachCollections($collection);
         $this->assertEquals(1, $media->collections()->count());
         // detach with empty-array resets back to zero collection
-        $media->detachCollection([]);
+        $media->detachCollections([]);
         $this->assertEquals(0, $media->collections()->count());
     }
 
