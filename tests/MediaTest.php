@@ -13,6 +13,22 @@ use Illuminate\Database\Eloquent\Collection as ElCollection;
 class MediaTest extends TestCase
 {
     /** @test */
+    public function it_can_create_a_media_record_with_media_uploader()
+    {
+    }
+
+    /** @test */
+    public function it_can_update_a_media_record()
+    {
+    }
+
+    /** @test */
+    public function it_can_delete_a_media_record()
+    {
+        // pivot should be deleted as well
+    }
+
+    /** @test */
     public function it_has_an_extension_accessor()
     {
         $image = new Media();
