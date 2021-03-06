@@ -1,3 +1,6 @@
+![Laravel MediaMan](https://raw.githubusercontent.com/FarhanShares/laravel-mediaman/main/docs/assets/MediaMan-banner.png "Laravel MediaMan")
+
+
 # Laravel MediaMan
 
 The most Elegant & Powerful media management package for Laravel!
