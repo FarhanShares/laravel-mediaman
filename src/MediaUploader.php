@@ -234,12 +234,13 @@ class MediaUploader
             $media->collections()->attach($collection->id);
         } else {
             // add to the default collection
-            $media->collections()->attach(1);
+            // todo: allow not to add in the default collection
+            $collection = MediaCollection::findByName(config('mediaman.collection'));
+            if ($collection) {
+                $media->collections()->attach($collection->id);
+            }
         }
 
-        // dump($collection);
-
-
-        return $media->fresh();
+        return $media;
     }
 }
