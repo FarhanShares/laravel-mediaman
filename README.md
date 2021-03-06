@@ -1,9 +1,15 @@
-![Laravel MediaMan](https://raw.githubusercontent.com/FarhanShares/laravel-mediaman/main/docs/assets/MediaMan-banner.png "Laravel MediaMan")
+<p align="center"><a href="https://farhanshares.com/projects/laravel-mediaman" target="_blank" title="Laravel MediaMan"><img src="https://raw.githubusercontent.com/FarhanShares/laravel-mediaman/main/docs/assets/MediaMan-banner.png" /></a></p>
 
+<p align="center">
+<a href="https://github.com/farhanshares/laravel-mediaman/actions/workflows/ci.yml"><img src="https://github.com/farhanshares/laravel-mediaman/actions/workflows/ci.yml/badge.svg" alt="Github CI"></a>
+<a href="https://packagist.org/packages/farhanshares/laravel-mediaman"><img src="https://img.shields.io/packagist/dt/farhanshares/laravel-mediaman" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/farhanshares/laravel-mediaman"><img src="https://img.shields.io/packagist/v/farhanshares/laravel-mediaman" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/farhanshares/laravel-mediaman"><img src="https://img.shields.io/packagist/l/farhanshares/laravel-mediaman" alt="License"></a>
+</p>
 
-# Laravel MediaMan
+# Laravel MediaMan</h1>
+The most elegant & powerful media management package for Laravel!
 
-The most Elegant & Powerful media management package for Laravel!
 
 ## Installation
 
