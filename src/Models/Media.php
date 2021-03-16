@@ -4,13 +4,15 @@ namespace FarhanShares\MediaMan\Models;
 
 use Countable;
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection as BaseCollection;
 use FarhanShares\MediaMan\Casts\Json;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\MediaCollection;
+use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class Media extends Model
 {
@@ -131,6 +133,15 @@ class Media extends Model
         return Storage::disk($this->disk);
     }
 
+
+    /**
+     * Find a media by media name
+     *
+     * @param $query
+     * @param string $names
+     * @param array $columns
+     * @return Collection|Model|null
+     */
     public  function scopeFindByName($query, $names, array $columns = ['*'])
     {
         if (is_array($names)) {
@@ -140,11 +151,25 @@ class Media extends Model
         return $query->select($columns)->where('name', $names)->first();
     }
 
-    public function collections()
+
+    /**
+     * A media belongs to many collection
+     *
+     * @return BelongsToMany
+     */
+    public function collections(): BelongsToMany
     {
         return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
     }
 
+
+    /**
+     * Sync collections of a media
+     *
+     * @param null|int|string|array|Model|Collection $collections
+     * @param boolean $detaching
+     * @return array of synced status
+     */
     public function syncCollections($collections, $detaching = true)
     {
         if ($this->shouldDetachAll($collections)) {
@@ -162,6 +187,13 @@ class Media extends Model
         return false;
     }
 
+
+    /**
+     * Attach a media to collections
+     *
+     * @param null|int|string|array|Model|Collection $collections
+     * @return int|null
+     */
     public function attachCollections($collections)
     {
         $fetch = $this->fetchCollections($collections);
@@ -169,22 +201,30 @@ class Media extends Model
             $ids = $fetch->pluck('id');
             $res = $this->collections()->sync($ids, false);
             $attached  = count($res['attached']);
-            return $attached > 0 ?: false;
+            return $attached > 0 ?: null;
         } else {
             $res = $this->collections()->sync($fetch->id, false);
             $attached  = count($res['attached']);
-            return $attached > 0 ?: false;
+            return $attached > 0 ?: null;
         }
 
-        return false;
+        return null;
     }
 
+
+    /**
+     * Detach a media from collections
+     *
+     * @param null|int|string|array|Model|Collection $collections
+     * @return int|null
+     */
     public function detachCollections($collections)
     {
         if ($this->shouldDetachAll($collections)) {
             return $this->collections()->detach();
         }
 
+        // todo: check if null is returned on failure
         $fetch = $this->fetchCollections($collections);
         if (is_countable($fetch)) {
             $ids = $fetch->pluck('id')->all();
@@ -193,10 +233,18 @@ class Media extends Model
             return $this->collections()->detach($fetch->id);
         }
 
-        return false;
+        return null;
     }
 
-    // bool|null|empty-string|empty-array to detach all collections
+
+    /**
+     * Check if all collections should be detached
+     *
+     * bool|null|empty-string|empty-array to detach all collections
+     *
+     * @param mixed $collections
+     * @return boolean
+     */
     private function shouldDetachAll($collections)
     {
         if (is_bool($collections) || is_null($collections) || empty($collections)) {
@@ -210,9 +258,17 @@ class Media extends Model
         return false;
     }
 
-    // returns single collection for single item
-    // and multiple collections for multiple items
-    // todo: exception / strict return types
+
+    /**
+     * Fetch collections
+     *
+     * returns single collection for single item
+     * and multiple collections for multiple items
+     * todo: exception / strict return types
+     *
+     * @param int|string|array|Model|Collection $collections
+     * @return Collection|Model|Object|null
+     */
     private function fetchCollections($collections)
     {
         // eloquent collection doesn't need to be fetched again
@@ -250,6 +306,6 @@ class Media extends Model
             }
         }
 
-        return false;
+        return null;
     }
 }
