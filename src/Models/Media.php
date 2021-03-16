@@ -154,9 +154,9 @@ class Media extends Model
         $fetch = $this->fetchCollections($collections);
         if (is_countable($fetch)) {
             $ids = $fetch->pluck('id')->all();
-            return $this->collections()->sync($ids, $detaching);
+            return ($this->collections()->sync($ids, $detaching));
         } else {
-            return $this->collections()->sync($fetch->id, $detaching);
+            return ($this->collections()->sync($fetch->id, $detaching));
         }
 
         return false;
@@ -167,9 +167,13 @@ class Media extends Model
         $fetch = $this->fetchCollections($collections);
         if (is_countable($fetch)) {
             $ids = $fetch->pluck('id');
-            return $this->collections()->attach($ids);
+            $res = $this->collections()->sync($ids, false);
+            $attached  = count($res['attached']);
+            return $attached > 0 ?: false;
         } else {
-            return $this->collections()->attach($fetch->id);
+            $res = $this->collections()->sync($fetch->id, false);
+            $attached  = count($res['attached']);
+            return $attached > 0 ?: false;
         }
 
         return false;
@@ -216,7 +220,7 @@ class Media extends Model
         if ($collections instanceof EloquentCollection) {
             return $collections;
         }
-
+        // todo: check for instance of media model / collection instead?
         if ($collections instanceof BaseCollection) {
             $ids = $collections->pluck('id')->all();
             return MediaCollection::find($ids);
