@@ -32,6 +32,14 @@ class MediaCollection extends Model
     }
 
 
+    /**
+     * Find a collection by name
+     *
+     * @param $query
+     * @param string $names
+     * @param array $columns
+     * @return Collection|MediaCollection|null
+     */
     public  function scopeFindByName($query, $names, array $columns = ['*'])
     {
         if (is_array($names)) {
