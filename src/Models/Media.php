@@ -130,7 +130,7 @@ class Media extends Model
      */
     public function getDirectory()
     {
-        return $this->getKey();
+        return $this->getKey() . '-' . md5($this->getKey() . config('app.key'));
     }
 
     /**
