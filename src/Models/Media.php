@@ -28,6 +28,17 @@ class Media extends Model
         'data' => Json::class
     ];
 
+
+    public static function booted()
+    {
+        static::deleting(static function ($media) {
+            // delete the media directory
+            $deleted = Storage::disk($media->disk)->deleteDirectory($media->getDirectory());
+            // if failed, try deleting the file then
+            !$deleted && Storage::disk($media->disk)->delete($media->getPath());
+        });
+    }
+
     /**
      * The table associated with the model.
      *
