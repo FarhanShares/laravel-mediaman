@@ -57,7 +57,7 @@ class MediaCollection extends Model
         }
 
         if (!$fetch = $this->fetchMedia($media)) {
-            return false;
+            return null;
         }
 
         if (is_countable($fetch)) {
@@ -69,7 +69,7 @@ class MediaCollection extends Model
             return $this->media()->sync($fetch->id);
         }
 
-        return false;
+        return null;
     }
 
     public function attachMedia($media)
@@ -77,7 +77,7 @@ class MediaCollection extends Model
         $fetch = $this->fetchMedia($media);
 
         if (!$fetch = $this->fetchMedia($media)) {
-            return false;
+            return null;
         }
 
         // to be consistent with the return type of detach method
@@ -87,17 +87,17 @@ class MediaCollection extends Model
             $res = $this->media()->sync($ids, false);
 
             $attached  = count($res['attached']);
-            return $attached > 0 ?: false;
+            return $attached > 0 ?: null;
         }
 
         if (isset($fetch->id)) {
             $res = $this->media()->sync($fetch->id, false);
 
             $attached  = count($res['attached']);
-            return $attached > 0 ?: false;
+            return $attached > 0 ?: null;
         }
 
-        return false;
+        return null;
     }
 
     public function detachMedia($media)
@@ -107,7 +107,7 @@ class MediaCollection extends Model
         }
 
         if (!$fetch = $this->fetchMedia($media)) {
-            return false;
+            return null;
         }
 
         if (is_countable($fetch)) {
@@ -119,7 +119,7 @@ class MediaCollection extends Model
             return $this->media()->detach($fetch->id);
         }
 
-        return false;
+        return null;
     }
 
     // bool|null|empty-string|empty-array to detach all media
@@ -180,6 +180,6 @@ class MediaCollection extends Model
             }
         }
 
-        return false;
+        return null;
     }
 }
