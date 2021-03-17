@@ -107,14 +107,14 @@ class MediaCollection extends Model
             $res = $this->media()->sync($ids, false);
 
             $attached  = count($res['attached']);
-            return $attached > 0 ?: null;
+            return $attached > 0 ? $attached : null;
         }
 
         if (isset($fetch->id)) {
             $res = $this->media()->sync($fetch->id, false);
 
             $attached  = count($res['attached']);
-            return $attached > 0 ?: null;
+            return $attached > 0 ? $attached : null;
         }
 
         return null;

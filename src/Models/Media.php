@@ -201,11 +201,11 @@ class Media extends Model
             $ids = $fetch->pluck('id');
             $res = $this->collections()->sync($ids, false);
             $attached  = count($res['attached']);
-            return $attached > 0 ?: null;
+            return $attached > 0 ? $attached : null;
         } else {
             $res = $this->collections()->sync($fetch->id, false);
             $attached  = count($res['attached']);
-            return $attached > 0 ?: null;
+            return $attached > 0 ? $attached : null;
         }
 
         return null;
