@@ -3,14 +3,11 @@
 namespace FarhanShares\MediaMan\Models;
 
 
-use Illuminate\Support\Str;
 use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class MediaCollection extends Model
 {
@@ -23,6 +20,7 @@ class MediaCollection extends Model
         'name', 'created_at', 'updated_at',
     ];
 
+
     /**
      * The table associated with the model.
      *
@@ -33,6 +31,15 @@ class MediaCollection extends Model
         return config('mediaman.tables.collections');
     }
 
+
+    /**
+     * Find a collection by name
+     *
+     * @param $query
+     * @param string $names
+     * @param array $columns
+     * @return Collection|MediaCollection|null
+     */
     public  function scopeFindByName($query, $names, array $columns = ['*'])
     {
         if (is_array($names)) {
@@ -42,22 +49,33 @@ class MediaCollection extends Model
         return $query->select($columns)->where('name', $names)->first();
     }
 
+
     /**
-     * The media that belong to the collection.
+     * A collection belongs to many media.
+     *
+     * @return BelongsToMany
      */
     public function media()
     {
         return $this->belongsToMany(Media::class, config('mediaman.tables.collection_media'), 'media_id', 'collection_id');
     }
 
-    public function syncMedia($media, $detaching = true)
+
+    /**
+     * Sync media of a collection
+     *
+     * @param null|int|string|array|Media|Collection $media
+     * @param boolean $detaching
+     * @return array|null
+     */
+    public function syncMedia($media, $detaching = true): ?array
     {
         if ($this->shouldDetachAll($media)) {
             return $this->media()->sync([]);
         }
 
         if (!$fetch = $this->fetchMedia($media)) {
-            return false;
+            return null;
         }
 
         if (is_countable($fetch)) {
@@ -69,15 +87,22 @@ class MediaCollection extends Model
             return $this->media()->sync($fetch->id);
         }
 
-        return false;
+        return null;
     }
 
-    public function attachMedia($media)
+
+    /**
+     * Attach media to a collection
+     *
+     * @param null|int|string|array|Media|Collection $media
+     * @return int|null number of attached media or null
+     */
+    public function attachMedia($media): ?int
     {
         $fetch = $this->fetchMedia($media);
 
         if (!$fetch = $this->fetchMedia($media)) {
-            return false;
+            return null;
         }
 
         // to be consistent with the return type of detach method
@@ -87,27 +112,34 @@ class MediaCollection extends Model
             $res = $this->media()->sync($ids, false);
 
             $attached  = count($res['attached']);
-            return $attached > 0 ? $attached : false;
+            return $attached > 0 ? $attached : null;
         }
 
         if (isset($fetch->id)) {
             $res = $this->media()->sync($fetch->id, false);
 
             $attached  = count($res['attached']);
-            return $attached > 0 ? $attached : false;
+            return $attached > 0 ? $attached : null;
         }
 
-        return false;
+        return null;
     }
 
-    public function detachMedia($media)
+
+    /**
+     * Detach media from a collection
+     *
+     * @param null|int|string|array|Media|Collection $media
+     * @return int|null number of detached media or null
+     */
+    public function detachMedia($media): ?int
     {
         if ($this->shouldDetachAll($media)) {
             return $this->media()->detach();
         }
 
         if (!$fetch = $this->fetchMedia($media)) {
-            return false;
+            return null;
         }
 
         if (is_countable($fetch)) {
@@ -119,11 +151,19 @@ class MediaCollection extends Model
             return $this->media()->detach($fetch->id);
         }
 
-        return false;
+        return null;
     }
 
-    // bool|null|empty-string|empty-array to detach all media
-    private function shouldDetachAll($media)
+
+    /**
+     * Check if all media should be detached
+     *
+     * bool|null|empty-string|empty-array to detach all media
+     *
+     * @param mixed $collections
+     * @return boolean
+     */
+    private function shouldDetachAll($media): bool
     {
         if (is_bool($media) || is_null($media) || empty($media)) {
             return true;
@@ -136,9 +176,17 @@ class MediaCollection extends Model
         return false;
     }
 
-    // returns single collection for single item
-    // and multiple collections for multiple items
-    // todo: exception / strict return types
+
+    /**
+     * Fetch media
+     *
+     * returns single collection for single item
+     * and multiple collections for multiple items
+     * todo: exception / strict return types
+     *
+     * @param int|string|array|MediaCollection|Collection $collections
+     * @return Collection|Media|Object|null
+     */
     private function fetchMedia($media)
     {
         // eloquent collection doesn't need to be fetched again
@@ -147,6 +195,7 @@ class MediaCollection extends Model
             return $media;
         }
 
+        // todo: check for instance of media model / collection instead?
         if ($media instanceof BaseCollection) {
             $ids = $media->pluck('id')->all();
             return Media::find($ids);
@@ -180,6 +229,6 @@ class MediaCollection extends Model
             }
         }
 
-        return false;
+        return null;
     }
 }
