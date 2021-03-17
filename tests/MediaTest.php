@@ -6,6 +6,7 @@ namespace FarhanShares\MediaMan\Tests;
 use Mockery;
 use Illuminate\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\Media;
+use Illuminate\Support\Facades\Storage;
 use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection as ElCollection;
@@ -67,7 +68,17 @@ class MediaTest extends TestCase
     /** @test */
     public function it_can_delete_a_media_record()
     {
-        // pivot should be deleted as well
+        $media = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->useDisk('default')
+            ->upload();
+
+        $mediaId = $media->id;
+        $mediaFile = $media->file_name;
+        $media->delete();
+
+        $this->assertEquals(null, Media::find($mediaId));
+        $this->assertEquals(false, Storage::disk('default')->exists($mediaFile));
     }
 
     /** @test */
