@@ -29,22 +29,14 @@ php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProv
 
 There are a few key concepts that should be understood before continuing:
 
-* Media: It can be any type of file. You should specify any file restrictions in your
-  application's validation logic before you attempt to upload a file.
+* **Media**: It can be any type of file. You should specify file restrictions in your application's validation logic before you attempt to upload a file.
 
-* MediaUploader: Items are uploaded as its own entity. It does not belong to any other model in the system when it's created, so items can be managed independently (which makes it the perfect engine for a media manager).
+* **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's created, so items can be managed independently (which makes it the perfect engine for a media manager).
 
-* Channel: Media items are bound to "channel". Thus you can easily associate multiple types of media to a model. For example, a model might have an "images" channel and a "documents" channel.
+* **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can use it to create groups of media without really associating media to your app models.
 
-* Collection: A media item can be bundled to any number of "collection".
+* **Association**: Media need be attached to a model for an association to be made. MediaMan exposes helpers to easily get the job done. Many-to-many polymorphic relationships allow any number of media to be assigned to any number of other models without the need of modifying their schema.
 
-* Association: Media must be attached to a model for an association to be made.
+* **Channel**: Media items are bound to a "channel" of a model during association. Thus you can easily associate multiple types of media to a model. For example, a "User" model might have an "avatar" and a "documents" channel.
 
-* Conversion: You can manipulate images using conversions. You can specify conversions to be performed when a media item is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to a
-  model's "gallery" group.
-
-* Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
-
-### Project is in active development:
-
-Docs will be updated over time, give it a star to support the project.
+* **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
