@@ -12,6 +12,12 @@ use Illuminate\Database\Eloquent\Collection as ElCollection;
 
 class MediaTest extends TestCase
 {
+    public function getMediaPath($mediaId): string
+    {
+        return $mediaId . '-' . md5($mediaId . config('app.key'));
+    }
+
+
     /** @test */
     public function it_can_create_a_media_record_with_media_uploader()
     {
@@ -107,7 +113,8 @@ class MediaTest extends TestCase
         $media->id = 1;
         $media->file_name = 'image.jpg';
 
-        $this->assertEquals('1/image.jpg', $media->getPath());
+        $path = $this->getMediaPath($media->id);
+        $this->assertEquals($path . '/image.jpg', $media->getPath());
     }
 
     /** @test */
@@ -117,8 +124,9 @@ class MediaTest extends TestCase
         $media->id = 1;
         $media->file_name = 'image.jpg';
 
+        $path = $this->getMediaPath($media->id);
         $this->assertEquals(
-            '1/conversions/thumbnail/image.jpg',
+            $path . '/conversions/thumbnail/image.jpg',
             $media->getPath('thumbnail')
         );
     }
