@@ -2,7 +2,6 @@
 
 namespace FarhanShares\MediaMan\Models;
 
-use Countable;
 use Illuminate\Support\Str;
 use FarhanShares\MediaMan\Casts\Json;
 use Illuminate\Database\Eloquent\Model;

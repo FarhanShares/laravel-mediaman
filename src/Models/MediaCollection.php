@@ -3,11 +3,8 @@
 namespace FarhanShares\MediaMan\Models;
 
 
-use Illuminate\Support\Str;
 use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
