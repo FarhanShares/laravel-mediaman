@@ -140,7 +140,7 @@ class Media extends Model
      * @param $query
      * @param string $names
      * @param array $columns
-     * @return Collection|Model|null
+     * @return Collection|Media|null
      */
     public  function scopeFindByName($query, $names, array $columns = ['*'])
     {
@@ -166,7 +166,7 @@ class Media extends Model
     /**
      * Sync collections of a media
      *
-     * @param null|int|string|array|Model|Collection $collections
+     * @param null|int|string|array|MediaCollection|Collection $collections
      * @param boolean $detaching
      * @return array of synced status
      */
@@ -191,7 +191,7 @@ class Media extends Model
     /**
      * Attach a media to collections
      *
-     * @param null|int|string|array|Model|Collection $collections
+     * @param null|int|string|array|MediaCollection|Collection $collections
      * @return int|null
      */
     public function attachCollections($collections)
@@ -215,7 +215,7 @@ class Media extends Model
     /**
      * Detach a media from collections
      *
-     * @param null|int|string|array|Model|Collection $collections
+     * @param null|int|string|array|MediaCollection|Collection $collections
      * @return int|null
      */
     public function detachCollections($collections)
@@ -266,7 +266,7 @@ class Media extends Model
      * and multiple collections for multiple items
      * todo: exception / strict return types
      *
-     * @param int|string|array|Model|Collection $collections
+     * @param int|string|array|MediaCollection|Collection $collections
      * @return Collection|Model|Object|null
      */
     private function fetchCollections($collections)
