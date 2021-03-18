@@ -40,3 +40,34 @@ There are a few key concepts that need to be understood before continuing:
 * **Channel**: Media items are bound to a "channel" of a model during association. Thus you can easily associate multiple types of media to a model. For example, a "User" model might have an "avatar" and a "documents" media channel.
 
 * **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item (image) is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
+
+
+# Usage
+
+
+## Upload media
+
+## Associate media
+
+## Disassociate media
+
+
+## Retrieve media
+## Update media
+
+## Delete media
+
+-----
+## Retrieve collection
+
+## Update collection
+## Delete collection
+
+
+------
+## Collections & Media
+
+-----
+# Conversions
+
+Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
