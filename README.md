@@ -10,6 +10,16 @@
 # Laravel MediaMan</h1>
 The most elegant & powerful media management package for Laravel!
 
+## In a hurry? Here's a quick example:
+
+```php
+$media = MediaUploader::source($request->file->('file'))
+    ->useCollection('Posts')
+    ->upload();
+
+$post = Post::find(1);
+$post->attachMedia($media, 'featured-image');
+```
 
 ## Installation
 
