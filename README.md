@@ -56,6 +56,13 @@ There are a few key concepts that need to be understood before continuing:
 
 
 ## Upload media
+You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file uploads. You can upload, create a record in the database & store the file in the filesystem in one go.
+
+```php
+$file  = $request->file('file')
+$media = MediaUploader::source($file)->upload();
+```
+The file will be stored in the default disk & bundled in the default collection & specified in the mediaman config.
 
 ## Associate media
 
