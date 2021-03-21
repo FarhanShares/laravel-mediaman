@@ -10,6 +10,16 @@
 # Laravel MediaMan</h1>
 The most elegant & powerful media management package for Laravel!
 
+## In a hurry? Here's a quick example:
+
+```php
+$media = MediaUploader::source($request->file->('file'))
+    ->useCollection('Posts')
+    ->upload();
+
+$post = Post::find(1);
+$post->attachMedia($media, 'featured-image');
+```
 
 ## Installation
 
@@ -25,26 +35,81 @@ Once installed, you should publish the provided assets to create the necessary m
 php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
 ```
 
-## Key concepts
+## Overview & Key concepts
 
-There are a few key concepts that should be understood before continuing:
+There are a few key concepts that need to be understood before continuing:
 
-* Media: It can be any type of file. You should specify any file restrictions in your
-  application's validation logic before you attempt to upload a file.
+* **Media**: It can be any type of file. You should specify file restrictions in your application's validation logic before you attempt to upload a file.
 
-* MediaUploader: Items are uploaded as its own entity. It does not belong to any other model in the system when it's created, so items can be managed independently (which makes it the perfect engine for a media manager).
+* **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
 
-* Channel: Media items are bound to "channel". Thus you can easily associate multiple types of media to a model. For example, a model might have an "images" channel and a "documents" channel.
+* **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can use it to create groups of media without really associating media to your app models.
 
-* Collection: A media item can be bundled to any number of "collection".
+* **Association**: Media need be attached to a model for an association to be made. MediaMan exposes helpers to easily get the job done. Many-to-many polymorphic relationships allow any number of media to be associated to any number of other models without the need of modifying their schema.
 
-* Association: Media must be attached to a model for an association to be made.
+* **Channel**: Media items are bound to a "channel" of a model during association. Thus you can easily associate multiple types of media to a model. For example, a "User" model might have an "avatar" and a "documents" media channel.
 
-* Conversion: You can manipulate images using conversions. You can specify conversions to be performed when a media item is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to a
-  model's "gallery" group.
+* **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item (image) is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
 
-* Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
 
-### Project is in active development:
+# Usage
 
-Docs will be updated over time, give it a star to support the project.
+
+## Upload media
+You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file uploads. You can upload, create a record in the database & store the file in the filesystem in one go.
+
+```php
+$file  = $request->file('file')
+$media = MediaUploader::source($file)->upload();
+```
+The file will be stored in the default disk & bundled in the default collection specified in the mediaman config. The file size will be stored in the database & the file name will be sanitized automatically.
+
+However, you can do a lot more, not just stick to the defaults.
+```php
+$file  = $request->file('file')
+$media = MediaUploader::source($file)
+            ->useName('Custom name')
+            ->useFileName('custom-name.png')
+            ->useCollection('Images')
+            ->useDisk('media')
+            ->useData([
+                'additional_data' => 'will be stored as json',
+                'use_associative_array' => 'to store any data you want to be with the file',
+            ])
+            ->upload();
+```
+If the collection doesn't exist, it'll be created on the fly. You can read more about collections below.
+
+**Q: What happens if I don't provide a unique file name in the above process?**
+
+A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stored in the disk in a way that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house.
+
+**Q: But why? Won't I get a bunch of directories?**
+
+A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
+
+**Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, use Laravel's validator.**
+## Associate media
+
+## Disassociate media
+
+
+## Retrieve media
+## Update media
+
+## Delete media
+
+-----
+## Retrieve collection
+
+## Update collection
+## Delete collection
+
+
+------
+## Collections & Media
+
+-----
+# Conversions
+
+Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
