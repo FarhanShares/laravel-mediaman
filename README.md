@@ -62,7 +62,27 @@ You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file up
 $file  = $request->file('file')
 $media = MediaUploader::source($file)->upload();
 ```
-The file will be stored in the default disk & bundled in the default collection & specified in the mediaman config.
+The file will be stored in the default disk & bundled in the default collection & specified in the mediaman config. The file size will be stored in the database & the file name will be sanitized automatically.
+
+However, you can do a lot more, not just stick to the defaults.
+```php
+$file  = $request->file('file')
+$media = MediaUploader::source($file)
+            ->useName('Custom name')
+            ->useFileName('custom-name.png')
+            ->useCollection('Images')
+            ->useDisk('media')
+            ->useData([
+                'additional_data' => 'will be stored as json',
+                'use_associative_array' => 'to store any data you want to be with the file',
+            ])
+            ->upload();
+```
+If the collection doesn't exist, it'll be created on the fly. You can read more about collections below.
+
+Q: What happens if I don't provide a unique file name in the above process?
+A: Don't worry, MediaMan manages uploading in a smart & secure way. Files are stored in the disk in a format that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house.
+
 
 ## Associate media
 
