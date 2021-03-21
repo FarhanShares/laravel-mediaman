@@ -41,7 +41,7 @@ There are a few key concepts that need to be understood before continuing:
 
 * **Media**: It can be any type of file. You should specify file restrictions in your application's validation logic before you attempt to upload a file.
 
-* **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
+* **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's being created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
 
 * **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can use it to create groups of media without really associating media to your app models.
 
