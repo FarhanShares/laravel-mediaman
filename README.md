@@ -62,7 +62,7 @@ You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file up
 $file  = $request->file('file')
 $media = MediaUploader::source($file)->upload();
 ```
-The file will be stored in the default disk & bundled in the default collection & specified in the mediaman config. The file size will be stored in the database & the file name will be sanitized automatically.
+The file will be stored in the default disk & bundled in the default collection specified in the mediaman config. The file size will be stored in the database & the file name will be sanitized automatically.
 
 However, you can do a lot more, not just stick to the defaults.
 ```php
