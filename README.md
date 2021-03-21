@@ -80,10 +80,13 @@ $media = MediaUploader::source($file)
 ```
 If the collection doesn't exist, it'll be created on the fly. You can read more about collections below.
 
-Q: What happens if I don't provide a unique file name in the above process?
-A: Don't worry, MediaMan manages uploading in a smart & secure way. Files are stored in the disk in a format that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house.
+**Q: What happens if I don't provide a unique file name in the above process?**
 
+A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stored in the disk in a way that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house.
 
+**Q: But why? Won't I get a bunch of directories?**
+
+A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
 ## Associate media
 
 ## Disassociate media
