@@ -87,6 +87,8 @@ A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stor
 **Q: But why? Won't I get a bunch of directories?**
 
 A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
+
+**Reminder: MediaMan treats any file as a media source. If you want a certain file types can be uploaded, use Laravel's validator.**
 ## Associate media
 
 ## Disassociate media
