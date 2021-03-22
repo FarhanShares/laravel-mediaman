@@ -122,13 +122,34 @@ $post->attachMedia(['media-name', 'another-media-name']);
 $post->attachMedia($media, 'featured-image');
 ```
 
-
+`attachMedia()` returns number of media attached (int) on success & null on failure.
 
 ## Disassociate media
+You can use detachMedia() to disassociate media from model. It accepts only one argument & the signature of it is pretty much same as the first argument of attachMedia(), plus you can even pass null / bool / empty-string / empty-array to detach all media.
+
+```php
+// You can just pass media model / id / name
+$post->detachMedia($media);
+
+// You can even pass iterable list / collection
+$post->detachMedia(Media::all())
+$post->detachMedia([1, 2, 3, 4, 5]);
+$post->detachMedia([$mediaSix, $mediaSeven]);
+$post->detachMedia(['media-name', 'another-media-name']);
+
+// Detach all media by passing null / bool / empty-string / empty-array
+$post->detachMedia([]);
+```
+
+`detachMedia()` returns number of media detached (int) on success & null on failure.
+
+## Synchronize media
 
 
 ## Retrieve media
+
 ## Update media
+
 
 ## Delete media
 
