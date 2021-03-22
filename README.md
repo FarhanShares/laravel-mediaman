@@ -14,8 +14,8 @@ The most elegant & powerful media management package for Laravel!
 
 ```php
 $media = MediaUploader::source($request->file->('file'))
-    ->useCollection('Posts')
-    ->upload();
+            ->useCollection('Posts')
+            ->upload();
 
 $post = Post::find(1);
 $post->attachMedia($media, 'featured-image');
@@ -103,15 +103,22 @@ class Post extends Model
 ```
 This will establish the relationship between your model and the media model.
 
-Once included, you can attach media to the model as demonstrated below. The first parameter of the attach media method can either be a media model instance, an id, or an iterable list of models / ids.
+Once included, you can attach media to the model as demonstrated below. The first parameter of the attach media method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
 
 ```php
 $post = Post::first();
 
-// To the default channel
+// You can just pass media model / id / name
 $post->attachMedia($media);
 
-// To a custom channel
+// You can even pass iterable list / collection
+$post->attachMedia(Media::all())
+$post->attachMedia([1, 2, 3, 4, 5]);
+$post->attachMedia([$mediaSix, $mediaSeven]);
+$post->attachMedia(['media-name', 'another-media-name']);
+
+// Ignoring the second argument associates media in the default channel
+// Include it (string) to associate in a custom channel
 $post->attachMedia($media, 'featured-image');
 ```
 
