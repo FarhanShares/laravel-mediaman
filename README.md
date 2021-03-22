@@ -88,8 +88,34 @@ A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stor
 
 A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
 
-**Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, use Laravel's validator.**
+**Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 ## Associate media
+MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use FarhanShares\MediaMan\Traits\HasMedia;
+
+class Post extends Model
+{
+    use HasMedia;
+}
+```
+This will establish the relationship between your model and the media model.
+
+Once included, you can attach media to the model as demonstrated below. The first parameter of the attach media method can either be a media model instance, an id, or an iterable list of models / ids.
+
+```php
+$post = Post::first();
+
+// To the default channel
+$post->attachMedia($media);
+
+// To a custom channel
+$post->attachMedia($media, 'featured-image');
+```
+
+
 
 ## Disassociate media
 
