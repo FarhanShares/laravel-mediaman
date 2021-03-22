@@ -14,8 +14,8 @@ The most elegant & powerful media management package for Laravel!
 
 ```php
 $media = MediaUploader::source($request->file->('file'))
-    ->useCollection('Posts')
-    ->upload();
+            ->useCollection('Posts')
+            ->upload();
 
 $post = Post::find(1);
 $post->attachMedia($media, 'featured-image');
@@ -41,7 +41,7 @@ There are a few key concepts that need to be understood before continuing:
 
 * **Media**: It can be any type of file. You should specify file restrictions in your application's validation logic before you attempt to upload a file.
 
-* **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
+* **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's being created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
 
 * **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can use it to create groups of media without really associating media to your app models.
 
@@ -51,10 +51,18 @@ There are a few key concepts that need to be understood before continuing:
 
 * **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item (image) is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
 
-
 # Usage
+    - # Media
+    - # Media & Models
+    - # Collections
+    - # Media & Collections
+    - # Media, Models & Conversions
+----
 
 
+
+
+# Media
 ## Upload media
 You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file uploads. You can upload, create a record in the database & store the file in the filesystem in one go.
 
@@ -88,28 +96,104 @@ A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stor
 
 A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
 
-**Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, use Laravel's validator.**
-## Associate media
-
-## Disassociate media
+**Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 
 
 ## Retrieve media
+Docs will be added soon.
 ## Update media
-
+Docs will be added soon.
 ## Delete media
+Docs will be added soon.
+
+
 
 -----
+# Media & Models
+## Associate media
+MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
+
+```php
+use Illuminate\Database\Eloquent\Model;
+use FarhanShares\MediaMan\Traits\HasMedia;
+
+class Post extends Model
+{
+    use HasMedia;
+}
+```
+This will establish the relationship between your model and the media model.
+
+Once included, you can attach media to the model as demonstrated below. The first parameter of the attach media method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
+
+```php
+$post = Post::first();
+
+// You can just pass media model / id / name
+$post->attachMedia($media);
+
+// You can even pass iterable list / collection
+$post->attachMedia(Media::all())
+$post->attachMedia([1, 2, 3, 4, 5]);
+$post->attachMedia([$mediaSix, $mediaSeven]);
+$post->attachMedia(['media-name', 'another-media-name']);
+
+// Ignoring the second argument associates media in the default channel
+// Include it (string) to associate in a custom channel
+$post->attachMedia($media, 'featured-image');
+```
+
+`attachMedia()` returns number of media attached (int) on success & null on failure.
+
+## Disassociate media
+You can use detachMedia() to disassociate media from model. It accepts only one argument & the signature of it is pretty much same as the first argument of attachMedia(), plus you can even pass null / bool / empty-string / empty-array to detach all media.
+
+```php
+// You can just pass media model / id / name
+$post->detachMedia($media);
+
+// You can even pass iterable list / collection
+$post->detachMedia(Media::all())
+$post->detachMedia([1, 2, 3, 4, 5]);
+$post->detachMedia([$mediaSix, $mediaSeven]);
+$post->detachMedia(['media-name', 'another-media-name']);
+
+// Detach all media by passing null / bool / empty-string / empty-array
+$post->detachMedia([]);
+```
+
+`detachMedia()` returns number of media detached (int) on success & null on failure.
+
+## Synchronize association / disassociation
+WIP: This feature will be added soon.
+
+
+
+
+-----
+# Collections
+## Create collection
+Docs will be added soon.
 ## Retrieve collection
-
+Docs will be added soon.
 ## Update collection
+Docs will be added soon.
 ## Delete collection
-
+Docs will be added soon.
 
 ------
-## Collections & Media
+## Media & Collections
+
+# Bind media
+Docs will be added soon.
+# Unbind media
+Docs will be added soon.
+# Synchronize binding & unbinding
+Docs will be added soon.
+
+
+
 
 -----
 # Conversions
-
 Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
