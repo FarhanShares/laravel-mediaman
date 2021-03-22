@@ -51,10 +51,18 @@ There are a few key concepts that need to be understood before continuing:
 
 * **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item (image) is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
 
-
 # Usage
+    - # Media
+    - # Media & Models
+    - # Collections
+    - # Media & Collections
+    - # Media, Models & Conversions
+----
 
 
+
+
+# Media
 ## Upload media
 You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file uploads. You can upload, create a record in the database & store the file in the filesystem in one go.
 
@@ -89,6 +97,19 @@ A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stor
 A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
 
 **Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
+
+
+## Retrieve media
+Docs will be added soon.
+## Update media
+Docs will be added soon.
+## Delete media
+Docs will be added soon.
+
+
+
+-----
+# Media & Models
 ## Associate media
 MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
 
@@ -143,27 +164,36 @@ $post->detachMedia([]);
 
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
-## Synchronize media
+## Synchronize association / disassociation
+WIP: This feature will be added soon.
 
 
-## Retrieve media
 
-## Update media
-
-
-## Delete media
 
 -----
+# Collections
+## Create collection
+Docs will be added soon.
 ## Retrieve collection
-
+Docs will be added soon.
 ## Update collection
+Docs will be added soon.
 ## Delete collection
-
+Docs will be added soon.
 
 ------
-## Collections & Media
+## Media & Collections
+
+# Bind media
+Docs will be added soon.
+# Unbind media
+Docs will be added soon.
+# Synchronize binding & unbinding
+Docs will be added soon.
+
+
+
 
 -----
 # Conversions
-
 Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
