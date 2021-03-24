@@ -172,14 +172,47 @@ WIP: This feature will be added soon.
 
 -----
 # Collections
+MediaMan provides collections to bundle your media for better management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with collection.
 ## Create collection
-Docs will be added soon.
+Collections are created on thy fly if it doesn't exist while uploading file.
+```php
+$media = MediaUploader::source($request->file('file'))
+            ->useCollection('New Collection')
+            ->upload();
+```
+
+If you wish to create collection without uploading a file, you can do it, after all, it's a model.
+
+```php
+MediaCollection::create(['name' => 'My Collection']);
+```
 ## Retrieve collection
-Docs will be added soon.
+You can retrieve a collection by it's id or name.
+```php
+MediaCollection::find(1);
+MediaCollection::findByName('My Collection');
+
+// Retrieve the bound media as well
+MediaCollection::with('media')->find(1);
+MediaCollection::with('media')->findByName('My Collection');
+```
 ## Update collection
-Docs will be added soon.
+You can update a collection name.
+```php
+$collection = MediaCollection::find(1);
+$collection->name = 'New Name'
+$collection->save();
+```
+
 ## Delete collection
-Docs will be added soon.
+You can delete a collection.
+```php
+$collection = MediaCollection::find(1);
+$collection->delete()
+```
+This won't delete the media from disk but the bindings will be removed.
+
+*Heads Up!* deleteWithMedia() is a conceptual method that hasn't implemented yet, create a feature request if you need this.
 
 ------
 ## Media & Collections
