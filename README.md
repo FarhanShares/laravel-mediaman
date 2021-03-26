@@ -124,7 +124,7 @@ class Post extends Model
 ```
 This will establish the relationship between your model and the media model.
 
-Once done, you can attach media to the model as demonstrated below. The first parameter of the attach media method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
+Once done, you can associate media to the model as demonstrated below. The first parameter of the attachMedia() method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
 
 ```php
 $post = Post::first();
