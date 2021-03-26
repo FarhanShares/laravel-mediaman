@@ -122,7 +122,7 @@ $media = Media::find(1);
 // by name
 $media = Media::findByName('media-name');
 ```
-
+<!-- todo: add mime_type, size, friendly_size docs -->
 
 
 
@@ -134,7 +134,7 @@ $media->name = 'New name';
 $media->save()
 ```
 
-Do not update anything rather than name using the model. If you need to deal with collections, please read the docs below. Updating disk & file name will be added in future release. PRs are welcome.
+Do not update anything rather than `name` using the Media instance. If you need to deal with collections, please read the docs below. Updating disk & file name will be added soon. PRs are welcome.
 
 
 
@@ -150,6 +150,8 @@ $media->delete()
 
 -----
 ## Media & Models
+<!-- todo: add: retrieve model's media -->
+
 ### Associate media
 MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
 
@@ -212,7 +214,7 @@ WIP: This feature will be added soon.
 
 -----
 ## Collections
-MediaMan provides collections to bundle your media for better management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with collection.
+MediaMan provides collections to bundle your media for better management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with media collections.
 ### Create collection
 Collections are created on thy fly if it doesn't exist while uploading file.
 ```php
