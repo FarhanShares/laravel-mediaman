@@ -10,6 +10,9 @@
 # Laravel MediaMan</h1>
 The most elegant & powerful media management package for Laravel!
 
+
+
+
 ## In a hurry? Here's a quick example:
 
 ```php
@@ -21,19 +24,7 @@ $post = Post::find(1);
 $post->attachMedia($media, 'featured-image');
 ```
 
-## Installation
 
-You can install the package via composer:
-
-```bash
-composer require farhanshares/laravel-mediaman
-```
-
-Once installed, you should publish the provided assets to create the necessary migration and config files.
-
-```bash
-php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
-```
 
 ## Overview & Key concepts
 
@@ -51,19 +42,46 @@ There are a few key concepts that need to be understood before continuing:
 
 * **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item (image) is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
 
-# Usage
-    - # Media
-    - # Media & Models
-    - # Collections
-    - # Media & Collections
-    - # Media, Models & Conversions
-----
+
+
+
+## Table of Contents
+  * [Installation](#installation)
+  * [Configuration](#configuration)
+  * [Media](#media)
+  * [Media & Models](#media--models)
+  * [Collections](#collections)
+  * [Media & Collections](#media--collections)
+  * [Media, Models & Conversions](#conversions)
+
+
+
+## Installation
+
+You can install the package via composer:
+
+```bash
+composer require farhanshares/laravel-mediaman
+```
+The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the following line in:
+
+
+Once installed, you should publish the provided assets to create the necessary migration and config files.
+
+```bash
+php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
+```
+
+
+
+## Configuration
+WIP: Docs will be added soon
 
 
 
 
-# Media
-## Upload media
+## Media
+### Upload media
 You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file uploads. You can upload, create a record in the database & store the file in the filesystem in one go.
 
 ```php
@@ -99,18 +117,64 @@ A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` mod
 **Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 
 
-## Retrieve media
-Docs will be added soon.
-## Update media
-Docs will be added soon.
-## Delete media
-Docs will be added soon.
 
+
+### Retrieve media
+You can use any Eloquent operation to retrieve a media plus we've added findByName().
+
+```php
+// by id
+$media = Media::find(1);
+// by name
+$media = Media::findByName('media-name');
+// with collections
+$media = Media::with('collections')->find(1);
+```
+
+An instance of Media has the following attributes:
+- id
+- name
+- file_name
+- size (in bytes)
+- friendly_size (in human readable format)
+- mime_type
+- url
+- disk
+- data
+- created_at
+- updated_at
+- collections
+
+
+### Update media
+You can update a media name with an instance of Media.
+
+```php
+$media = Media::first();
+$media->name = 'New name';
+$media->save()
+```
+
+Do not update anything rather than `name` using the Media instance. If you need to deal with collections, please read the docs below.
+
+WIP: Updating disk & file name will be added soon. PRs are welcome.
+
+
+
+### Delete media
+You can delete media by calling delete() method on an instance of Media.
+
+```php
+$media = Media::first();
+$media->delete()
+```
+*Heads Up!* When a Media instance gets deleted, file will be removed from the filesystem, all the association with your app models & MediaCollection will be removed as well. Isn't that cool?
 
 
 -----
-# Media & Models
-## Associate media
+## Media & Models
+
+### Associate media
 MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
 
 ```php
@@ -124,7 +188,7 @@ class Post extends Model
 ```
 This will establish the relationship between your model and the media model.
 
-Once included, you can attach media to the model as demonstrated below. The first parameter of the attach media method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
+Once done, you can associate media to the model as demonstrated below. The first parameter of the attachMedia() method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
 
 ```php
 $post = Post::first();
@@ -145,7 +209,7 @@ $post->attachMedia($media, 'featured-image');
 
 `attachMedia()` returns number of media attached (int) on success & null on failure.
 
-## Disassociate media
+### Disassociate media
 You can use detachMedia() to disassociate media from model. It accepts only one argument & the signature of it is pretty much same as the first argument of attachMedia(), plus you can even pass null / bool / empty-string / empty-array to detach all media.
 
 ```php
@@ -160,20 +224,47 @@ $post->detachMedia(['media-name', 'another-media-name']);
 
 // Detach all media by passing null / bool / empty-string / empty-array
 $post->detachMedia([]);
+
+// Detach all media in a specific channel
+$post->clearMediaChannel('channel-name');
 ```
 
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
-## Synchronize association / disassociation
+### Synchronize association / disassociation
 WIP: This feature will be added soon.
 
 
 
 
+### Retrieve media of a model
+Apart from that, `HasMedia` trait enables your app models retrieving media conveniently.
+```php
+// All media from the default channel
+$post->getMedia();
+// All media from the specified channel
+$post->getMedia('custom-channel');
+```
+
+It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
+
+```php
+// First media item from the default channel
+$post->getFirstMedia();
+// First media item from the specified channel
+$post->getFirstMedia('custom-channel');
+
+// URL of the first media item from the default channel
+$post->getFirstMediaUrl();
+// URL of the first media item from the specified channel
+$post->getFirstMediaUrl('custom-channel');
+```
+
+
 -----
-# Collections
-MediaMan provides collections to bundle your media for better management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with collection.
-## Create collection
+## Collections
+MediaMan provides collections to bundle your media for better media management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with media collections.
+### Create collection
 Collections are created on thy fly if it doesn't exist while uploading file.
 ```php
 $media = MediaUploader::source($request->file('file'))
@@ -181,12 +272,12 @@ $media = MediaUploader::source($request->file('file'))
             ->upload();
 ```
 
-If you wish to create collection without uploading a file, you can do it, after all, it's a model.
+If you wish to create collection without uploading a file, you can do it, after all, it's an Eloquent model.
 
 ```php
 MediaCollection::create(['name' => 'My Collection']);
 ```
-## Retrieve collection
+### Retrieve collection
 You can retrieve a collection by it's id or name.
 ```php
 MediaCollection::find(1);
@@ -196,28 +287,28 @@ MediaCollection::findByName('My Collection');
 MediaCollection::with('media')->find(1);
 MediaCollection::with('media')->findByName('My Collection');
 ```
-## Update collection
-You can update a collection name.
+### Update collection
+You can update a collection name. It doesn't really have any other things to update.
 ```php
-$collection = MediaCollection::find(1);
+$collection = MediaCollection::findByName('My Collection');
 $collection->name = 'New Name'
 $collection->save();
 ```
 
-## Delete collection
-You can delete a collection.
+### Delete collection
+You can delete a collection using an instance of MediaCollection.
 ```php
 $collection = MediaCollection::find(1);
 $collection->delete()
 ```
 This won't delete the media from disk but the bindings will be removed from database.
 
-*Heads Up!* deleteWithMedia() is a conceptual method that hasn't implemented yet, create a feature request if you need this.
+*Heads Up!* deleteWithMedia() is a conceptual method that hasn't implemented yet, create a feature request if you need this. PRs are very much appreciated.
 
 ------
 ## Media & Collections
 You can create relationship between `Media` & `MediaCollection` very easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`, which is again similar to the `HasMedia` trait.
-# Bind media
+### Bind media
 ```php
 $collection = MediaCollection::first();
 // You can just pass a media model / id / name
@@ -233,7 +324,7 @@ $collection->attachMedia(['media-name']);
 `attachMedia()` returns number of media attached (int) on success & null on failure. You can you `Media::attachCollections()` to bind to collections from a media model.
 
 *Heads Up!* Unlike `HasMedia` trait, you can not have channels on media collections.
-# Unbind media
+### Unbind media
 ```php
 $collection = MediaCollection::first();
 // You can just pass media model / id / name
@@ -250,7 +341,7 @@ $collection->detachMedia([]);
 ```
 `detachMedia()` returns number of media detached (int) on success & null on failure. You can you `Media::detachCollections()` to unbind from collections from a media model.
 
-# Synchronize binding & unbinding
+### Synchronize binding & unbinding
 
 ```php
 $collection = MediaCollection::first();
@@ -269,6 +360,6 @@ $collection->syncMedia([]);
 `syncMedia()` always returns an array containing synchronization status. You can use `Media::syncCollections()` to sync with collections from a media model.
 
 
------
-# Conversions
-Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+
+## Conversions
+WIP: Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
