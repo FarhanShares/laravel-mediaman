@@ -172,26 +172,101 @@ WIP: This feature will be added soon.
 
 -----
 # Collections
+MediaMan provides collections to bundle your media for better management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with collection.
 ## Create collection
-Docs will be added soon.
+Collections are created on thy fly if it doesn't exist while uploading file.
+```php
+$media = MediaUploader::source($request->file('file'))
+            ->useCollection('New Collection')
+            ->upload();
+```
+
+If you wish to create collection without uploading a file, you can do it, after all, it's a model.
+
+```php
+MediaCollection::create(['name' => 'My Collection']);
+```
 ## Retrieve collection
-Docs will be added soon.
+You can retrieve a collection by it's id or name.
+```php
+MediaCollection::find(1);
+MediaCollection::findByName('My Collection');
+
+// Retrieve the bound media as well
+MediaCollection::with('media')->find(1);
+MediaCollection::with('media')->findByName('My Collection');
+```
 ## Update collection
-Docs will be added soon.
+You can update a collection name.
+```php
+$collection = MediaCollection::find(1);
+$collection->name = 'New Name'
+$collection->save();
+```
+
 ## Delete collection
-Docs will be added soon.
+You can delete a collection.
+```php
+$collection = MediaCollection::find(1);
+$collection->delete()
+```
+This won't delete the media from disk but the bindings will be removed from database.
+
+*Heads Up!* deleteWithMedia() is a conceptual method that hasn't implemented yet, create a feature request if you need this.
 
 ------
 ## Media & Collections
-
+You can create relationship between `Media` & `MediaCollection` very easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`, which is again similar to the `HasMedia` trait.
 # Bind media
-Docs will be added soon.
+```php
+$collection = MediaCollection::first();
+// You can just pass a media model / id / name
+$collection->attachMedia($media);
+
+// You can even pass an iterable list / collection
+$collection->attachMedia(Media::all())
+$collection->attachMedia([1, 2, 3, 4, 5]);
+$collection->attachMedia([$mediaSix, $mediaSeven]);
+$collection->attachMedia(['media-name']);
+```
+
+`attachMedia()` returns number of media attached (int) on success & null on failure. You can you `Media::attachCollections()` to bind to collections from a media model.
+
+*Heads Up!* Unlike `HasMedia` trait, you can not have channels on media collections.
 # Unbind media
-Docs will be added soon.
+```php
+$collection = MediaCollection::first();
+// You can just pass media model / id / name
+$collection->detachMedia($media);
+
+// You can even pass iterable list / collection
+$collection->detachMedia(Media::all())
+$collection->detachMedia([1, 2, 3, 4, 5]);
+$collection->detachMedia([$mediaSix, $mediaSeven]);
+$collection->detachMedia(['media-name', 'another-media-name']);
+
+// Detach all media by passing null / bool / empty-string / empty-array
+$collection->detachMedia([]);
+```
+`detachMedia()` returns number of media detached (int) on success & null on failure. You can you `Media::detachCollections()` to unbind from collections from a media model.
+
 # Synchronize binding & unbinding
-Docs will be added soon.
 
+```php
+$collection = MediaCollection::first();
+// You can just pass media model / id / name
+$collection->syncMedia($media);
 
+// You can even pass iterable list / collection
+$collection->syncMedia(Media::all())
+$collection->syncMedia([1, 2, 3, 4, 5]);
+$collection->syncMedia([$mediaSix, $mediaSeven]);
+$collection->syncMedia(['media-name', 'another-media-name']);
+
+// Synchronize to having zero media by passing null / bool / empty-string / empty-array
+$collection->syncMedia([]);
+```
+`syncMedia()` always returns an array containing synchronization status. You can use `Media::syncCollections()` to sync with collections from a media model.
 
 
 -----
