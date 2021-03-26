@@ -152,24 +152,34 @@ You can update a media name with an instance of Media.
 ```php
 $media = Media::first();
 $media->name = 'New name';
+$media->data = ['additional_data' => 'new additional data']
 $media->save()
 ```
-<!-- todo: add update data docs -->
 
-Do not update anything rather than `name` using the Media instance. If you need to deal with collections, please read the docs below.
+**Note:**: Updating file name & disk will be added soon.
 
-WIP: Updating disk & file name will be added soon. PRs are welcome.
+**Heads Up!:** Do not update anything other than `name` & `data` using the Media instance. If you need to deal with collections, please read the docs below.
+
 
 
 
 ### Delete media
-You can delete media by calling delete() method on an instance of Media.
+You can delete a media by calling delete() method on an instance of Media.
 
 ```php
 $media = Media::first();
 $media->delete()
 ```
-*Heads Up!* When a Media instance gets deleted, file will be removed from the filesystem, all the association with your app models & MediaCollection will be removed as well. Isn't that cool?
+
+Or you delete media like this:
+```php
+Media::destroy(1);
+Media::destroy([1, 2, 3]);
+```
+
+**Note:** When a Media instance gets deleted, file will be removed from the filesystem, all the association with your App Models & MediaCollection will be removed as well.
+
+**Heads Up!:** You should not delete media using queries, e.g. `Media::where('name', 'the-file')->delete()`, this will not trigger deleted event & the file won't be deleted from the filesystem. Read more about it [here](https://laravel.com/docs/master/eloquent#deleting-models-using-queries)
 
 
 -----
@@ -197,7 +207,7 @@ The first parameter of the attachMedia() method can either be a media model / id
 $post = Post::first();
 
 // Associate in the default channel
-$post->attachMedia($media); // or [1, 2, 3] or [$mediaOne, $mediaTwo]
+$post->attachMedia($media); // or Media::all() or [1, 2, 3]
 
 // Associate in a custom channel
 $post->attachMedia($media, 'featured-image');
@@ -212,7 +222,7 @@ You can use detachMedia() to disassociate media from model.
 // Detach all media from all channels
 $post->detachMedia();
 // Detach the specified media
-$post->detachMedia($media); // or [1, 2, 3] or [$mediaOne, $mediaTwo]
+$post->detachMedia($media); // or [1, 2, 3] //
 
 // Detach all media of the default channel
 $post->clearMediaChannel();
