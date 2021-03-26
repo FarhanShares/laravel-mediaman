@@ -131,7 +131,7 @@ class HasMediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_retrieve_all_the_media_from_the_specified_group()
+    public function it_can_retrieve_all_the_media_from_the_specified_channel()
     {
         $media = factory(Media::class, 2)->create();
 
@@ -179,15 +179,15 @@ class HasMediaTest extends TestCase
     }
 
     /** @test */
-    public function it_will_only_retrieve_media_from_the_specified_group()
+    public function it_will_only_retrieve_media_from_the_specified_channel()
     {
         $defaultMedia = factory(Media::class)->create();
         $galleryMedia = factory(Media::class)->create();
 
-        // Attach media to the default group...
+        // Attach media to the default channel...
         $this->subject->attachMedia($defaultMedia->id);
 
-        // Attach media to the gallery group...
+        // Attach media to the gallery channel...
         $this->subject->attachMedia($galleryMedia->id, 'gallery');
 
         $allDefaultMedia = $this->subject->getMedia();
@@ -291,7 +291,7 @@ class HasMediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_detach_all_the_media_in_a_specified_group()
+    public function it_can_detach_all_the_media_in_a_specified_channel()
     {
         $mediaOne = factory(Media::class)->create();
         $mediaTwo = factory(Media::class)->create();
