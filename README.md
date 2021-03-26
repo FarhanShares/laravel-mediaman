@@ -134,6 +134,7 @@ An instance of Media has the following attributes:
 - mime_type
 - url
 - disk
+- data
 - created_at
 - updated_at
 - collections
