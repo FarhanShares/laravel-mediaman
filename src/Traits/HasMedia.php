@@ -92,12 +92,12 @@ trait HasMedia
 
         $ids = $this->parseMediaIds($media);
 
-        $mediaGroup = $this->getMediaChannel($channel);
+        $mediaChannel = $this->getMediaChannel($channel);
 
-        if ($mediaGroup && $mediaGroup->hasConversions()) {
+        if ($mediaChannel && $mediaChannel->hasConversions()) {
             $conversions = array_merge(
                 $conversions,
-                $mediaGroup->getConversions()
+                $mediaChannel->getConversions()
             );
         }
 
@@ -114,6 +114,7 @@ trait HasMedia
             });
         }
 
+        // todo: use sync($ids, false)
         $this->media()->attach($ids, [
             'channel' => $channel,
         ]);
@@ -156,11 +157,11 @@ trait HasMedia
      */
     protected function addMediaChannel(string $name)
     {
-        $group = new MediaChannel();
+        $channel = new MediaChannel();
 
-        $this->mediaChannels[$name] = $group;
+        $this->mediaChannels[$name] = $channel;
 
-        return $group;
+        return $channel;
     }
 
     /**

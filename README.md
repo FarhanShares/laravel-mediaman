@@ -152,23 +152,34 @@ You can update a media name with an instance of Media.
 ```php
 $media = Media::first();
 $media->name = 'New name';
+$media->data = ['additional_data' => 'new additional data']
 $media->save()
 ```
 
-Do not update anything rather than `name` using the Media instance. If you need to deal with collections, please read the docs below.
+**Note:**: Updating file name & disk will be added soon.
 
-WIP: Updating disk & file name will be added soon. PRs are welcome.
+**Heads Up!:** Do not update anything other than `name` & `data` using the Media instance. If you need to deal with collections, please read the docs below.
+
 
 
 
 ### Delete media
-You can delete media by calling delete() method on an instance of Media.
+You can delete a media by calling delete() method on an instance of Media.
 
 ```php
 $media = Media::first();
 $media->delete()
 ```
-*Heads Up!* When a Media instance gets deleted, file will be removed from the filesystem, all the association with your app models & MediaCollection will be removed as well. Isn't that cool?
+
+Or you delete media like this:
+```php
+Media::destroy(1);
+Media::destroy([1, 2, 3]);
+```
+
+**Note:** When a Media instance gets deleted, file will be removed from the filesystem, all the association with your App Models & MediaCollection will be removed as well.
+
+**Heads Up!:** You should not delete media using queries, e.g. `Media::where('name', 'the-file')->delete()`, this will not trigger deleted event & the file won't be deleted from the filesystem. Read more about it [here](https://laravel.com/docs/master/eloquent#deleting-models-using-queries)
 
 
 -----
@@ -188,44 +199,36 @@ class Post extends Model
 ```
 This will establish the relationship between your model and the media model.
 
-Once done, you can associate media to the model as demonstrated below. The first parameter of the attachMedia() method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
+Once done, you can associate media to the model as demonstrated below.
+
+The first parameter of the attachMedia() method can either be a media model / id or an iterable collection of models / ids.
 
 ```php
 $post = Post::first();
 
-// You can just pass media model / id / name
-$post->attachMedia($media);
+// Associate in the default channel
+$post->attachMedia($media); // or 1 or [1, 2, 3] or collection of media models
 
-// You can even pass iterable list / collection
-$post->attachMedia(Media::all())
-$post->attachMedia([1, 2, 3, 4, 5]);
-$post->attachMedia([$mediaSix, $mediaSeven]);
-$post->attachMedia(['media-name', 'another-media-name']);
-
-// Ignoring the second argument associates media in the default channel
-// Include it (string) to associate in a custom channel
+// Associate in a custom channel
 $post->attachMedia($media, 'featured-image');
 ```
 
 `attachMedia()` returns number of media attached (int) on success & null on failure.
 
 ### Disassociate media
-You can use detachMedia() to disassociate media from model. It accepts only one argument & the signature of it is pretty much same as the first argument of attachMedia(), plus you can even pass null / bool / empty-string / empty-array to detach all media.
+You can use detachMedia() to disassociate media from model.
 
 ```php
-// You can just pass media model / id / name
-$post->detachMedia($media);
+// Detach all media from all channels
+$post->detachMedia();
 
-// You can even pass iterable list / collection
-$post->detachMedia(Media::all())
-$post->detachMedia([1, 2, 3, 4, 5]);
-$post->detachMedia([$mediaSix, $mediaSeven]);
-$post->detachMedia(['media-name', 'another-media-name']);
+// Detach the specified media
+$post->detachMedia($media); // or 1 or [1, 2, 3] or collection of media models
 
-// Detach all media by passing null / bool / empty-string / empty-array
-$post->detachMedia([]);
+// Detach all media of the default channel
+$post->clearMediaChannel();
 
-// Detach all media in a specific channel
+// Detach all media of the specific channel
 $post->clearMediaChannel('channel-name');
 ```
 
@@ -243,7 +246,7 @@ Apart from that, `HasMedia` trait enables your app models retrieving media conve
 // All media from the default channel
 $post->getMedia();
 // All media from the specified channel
-$post->getMedia('custom-channel');
+$post->getMedia('featured-image');
 ```
 
 It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
@@ -252,12 +255,12 @@ It might be a common scenario for most of the Laravel apps to use the first medi
 // First media item from the default channel
 $post->getFirstMedia();
 // First media item from the specified channel
-$post->getFirstMedia('custom-channel');
+$post->getFirstMedia('avatar');
 
 // URL of the first media item from the default channel
 $post->getFirstMediaUrl();
 // URL of the first media item from the specified channel
-$post->getFirstMediaUrl('custom-channel');
+$post->getFirstMediaUrl('avatar');
 ```
 
 
@@ -268,7 +271,7 @@ MediaMan provides collections to bundle your media for better media management. 
 Collections are created on thy fly if it doesn't exist while uploading file.
 ```php
 $media = MediaUploader::source($request->file('file'))
-            ->useCollection('New Collection')
+            ->useCollection('My Collection')
             ->upload();
 ```
 
@@ -291,7 +294,7 @@ MediaCollection::with('media')->findByName('My Collection');
 You can update a collection name. It doesn't really have any other things to update.
 ```php
 $collection = MediaCollection::findByName('My Collection');
-$collection->name = 'New Name'
+$collection->name = 'Our Collection'
 $collection->save();
 ```
 
@@ -307,39 +310,30 @@ This won't delete the media from disk but the bindings will be removed from data
 
 ------
 ## Media & Collections
-You can create relationship between `Media` & `MediaCollection` very easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`, which is again similar to the `HasMedia` trait.
+The relationship between `Media` & `MediaCollection` are already configured. You can bind, unbind & sync binding & unbinding easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`.
+
 ### Bind media
 ```php
 $collection = MediaCollection::first();
-// You can just pass a media model / id / name
+// You can just pass a media model / id / name or an iterable collection of those
+// e.g. 1 or [1, 2] or $media or [$mediaOne, $mediaTwo] or 'media-name' or ['media-name', 'another-media-name']
 $collection->attachMedia($media);
-
-// You can even pass an iterable list / collection
-$collection->attachMedia(Media::all())
-$collection->attachMedia([1, 2, 3, 4, 5]);
-$collection->attachMedia([$mediaSix, $mediaSeven]);
-$collection->attachMedia(['media-name']);
 ```
 
-`attachMedia()` returns number of media attached (int) on success & null on failure. You can you `Media::attachCollections()` to bind to collections from a media model.
+`attachMedia()` returns number of media attached (int) on success & null on failure. Alternatively, you can use `Media::attachCollections()` to bind to collections from a media model instance.
 
 *Heads Up!* Unlike `HasMedia` trait, you can not have channels on media collections.
 ### Unbind media
 ```php
 $collection = MediaCollection::first();
-// You can just pass media model / id / name
+// You can just pass a media model / id / name or an iterable collection of those
+// e.g. 1 or [1, 2] or $media or [$mediaOne, $mediaTwo] or 'media-name' or ['media-name', 'another-media-name']
 $collection->detachMedia($media);
-
-// You can even pass iterable list / collection
-$collection->detachMedia(Media::all())
-$collection->detachMedia([1, 2, 3, 4, 5]);
-$collection->detachMedia([$mediaSix, $mediaSeven]);
-$collection->detachMedia(['media-name', 'another-media-name']);
 
 // Detach all media by passing null / bool / empty-string / empty-array
 $collection->detachMedia([]);
 ```
-`detachMedia()` returns number of media detached (int) on success & null on failure. You can you `Media::detachCollections()` to unbind from collections from a media model.
+`detachMedia()` returns number of media detached (int) on success & null on failure. Alternatively, you can use `Media::detachCollections()` to unbind from collections from a media model instance.
 
 ### Synchronize binding & unbinding
 
@@ -362,4 +356,6 @@ $collection->syncMedia([]);
 
 
 ## Conversions
-WIP: Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+
+Note: Docs are being updated asap! Keep an eye here :)
