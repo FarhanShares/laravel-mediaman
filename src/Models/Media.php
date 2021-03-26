@@ -21,7 +21,7 @@ class Media extends Model
      * @var array
      */
     protected $fillable = [
-        'disk', 'display_name', 'name', 'mime_type', 'size', 'data'
+        'name', 'file_name', 'mime_type', 'size', 'disk', 'data'
     ];
 
     protected $casts = [
@@ -79,6 +79,27 @@ class Media extends Model
     {
         return $this->type === $type;
     }
+
+    /**
+     * Get the file size in human readable format.
+     *
+     * @return string|null
+     */
+    public function getFriendlySizeAttribute()
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        if ($this->size == 0) {
+            return '0 ' . $units[1];
+        }
+
+        for ($i = 0; $this->size > 1024; $i++) {
+            $this->size /= 1024;
+        }
+
+        return round($this->size, 2) . ' ' . $units[$i];
+    }
+
 
     /**
      * Get the url to the file.
