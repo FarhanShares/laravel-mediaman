@@ -150,7 +150,6 @@ $media->delete()
 
 -----
 ## Media & Models
-<!-- todo: add: retrieve model's media -->
 
 ### Associate media
 MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
@@ -202,14 +201,55 @@ $post->detachMedia(['media-name', 'another-media-name']);
 
 // Detach all media by passing null / bool / empty-string / empty-array
 $post->detachMedia([]);
+
+// Detach all media in a specific channel
+$post->clearMediaChannel('channel-name');
 ```
 
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
 ### Synchronize association / disassociation
-WIP: This feature will be added soon.
+This feature will be added soon.
 
 
+
+
+### Retrieve media of a model
+
+```php
+// All media from the default channel
+$post->getMedia();
+// All media from the specified channel
+$post->getMedia('custom-channel');
+```
+
+It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
+
+```php
+// First media item from the default channel
+$post->getFirstMedia();
+// First media item from the specified channel
+$post->getFirstMedia('custom-channel');
+
+// URL of the first media item from the default channel
+$post->getFirstMediaUrl();
+// URL of the first media item from the specified channel
+$post->getFirstMediaUrl('custom-channel');
+```
+
+
+An instance of Media has the following attributes
+- id
+- name
+- file_name
+- size
+- friendly_size
+- mime_type
+- url
+- disk
+- created_at
+- updated_at
+- collections
 
 
 -----
@@ -239,7 +279,7 @@ MediaCollection::with('media')->find(1);
 MediaCollection::with('media')->findByName('My Collection');
 ```
 ### Update collection
-You can update a collection name.
+You can update a collection name. It doesn't really have any other things to update.
 ```php
 $collection = MediaCollection::findByName('My Collection');
 $collection->name = 'New Name'
@@ -247,7 +287,7 @@ $collection->save();
 ```
 
 ### Delete collection
-You can delete a collection.
+You can delete a collection using an instance of MediaCollection.
 ```php
 $collection = MediaCollection::find(1);
 $collection->delete()
