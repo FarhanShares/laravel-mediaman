@@ -351,5 +351,5 @@ $collection->syncMedia([]);
 
 
 -----
-## Conversions
+## Conversions (WIP)
 Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
