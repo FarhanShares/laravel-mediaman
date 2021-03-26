@@ -63,8 +63,9 @@ You can install the package via composer:
 ```bash
 composer require farhanshares/laravel-mediaman
 ```
-The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the following line in:
+The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the service provider to your config/app.php file:
 
+`FarhanShares\MediaMan\MediaManServiceProvider::class`
 
 Once installed, you should publish the provided assets to create the necessary migration and config files.
 
@@ -75,8 +76,27 @@ php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProv
 
 
 ## Configuration
-WIP: Docs will be added soon
+MediaMan works out of the box. If you want to tweak it, MediaMan ships with a config/mediaman.php. One common need of tweaking could be to store media in a dedicated Storage.
 
+MediaMan supports all of the storage driver that are supported by Laravel.
+
+For i.e. Let's configure a local media disk for MediaMan.
+
+```php
+// file: config/filesystems.php
+// add the lines in disks array
+'media' => [
+    'driver' => 'local',
+    'root' => storage_path('app/media'),
+    'url' => env('APP_URL') . '/media',
+    'visibility' => 'public',
+  ],
+
+
+// file: config/mediaman.php
+// update the disk config to use our recently created media disk
+'disk' => 'media'
+```
 
 
 
