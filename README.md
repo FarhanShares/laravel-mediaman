@@ -135,9 +135,11 @@ An instance of Media has the following attributes:
 - id
 - name
 - file_name
+- extension
+- type
+- mime_type
 - size (in bytes)
 - friendly_size (in human readable format)
-- mime_type
 - url
 - disk
 - data
@@ -156,9 +158,9 @@ $media->data = ['additional_data' => 'new additional data']
 $media->save()
 ```
 
-**Note:**: Updating file name & disk will be added soon.
+**Note:** Updating file name & disk will be added soon.
 
-**Heads Up!:** Do not update anything other than `name` & `data` using the Media instance. If you need to deal with collections, please read the docs below.
+**Heads Up!** Do not update anything other than `name` & `data` using the Media instance. If you need to deal with collections, please read the docs below.
 
 
 
@@ -201,7 +203,7 @@ This will establish the relationship between your model and the media model.
 
 Once done, you can associate media to the model as demonstrated below.
 
-The first parameter of the attachMedia() method can either be a media model / id or an iterable collection of models / ids.
+The first parameter of the `attachMedia()` method can either be a media model / id or an iterable collection of models / ids.
 
 ```php
 $post = Post::first();
@@ -214,31 +216,6 @@ $post->attachMedia($media, 'featured-image');
 ```
 
 `attachMedia()` returns number of media attached (int) on success & null on failure.
-
-### Disassociate media
-You can use detachMedia() to disassociate media from model.
-
-```php
-// Detach all media from all channels
-$post->detachMedia();
-
-// Detach the specified media
-$post->detachMedia($media); // or 1 or [1, 2, 3] or collection of media models
-
-// Detach all media of the default channel
-$post->clearMediaChannel();
-
-// Detach all media of the specific channel
-$post->clearMediaChannel('channel-name');
-```
-
-`detachMedia()` returns number of media detached (int) on success & null on failure.
-
-### Synchronize association / disassociation
-WIP: This feature will be added soon.
-
-
-
 
 ### Retrieve media of a model
 Apart from that, `HasMedia` trait enables your app models retrieving media conveniently.
@@ -262,6 +239,28 @@ $post->getFirstMediaUrl();
 // URL of the first media item from the specified channel
 $post->getFirstMediaUrl('avatar');
 ```
+
+### Disassociate media
+You can use `detachMedia()` to disassociate media from model.
+
+```php
+// Detach the specified media
+$post->detachMedia($media); // or 1 or [1, 2, 3] or collection of media models
+
+// Detach all media from all channels
+$post->detachMedia();
+
+// Detach all media of the default channel
+$post->clearMediaChannel();
+
+// Detach all media of the specific channel
+$post->clearMediaChannel('channel-name');
+```
+
+`detachMedia()` returns number of media detached (int) on success & null on failure.
+
+### Synchronize association / disassociation
+WIP: This feature will be added soon.
 
 
 -----
