@@ -10,6 +10,9 @@
 # Laravel MediaMan</h1>
 The most elegant & powerful media management package for Laravel!
 
+
+
+
 ## In a hurry? Here's a quick example:
 
 ```php
@@ -20,6 +23,9 @@ $media = MediaUploader::source($request->file->('file'))
 $post = Post::find(1);
 $post->attachMedia($media, 'featured-image');
 ```
+
+
+
 
 ## Installation
 
@@ -34,6 +40,9 @@ Once installed, you should publish the provided assets to create the necessary m
 ```bash
 php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
 ```
+
+
+
 
 ## Overview & Key concepts
 
@@ -51,19 +60,22 @@ There are a few key concepts that need to be understood before continuing:
 
 * **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item (image) is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
 
-# Usage
-    - # Media
-    - # Media & Models
-    - # Collections
-    - # Media & Collections
-    - # Media, Models & Conversions
-----
+
+
+
+Table of Contents
+=================
+  * [Media](#media)
+  * [Media & Models](#media--models)
+  * [Collections](#collections)
+  * [Media & Collections](#media--collections)
+  * [Media, Models & Conversions](#conversions)
 
 
 
 
-# Media
-## Upload media
+## Media
+### Upload media
 You should use the `FarhanShares\MediaMan\MediaUploader` class to handle file uploads. You can upload, create a record in the database & store the file in the filesystem in one go.
 
 ```php
@@ -99,18 +111,35 @@ A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` mod
 **Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 
 
-## Retrieve media
+
+
+### Retrieve media
+You can use any Eloquent operation to retrieve a media plus we've added findByName().
+
+```php
+// by id
+$media = Media::find(1);
+// by name
+$media = Media::findByName('media-name');
+```
+
+
+
+
+### Update media
 Docs will be added soon.
-## Update media
-Docs will be added soon.
-## Delete media
+
+
+
+
+### Delete media
 Docs will be added soon.
 
 
 
 -----
-# Media & Models
-## Associate media
+## Media & Models
+### Associate media
 MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
 
 ```php
@@ -145,7 +174,7 @@ $post->attachMedia($media, 'featured-image');
 
 `attachMedia()` returns number of media attached (int) on success & null on failure.
 
-## Disassociate media
+### Disassociate media
 You can use detachMedia() to disassociate media from model. It accepts only one argument & the signature of it is pretty much same as the first argument of attachMedia(), plus you can even pass null / bool / empty-string / empty-array to detach all media.
 
 ```php
@@ -164,16 +193,16 @@ $post->detachMedia([]);
 
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
-## Synchronize association / disassociation
+### Synchronize association / disassociation
 WIP: This feature will be added soon.
 
 
 
 
 -----
-# Collections
+## Collections
 MediaMan provides collections to bundle your media for better management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with collection.
-## Create collection
+### Create collection
 Collections are created on thy fly if it doesn't exist while uploading file.
 ```php
 $media = MediaUploader::source($request->file('file'))
@@ -186,7 +215,7 @@ If you wish to create collection without uploading a file, you can do it, after 
 ```php
 MediaCollection::create(['name' => 'My Collection']);
 ```
-## Retrieve collection
+### Retrieve collection
 You can retrieve a collection by it's id or name.
 ```php
 MediaCollection::find(1);
@@ -196,7 +225,7 @@ MediaCollection::findByName('My Collection');
 MediaCollection::with('media')->find(1);
 MediaCollection::with('media')->findByName('My Collection');
 ```
-## Update collection
+### Update collection
 You can update a collection name.
 ```php
 $collection = MediaCollection::find(1);
@@ -204,7 +233,7 @@ $collection->name = 'New Name'
 $collection->save();
 ```
 
-## Delete collection
+### Delete collection
 You can delete a collection.
 ```php
 $collection = MediaCollection::find(1);
@@ -212,12 +241,12 @@ $collection->delete()
 ```
 This won't delete the media from disk but the bindings will be removed from database.
 
-*Heads Up!* deleteWithMedia() is a conceptual method that hasn't implemented yet, create a feature request if you need this.
+*Heads Up!* deleteWithMedia() is a conceptual method that hasn't implemented yet, create a feature request if you need this. PRs are very much appreciated.
 
 ------
 ## Media & Collections
 You can create relationship between `Media` & `MediaCollection` very easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`, which is again similar to the `HasMedia` trait.
-# Bind media
+### Bind media
 ```php
 $collection = MediaCollection::first();
 // You can just pass a media model / id / name
@@ -233,7 +262,7 @@ $collection->attachMedia(['media-name']);
 `attachMedia()` returns number of media attached (int) on success & null on failure. You can you `Media::attachCollections()` to bind to collections from a media model.
 
 *Heads Up!* Unlike `HasMedia` trait, you can not have channels on media collections.
-# Unbind media
+### Unbind media
 ```php
 $collection = MediaCollection::first();
 // You can just pass media model / id / name
@@ -250,7 +279,7 @@ $collection->detachMedia([]);
 ```
 `detachMedia()` returns number of media detached (int) on success & null on failure. You can you `Media::detachCollections()` to unbind from collections from a media model.
 
-# Synchronize binding & unbinding
+### Synchronize binding & unbinding
 
 ```php
 $collection = MediaCollection::first();
@@ -270,5 +299,5 @@ $collection->syncMedia([]);
 
 
 -----
-# Conversions
+## Conversions
 Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
