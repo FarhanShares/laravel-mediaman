@@ -34,12 +34,19 @@ You can install the package via composer:
 ```bash
 composer require farhanshares/laravel-mediaman
 ```
+The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the following line in:
+
 
 Once installed, you should publish the provided assets to create the necessary migration and config files.
 
 ```bash
 php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
 ```
+
+
+
+## Config
+WIP: Docs will be added soon
 
 
 
@@ -141,14 +148,17 @@ An instance of Media has the following attributes:
 
 
 ### Update media
+You can update a media name with an instance of Media.
+
 ```php
-// by id
 $media = Media::first();
 $media->name = 'New name';
 $media->save()
 ```
 
-Do not update anything rather than `name` using the Media instance. If you need to deal with collections, please read the docs below. Updating disk & file name will be added soon. PRs are welcome.
+Do not update anything rather than `name` using the Media instance. If you need to deal with collections, please read the docs below.
+
+WIP: Updating disk & file name will be added soon. PRs are welcome.
 
 
 
@@ -159,7 +169,7 @@ You can delete media by calling delete() method on an instance of Media.
 $media = Media::first();
 $media->delete()
 ```
-*Heads Up!* When a Media instance gets deleted, file will be removed from the filesystem.
+*Heads Up!* When a Media instance gets deleted, file will be removed from the filesystem, all the association with your app models & MediaCollection will be removed as well. Isn't that cool?
 
 
 -----
@@ -223,13 +233,13 @@ $post->clearMediaChannel('channel-name');
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
 ### Synchronize association / disassociation
-This feature will be added soon.
+WIP: This feature will be added soon.
 
 
 
 
 ### Retrieve media of a model
-
+Apart from that, `HasMedia` trait enables your app models retrieving media conveniently.
 ```php
 // All media from the default channel
 $post->getMedia();
@@ -254,7 +264,7 @@ $post->getFirstMediaUrl('custom-channel');
 
 -----
 ## Collections
-MediaMan provides collections to bundle your media for better management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with media collections.
+MediaMan provides collections to bundle your media for better media management. Use `FarhanShares\MediaMan\Models\MediaCollection` to deal with media collections.
 ### Create collection
 Collections are created on thy fly if it doesn't exist while uploading file.
 ```php
@@ -351,6 +361,6 @@ $collection->syncMedia([]);
 `syncMedia()` always returns an array containing synchronization status. You can use `Media::syncCollections()` to sync with collections from a media model.
 
 
------
-## Conversions (WIP)
-Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+
+## Conversions
+WIP: Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
