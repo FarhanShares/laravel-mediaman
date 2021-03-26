@@ -121,9 +121,22 @@ You can use any Eloquent operation to retrieve a media plus we've added findByNa
 $media = Media::find(1);
 // by name
 $media = Media::findByName('media-name');
+// with collections
+$media = Media::with('collections')->find(1);
 ```
-<!-- todo: add mime_type, size, friendly_size docs -->
 
+An instance of Media has the following attributes:
+- id
+- name
+- file_name
+- size (in bytes)
+- friendly_size (in human readable format)
+- mime_type
+- url
+- disk
+- created_at
+- updated_at
+- collections
 
 
 ### Update media
@@ -236,20 +249,6 @@ $post->getFirstMediaUrl();
 // URL of the first media item from the specified channel
 $post->getFirstMediaUrl('custom-channel');
 ```
-
-
-An instance of Media has the following attributes
-- id
-- name
-- file_name
-- size
-- friendly_size
-- mime_type
-- url
-- disk
-- created_at
-- updated_at
-- collections
 
 
 -----
