@@ -26,31 +26,6 @@ $post->attachMedia($media, 'featured-image');
 
 
 
-
-## Installation
-
-You can install the package via composer:
-
-```bash
-composer require farhanshares/laravel-mediaman
-```
-The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the following line in:
-
-
-Once installed, you should publish the provided assets to create the necessary migration and config files.
-
-```bash
-php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
-```
-
-
-
-## Config
-WIP: Docs will be added soon
-
-
-
-
 ## Overview & Key concepts
 
 There are a few key concepts that need to be understood before continuing:
@@ -70,13 +45,38 @@ There are a few key concepts that need to be understood before continuing:
 
 
 
-Usage
+Table of Contents
 =====
+  * [Installation](#installation)
+  * [Configuration](#configuration)
   * [Media](#media)
   * [Media & Models](#media--models)
   * [Collections](#collections)
   * [Media & Collections](#media--collections)
   * [Media, Models & Conversions](#conversions)
+
+
+
+## Installation
+
+You can install the package via composer:
+
+```bash
+composer require farhanshares/laravel-mediaman
+```
+The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the following line in:
+
+
+Once installed, you should publish the provided assets to create the necessary migration and config files.
+
+```bash
+php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
+```
+
+
+
+## Configuration
+WIP: Docs will be added soon
 
 
 
