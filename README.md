@@ -207,7 +207,7 @@ The first parameter of the attachMedia() method can either be a media model / id
 $post = Post::first();
 
 // Associate in the default channel
-$post->attachMedia($media); // or Media::all() or [1, 2, 3]
+$post->attachMedia($media); // or 1 or [1, 2, 3] or collection of media models
 
 // Associate in a custom channel
 $post->attachMedia($media, 'featured-image');
@@ -221,11 +221,13 @@ You can use detachMedia() to disassociate media from model.
 ```php
 // Detach all media from all channels
 $post->detachMedia();
+
 // Detach the specified media
-$post->detachMedia($media); // or [1, 2, 3] //
+$post->detachMedia($media); // or 1 or [1, 2, 3] or collection of media models
 
 // Detach all media of the default channel
 $post->clearMediaChannel();
+
 // Detach all media of the specific channel
 $post->clearMediaChannel('channel-name');
 ```
