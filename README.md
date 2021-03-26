@@ -223,7 +223,7 @@ $media = MediaUploader::source($request->file('file'))
             ->upload();
 ```
 
-If you wish to create collection without uploading a file, you can do it, after all, it's a model.
+If you wish to create collection without uploading a file, you can do it, after all, it's an Eloquent model.
 
 ```php
 MediaCollection::create(['name' => 'My Collection']);
@@ -241,7 +241,7 @@ MediaCollection::with('media')->findByName('My Collection');
 ### Update collection
 You can update a collection name.
 ```php
-$collection = MediaCollection::find(1);
+$collection = MediaCollection::findByName('My Collection');
 $collection->name = 'New Name'
 $collection->save();
 ```
