@@ -63,8 +63,8 @@ There are a few key concepts that need to be understood before continuing:
 
 
 
-Table of Contents
-=================
+Usage
+=====
   * [Media](#media)
   * [Media & Models](#media--models)
   * [Collections](#collections)
@@ -127,14 +127,25 @@ $media = Media::findByName('media-name');
 
 
 ### Update media
-Docs will be added soon.
+```php
+// by id
+$media = Media::first();
+$media->name = 'New name';
+$media->save()
+```
 
+Do not update anything rather than name using the model. If you need to deal with collections, please read the docs below. Updating disk & file name will be added in future release. PRs are welcome.
 
 
 
 ### Delete media
-Docs will be added soon.
+You can delete media by calling delete() method on an instance of Media.
 
+```php
+$media = Media::first();
+$media->delete()
+```
+*Heads Up!* When a Media instance gets deleted, file will be removed from the filesystem.
 
 
 -----
