@@ -135,9 +135,11 @@ An instance of Media has the following attributes:
 - id
 - name
 - file_name
+- extension
+- type
+- mime_type
 - size (in bytes)
 - friendly_size (in human readable format)
-- mime_type
 - url
 - disk
 - data
