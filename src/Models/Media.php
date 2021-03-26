@@ -31,7 +31,7 @@ class Media extends Model
 
     public static function booted()
     {
-        static::deleting(static function ($media) {
+        static::deleted(static function ($media) {
             // delete the media directory
             $deleted = Storage::disk($media->disk)->deleteDirectory($media->getDirectory());
             // if failed, try deleting the file then
