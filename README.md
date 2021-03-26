@@ -45,8 +45,7 @@ There are a few key concepts that need to be understood before continuing:
 
 
 
-Table of Contents
-=====
+## Table of Contents
   * [Installation](#installation)
   * [Configuration](#configuration)
   * [Media](#media)
