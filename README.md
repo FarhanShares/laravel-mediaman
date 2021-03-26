@@ -246,7 +246,7 @@ Apart from that, `HasMedia` trait enables your app models retrieving media conve
 // All media from the default channel
 $post->getMedia();
 // All media from the specified channel
-$post->getMedia('custom-channel');
+$post->getMedia('featured-image');
 ```
 
 It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
@@ -255,12 +255,12 @@ It might be a common scenario for most of the Laravel apps to use the first medi
 // First media item from the default channel
 $post->getFirstMedia();
 // First media item from the specified channel
-$post->getFirstMedia('custom-channel');
+$post->getFirstMedia('avatar');
 
 // URL of the first media item from the default channel
 $post->getFirstMediaUrl();
 // URL of the first media item from the specified channel
-$post->getFirstMediaUrl('custom-channel');
+$post->getFirstMediaUrl('avatar');
 ```
 
 
@@ -271,7 +271,7 @@ MediaMan provides collections to bundle your media for better media management. 
 Collections are created on thy fly if it doesn't exist while uploading file.
 ```php
 $media = MediaUploader::source($request->file('file'))
-            ->useCollection('New Collection')
+            ->useCollection('My Collection')
             ->upload();
 ```
 
@@ -310,39 +310,30 @@ This won't delete the media from disk but the bindings will be removed from data
 
 ------
 ## Media & Collections
-You can create relationship between `Media` & `MediaCollection` very easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`.
+The relationship between `Media` & `MediaCollection` are already configured. You can bind, unbind & sync binding & unbinding easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`.
+
 ### Bind media
 ```php
 $collection = MediaCollection::first();
-// You can just pass a media model / id / name
+// You can just pass a media model / id / name or an iterable collection of those
+// e.g. 1 or [1, 2] or $media or [$mediaOne, $mediaTwo] or 'media-name' or ['media-name', 'another-media-name']
 $collection->attachMedia($media);
-
-// You can even pass an iterable list / collection
-$collection->attachMedia(Media::all())
-$collection->attachMedia([1, 2, 3, 4, 5]);
-$collection->attachMedia([$mediaSix, $mediaSeven]);
-$collection->attachMedia(['media-name']);
 ```
 
-`attachMedia()` returns number of media attached (int) on success & null on failure. You can you `Media::attachCollections()` to bind to collections from a media model.
+`attachMedia()` returns number of media attached (int) on success & null on failure. Alternatively, you can use `Media::attachCollections()` to bind to collections from a media model instance.
 
 *Heads Up!* Unlike `HasMedia` trait, you can not have channels on media collections.
 ### Unbind media
 ```php
 $collection = MediaCollection::first();
-// You can just pass media model / id / name
+// You can just pass a media model / id / name or an iterable collection of those
+// e.g. 1 or [1, 2] or $media or [$mediaOne, $mediaTwo] or 'media-name' or ['media-name', 'another-media-name']
 $collection->detachMedia($media);
-
-// You can even pass iterable list / collection
-$collection->detachMedia(Media::all())
-$collection->detachMedia([1, 2, 3, 4, 5]);
-$collection->detachMedia([$mediaSix, $mediaSeven]);
-$collection->detachMedia(['media-name', 'another-media-name']);
 
 // Detach all media by passing null / bool / empty-string / empty-array
 $collection->detachMedia([]);
 ```
-`detachMedia()` returns number of media detached (int) on success & null on failure. You can you `Media::detachCollections()` to unbind from collections from a media model.
+`detachMedia()` returns number of media detached (int) on success & null on failure. Alternatively, you can use `Media::detachCollections()` to unbind from collections from a media model instance.
 
 ### Synchronize binding & unbinding
 
@@ -365,4 +356,6 @@ $collection->syncMedia([]);
 
 
 ## Conversions
-WIP: Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+
+Note: Docs are being updated asap! Keep an eye here :)
