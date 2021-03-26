@@ -154,6 +154,7 @@ $media = Media::first();
 $media->name = 'New name';
 $media->save()
 ```
+<!-- todo: add update data docs -->
 
 Do not update anything rather than `name` using the Media instance. If you need to deal with collections, please read the docs below.
 
@@ -188,44 +189,34 @@ class Post extends Model
 ```
 This will establish the relationship between your model and the media model.
 
-Once done, you can associate media to the model as demonstrated below. The first parameter of the attachMedia() method can either be a media model instance, an id, a name, or an iterable list / collection of models / ids / names.
+Once done, you can associate media to the model as demonstrated below.
+
+The first parameter of the attachMedia() method can either be a media model / id or an iterable collection of models / ids.
 
 ```php
 $post = Post::first();
 
-// You can just pass media model / id / name
-$post->attachMedia($media);
+// Associate in the default channel
+$post->attachMedia($media); // or [1, 2, 3] or [$mediaOne, $mediaTwo]
 
-// You can even pass iterable list / collection
-$post->attachMedia(Media::all())
-$post->attachMedia([1, 2, 3, 4, 5]);
-$post->attachMedia([$mediaSix, $mediaSeven]);
-$post->attachMedia(['media-name', 'another-media-name']);
-
-// Ignoring the second argument associates media in the default channel
-// Include it (string) to associate in a custom channel
+// Associate in a custom channel
 $post->attachMedia($media, 'featured-image');
 ```
 
 `attachMedia()` returns number of media attached (int) on success & null on failure.
 
 ### Disassociate media
-You can use detachMedia() to disassociate media from model. It accepts only one argument & the signature of it is pretty much same as the first argument of attachMedia(), plus you can even pass null / bool / empty-string / empty-array to detach all media.
+You can use detachMedia() to disassociate media from model.
 
 ```php
-// You can just pass media model / id / name
-$post->detachMedia($media);
+// Detach all media from all channels
+$post->detachMedia();
+// Detach the specified media
+$post->detachMedia($media); // or [1, 2, 3] or [$mediaOne, $mediaTwo]
 
-// You can even pass iterable list / collection
-$post->detachMedia(Media::all())
-$post->detachMedia([1, 2, 3, 4, 5]);
-$post->detachMedia([$mediaSix, $mediaSeven]);
-$post->detachMedia(['media-name', 'another-media-name']);
-
-// Detach all media by passing null / bool / empty-string / empty-array
-$post->detachMedia([]);
-
-// Detach all media in a specific channel
+// Detach all media of the default channel
+$post->clearMediaChannel();
+// Detach all media of the specific channel
 $post->clearMediaChannel('channel-name');
 ```
 
@@ -291,7 +282,7 @@ MediaCollection::with('media')->findByName('My Collection');
 You can update a collection name. It doesn't really have any other things to update.
 ```php
 $collection = MediaCollection::findByName('My Collection');
-$collection->name = 'New Name'
+$collection->name = 'Our Collection'
 $collection->save();
 ```
 
@@ -307,7 +298,7 @@ This won't delete the media from disk but the bindings will be removed from data
 
 ------
 ## Media & Collections
-You can create relationship between `Media` & `MediaCollection` very easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`, which is again similar to the `HasMedia` trait.
+You can create relationship between `Media` & `MediaCollection` very easily. The method signatures are similar for `Media::**Collections()` and `MediaCollection::**Media()`.
 ### Bind media
 ```php
 $collection = MediaCollection::first();
