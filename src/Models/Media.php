@@ -112,6 +112,15 @@ class Media extends Model
         return round($this->size, 2) . ' ' . $units[$i];
     }
 
+    /**
+     * Get the original media url.
+     *
+     * @return string
+     */
+    public function getMediaUrlAttribute()
+    {
+        return $this->filesystem()->url($this->getPath());
+    }
 
     /**
      * Get the url to the file.
