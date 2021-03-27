@@ -434,8 +434,15 @@ class Post extends Model
 From now on, whenever a media item is attached to the "gallery" channel, a converted image will be generated. You can get the url of the converted image as demonstrated below:
 
 ```php
-// The thumbnail of the first image from the gallery group
+// The 'thumb' conversion URL of the first image from the 'gallery' channel
 $post->getFirstMediaUrl('gallery', 'thumb');
+```
+
+```php
+// if you have multiple media associated & need to retrieve URLs you can do it:
+$media = $post->getMedia();
+// getUrl() accepts two arguments: name of the channel & name of the conversion
+$mediaOneThumb = $media[0]->getUrl('gallery', 'thumb');
 ```
 
 
