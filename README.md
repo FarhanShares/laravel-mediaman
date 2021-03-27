@@ -95,7 +95,7 @@ MediaMan supports all of the storage drivers that are supported by Laravel. For 
 // update the disk config to use our recently created media disk
 'disk' => 'media'
 ```
-
+Now, run `php artisan storage:link` to create the symbolic link of our newly created media disk.
 
 
 ## Media
@@ -152,21 +152,33 @@ $media = Media::with('collections')->find(1);
 ```
 
 An instance of Media has the following attributes:
-- id
-- name
-- file_name
-- extension
-- type
-- mime_type
-- size (in bytes)
-- friendly_size (in human readable format)
-- url
-- disk
-- data
-- created_at
-- updated_at
-- collections
 
+```php
+'id' => int
+'name' => string
+'file_name' => string
+'extension' => string
+'type' => string
+'mime_type' => string
+'size' =>  int // in bytes
+'friendly_size' => string // in human readable format
+'media_url' =>  string // original media url
+'disk' =>  string
+'data' => array // casts as array
+'created_at' =>  string
+'updated_at' => string
+'collections' => object // eloquent collection
+```
+
+Once you have the media instance, you can also retrieve the converted media URLs:
+```php
+// by id
+$media = Media::find(1);
+// original media url
+$media->getUrl()
+// converted media url
+$media->getUrl('conversion-name');
+```
 
 ### Update media
 You can update a media name with an instance of Media.
@@ -248,6 +260,16 @@ $post->getMedia();
 $post->getMedia('featured-image');
 ```
 
+
+Though the original media URL is appended with the Media model, it's nice to know that you have a getUrl() method available.
+
+```php
+$media =  $post->getMedia('featured-image');
+// getUrl() accepts only one optional argument: name of the conversion
+// leave it empty to get the original media URL
+$mediaOneUrl = $media[0]->getUrl();
+```
+
 It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
 
 ```php
@@ -263,6 +285,7 @@ $post->getFirstMediaUrl();
 // URL of the first media item from the specified channel
 $post->getFirstMediaUrl('featured-image');
 ```
+*Tip:* getFirstMediaUrl() accepts two optional arguments: channel name & conversion name
 
 ### Disassociate media
 You can use `detachMedia()` method which is also shipped with HasMedia trait to disassociate media from model.
@@ -422,10 +445,23 @@ class Post extends Model
 From now on, whenever a media item is attached to the "gallery" channel, a converted image will be generated. You can get the url of the converted image as demonstrated below:
 
 ```php
-// The thumbnail of the first image from the gallery group
+// getFirstMediaUrl() accepts two optional arguments: channel name & conversion name
+// you should provide channel name & conversion name to get the url
 $post->getFirstMediaUrl('gallery', 'thumb');
 ```
 
+*Tip:* The default channel name is `default`.
+
+
+```php
+// if you have multiple media associated & need to retrieve URLs you can do it with getUrl():
+$media = $post->getMedia();
+// getUrl() accepts only one optional argument: name of the conversion
+// you should provide the conversion name to get the url
+$mediaOneThumb = $media[0]->getUrl('thumb');
+```
+
+*Tip:* The `media_url` is always appended & it's the original media URL.
 
 ## License
 The MIT License (MIT). Please read [License File](LICENSE.md) for more information.

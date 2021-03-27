@@ -24,9 +24,21 @@ class Media extends Model
         'name', 'file_name', 'mime_type', 'size', 'disk', 'data'
     ];
 
+    /**
+     * The attributes that need casting.
+     *
+     * @var array
+     */
     protected $casts = [
         'data' => Json::class
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['friendly_size',  'media_url', 'type', 'extension'];
 
 
     public static function booted()
@@ -100,6 +112,15 @@ class Media extends Model
         return round($this->size, 2) . ' ' . $units[$i];
     }
 
+    /**
+     * Get the original media url.
+     *
+     * @return string
+     */
+    public function getMediaUrlAttribute()
+    {
+        return $this->filesystem()->url($this->getPath());
+    }
 
     /**
      * Get the url to the file.
