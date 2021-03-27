@@ -2,6 +2,7 @@
 
 namespace FarhanShares\MediaMan\Traits;
 
+use Throwable;
 use FarhanShares\MediaMan\MediaChannel;
 use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Collection;
@@ -114,10 +115,19 @@ trait HasMedia
             });
         }
 
-        // todo: use sync($ids, false)
-        $this->media()->attach($ids, [
-            'channel' => $channel,
-        ]);
+
+        $mappedIds = [];
+        foreach ($ids as $id) {
+            $mappedIds[$id] = ['channel' => $channel];
+        }
+
+        try {
+            $res = $this->media()->sync($mappedIds, false);
+            $attached  = count($res['attached']);
+            return $attached > 0 ? $attached : null;
+        } catch (Throwable $th) {
+            return null;
+        }
     }
 
     /**

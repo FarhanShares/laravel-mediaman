@@ -76,6 +76,22 @@ class HasMediaTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_number_of_attached_media_or_null_while_associating()
+    {
+        $media = factory(Media::class)->create();
+
+        $attached = $this->subject->attachMedia($media, 'custom');
+
+        $this->assertEquals(1, $attached);
+
+        // todo: couldn't test null return type with sqlite test environment
+        // todo: as sqlite doesn't have relationship, it won't fail, but it works on relational db
+        // try attaching a non-existing media
+        // $attached = $this->subject->attachMedia(5, 'custom');
+        // $this->assertEquals(null, $attached);
+    }
+
+    /** @test */
     public function it_will_perform_the_given_conversions_when_media_is_attached()
     {
         Queue::fake();
