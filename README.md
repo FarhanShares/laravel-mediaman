@@ -176,7 +176,7 @@ $media->data = ['additional_data' => 'new additional data']
 $media->save()
 ```
 
-**Note:** Updating file name & disk will be added soon.
+**Note:** Support for updating file name & disk will be added soon.
 
 **Heads Up!** Do not update anything other than `name` & `data` using the Media instance. If you need to deal with collections, please read the docs below.
 
