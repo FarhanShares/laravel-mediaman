@@ -243,6 +243,7 @@ Apart from that, `HasMedia` trait enables your App Models retrieving media conve
 ```php
 // All media from the default channel
 $post->getMedia();
+
 // All media from the specified channel
 $post->getMedia('featured-image');
 ```
@@ -252,11 +253,13 @@ It might be a common scenario for most of the Laravel apps to use the first medi
 ```php
 // First media item from the default channel
 $post->getFirstMedia();
+
 // First media item from the specified channel
 $post->getFirstMedia('featured-image');
 
 // URL of the first media item from the default channel
 $post->getFirstMediaUrl();
+
 // URL of the first media item from the specified channel
 $post->getFirstMediaUrl('featured-image');
 ```
