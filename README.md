@@ -78,7 +78,7 @@ php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProv
 ## Configuration
 MediaMan works out of the box. If you want to tweak it, MediaMan ships with a config/mediaman.php. One common need of tweaking could be to store media in a dedicated Storage.
 
-MediaMan supports all of the storage driver that are supported by Laravel. For i.e. Let's configure a local media disk for MediaMan.
+MediaMan supports all of the storage drivers that are supported by Laravel. For i.e. Let's configure a local media disk for MediaMan.
 
 ```php
 // file: config/filesystems.php
