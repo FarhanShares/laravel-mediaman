@@ -196,7 +196,7 @@ $media->save()
 
 **Note:** Support for updating file name & disk will be added soon.
 
-**Heads Up!** Do not update anything other than `name` & `data` using the Media instance. If you need to deal with collections, please read the docs below.
+**Heads Up!** If you need to deal with collections, please read the docs below. Do not update anything other than `name` & `data` using the Media instance for the time being.
 
 
 
