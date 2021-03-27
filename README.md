@@ -78,7 +78,7 @@ php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProv
 ## Configuration
 MediaMan works out of the box. If you want to tweak it, MediaMan ships with a config/mediaman.php. One common need of tweaking could be to store media in a dedicated Storage.
 
-MediaMan supports all of the storage driver that are supported by Laravel. For i.e. Let's configure a local media disk for MediaMan.
+MediaMan supports all of the storage drivers that are supported by Laravel. For i.e. Let's configure a local media disk for MediaMan.
 
 ```php
 // file: config/filesystems.php
@@ -130,7 +130,7 @@ A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stor
 
 **Q: But why? Won't I get a bunch of directories?**
 
-A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
+A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, hence users won't be able to guess & retrieve a random file. More on customization will be added later.
 
 **Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 
@@ -143,8 +143,10 @@ You can use any Eloquent operation to retrieve a media plus we've added findByNa
 ```php
 // by id
 $media = Media::find(1);
+
 // by name
 $media = Media::findByName('media-name');
+
 // with collections
 $media = Media::with('collections')->find(1);
 ```
@@ -176,7 +178,7 @@ $media->data = ['additional_data' => 'new additional data']
 $media->save()
 ```
 
-**Note:** Updating file name & disk will be added soon.
+**Note:** Support for updating file name & disk will be added soon.
 
 **Heads Up!** Do not update anything other than `name` & `data` using the Media instance. If you need to deal with collections, please read the docs below.
 
@@ -199,7 +201,7 @@ Media::destroy([1, 2, 3]);
 
 **Note:** When a Media instance gets deleted, file will be removed from the filesystem, all the association with your App Models & MediaCollection will be removed as well.
 
-**Heads Up!:** You should not delete media using queries, e.g. `Media::where('name', 'the-file')->delete()`, this will not trigger deleted event & the file won't be deleted from the filesystem. Read more about it [here](https://laravel.com/docs/master/eloquent#deleting-models-using-queries)
+**Heads Up!:** You should not delete media using queries, e.g. `Media::where('name', 'the-file')->delete()`, this will not trigger deleted event & the file won't be deleted from the filesystem. Read more about it in the [official documentation](https://laravel.com/docs/master/eloquent#deleting-models-using-queries).
 
 
 -----
@@ -217,7 +219,7 @@ class Post extends Model
     use HasMedia;
 }
 ```
-This will establish the relationship between your model and the media model.
+This will establish the relationship between your App Model and the Media Model.
 
 Once done, you can associate media to the model as demonstrated below.
 
@@ -241,6 +243,7 @@ Apart from that, `HasMedia` trait enables your App Models retrieving media conve
 ```php
 // All media from the default channel
 $post->getMedia();
+
 // All media from the specified channel
 $post->getMedia('featured-image');
 ```
@@ -250,11 +253,13 @@ It might be a common scenario for most of the Laravel apps to use the first medi
 ```php
 // First media item from the default channel
 $post->getFirstMedia();
+
 // First media item from the specified channel
 $post->getFirstMedia('featured-image');
 
 // URL of the first media item from the default channel
 $post->getFirstMediaUrl();
+
 // URL of the first media item from the specified channel
 $post->getFirstMediaUrl('featured-image');
 ```
@@ -279,7 +284,7 @@ $post->clearMediaChannel('channel-name');
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
 ### Synchronize association / disassociation
-WIP: This feature will be added soon.
+This feature will be added soon.
 
 
 -----
@@ -369,16 +374,16 @@ $collection->syncMedia(['media-name', 'another-media-name']);
 // Synchronize to having zero media by passing null / bool / empty-string / empty-array
 $collection->syncMedia([]);
 ```
-`syncMedia()` always returns an array containing synchronization status. You can use `Media::syncCollections()` to sync with collections from a media model.
+`syncMedia()` always returns an array containing synchronization status. Alternatively, you can use `Media::syncCollections()` to sync with collections from a media model instance.
 
 
 
 ## Conversions
-It can be referred to as Manipulation as well. You can specify a model to perform "conversions" when a media is attached to a group.
+You can specify a model to perform "conversions" when a media is attached to a channel.
 
 MediaMan provides a fluent api to manipulate images. It uses the popular [intervention/image](https://github.com/Intervention/image) library under the hood. Resizing, adding watermark, converting to a different format or anything that is supported can be done. In short, You can utilize all functionalities from the library.
 
-Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+Conversions are registered globally. This means that they can be reused across your application, for i.e a Post and a User both can have the same sized thumbnail without having to register the same conversion twice.
 
 To get started, you should first register a conversion in one of your application's service providers:
 
@@ -391,8 +396,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Conversion::register('thumb', function (Image $image) {
-            // you have access to intervention/image library
-            // perform your desired conversion / manipulation here
+            // you have access to intervention/image library,
+            // perform your desired conversions here
             return $image->fit(64, 64);
         });
     }
