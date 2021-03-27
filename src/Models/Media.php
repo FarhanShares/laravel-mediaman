@@ -24,9 +24,21 @@ class Media extends Model
         'name', 'file_name', 'mime_type', 'size', 'disk', 'data'
     ];
 
+    /**
+     * The attributes that need casting.
+     *
+     * @var array
+     */
     protected $casts = [
         'data' => Json::class
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['friendly_size',  'media_url', 'type', 'extension'];
 
 
     public static function booted()
