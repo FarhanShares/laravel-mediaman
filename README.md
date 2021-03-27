@@ -376,7 +376,7 @@ $collection->syncMedia([]);
 
 
 ## Conversions
-It can be referred to as Manipulation as well. You can specify a model to perform "conversions" when a media is attached to a group.
+You can specify a model to perform "conversions" when a media is attached to a channel.
 
 MediaMan provides a fluent api to manipulate images. It uses the popular [intervention/image](https://github.com/Intervention/image) library under the hood. Resizing, adding watermark, converting to a different format or anything that is supported can be done. In short, You can utilize all functionalities from the library.
 
@@ -394,7 +394,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Conversion::register('thumb', function (Image $image) {
             // you have access to intervention/image library,
-            // perform your desired conversion / manipulation here
+            // perform your desired conversions here
             return $image->fit(64, 64);
         });
     }
