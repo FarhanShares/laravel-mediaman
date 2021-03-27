@@ -85,7 +85,7 @@ trait HasMedia
      * @param mixed $media
      * @param string $channel
      * @param array $conversions
-     * @return void
+     * @return int|null
      */
     public function attachMedia($media, string $channel = 'default', array $conversions = [])
     {
@@ -189,11 +189,13 @@ trait HasMedia
      * Detach the specified media.
      *
      * @param mixed $media
-     * @return void
+     * @return int|null
      */
     public function detachMedia($media = null)
     {
-        $this->media()->detach($media);
+        $count =  $this->media()->detach($media);
+
+        return $count > 0 ? $count : null;
     }
 
     /**
