@@ -170,6 +170,15 @@ An instance of Media has the following attributes:
 'collections' => object // eloquent collection
 ```
 
+Once you have the media instance, you can also retrieve the conversion urls:
+```php
+// by id
+$media = Media::find(1);
+// original media url
+$media->getUrl()
+// converted media url
+$media->getUrl('conversion-name');
+```
 
 ### Update media
 You can update a media name with an instance of Media.
