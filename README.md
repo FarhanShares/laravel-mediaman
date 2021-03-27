@@ -170,7 +170,7 @@ An instance of Media has the following attributes:
 'collections' => object // eloquent collection
 ```
 
-Once you have the media instance, you can also retrieve the conversion urls:
+Once you have the media instance, you can also retrieve the converted media URLs:
 ```php
 // by id
 $media = Media::find(1);
