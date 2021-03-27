@@ -130,7 +130,7 @@ A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stor
 
 **Q: But why? Won't I get a bunch of directories?**
 
-A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, thus users won't be able to guess & retrieve a random file. More on customization will be added later.
+A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, hence users won't be able to guess & retrieve a random file. More on customization will be added later.
 
 **Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 
@@ -143,8 +143,10 @@ You can use any Eloquent operation to retrieve a media plus we've added findByNa
 ```php
 // by id
 $media = Media::find(1);
+
 // by name
 $media = Media::findByName('media-name');
+
 // with collections
 $media = Media::with('collections')->find(1);
 ```
@@ -217,7 +219,7 @@ class Post extends Model
     use HasMedia;
 }
 ```
-This will establish the relationship between your model and the media model.
+This will establish the relationship between your App Model and the Media Model.
 
 Once done, you can associate media to the model as demonstrated below.
 
@@ -279,7 +281,7 @@ $post->clearMediaChannel('channel-name');
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
 ### Synchronize association / disassociation
-WIP: This feature will be added soon.
+This feature will be added soon.
 
 
 -----
@@ -369,7 +371,7 @@ $collection->syncMedia(['media-name', 'another-media-name']);
 // Synchronize to having zero media by passing null / bool / empty-string / empty-array
 $collection->syncMedia([]);
 ```
-`syncMedia()` always returns an array containing synchronization status. You can use `Media::syncCollections()` to sync with collections from a media model.
+`syncMedia()` always returns an array containing synchronization status. Alternatively, you can use `Media::syncCollections()` to sync with collections from a media model instance.
 
 
 
@@ -378,7 +380,7 @@ It can be referred to as Manipulation as well. You can specify a model to perfor
 
 MediaMan provides a fluent api to manipulate images. It uses the popular [intervention/image](https://github.com/Intervention/image) library under the hood. Resizing, adding watermark, converting to a different format or anything that is supported can be done. In short, You can utilize all functionalities from the library.
 
-Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
+Conversions are registered globally. This means that they can be reused across your application, for i.e a Post and a User both can have the same sized thumbnail without having to register the same conversion twice.
 
 To get started, you should first register a conversion in one of your application's service providers:
 
@@ -391,7 +393,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Conversion::register('thumb', function (Image $image) {
-            // you have access to intervention/image library
+            // you have access to intervention/image library,
             // perform your desired conversion / manipulation here
             return $image->fit(64, 64);
         });
