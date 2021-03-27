@@ -73,6 +73,10 @@ Once installed, you should publish the provided assets to create the necessary m
 php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
 ```
 
+Run the migration & you are all set.
+```bash
+php artisan migrate
+```
 
 
 ## Configuration
