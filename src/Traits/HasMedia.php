@@ -2,6 +2,7 @@
 
 namespace FarhanShares\MediaMan\Traits;
 
+use Throwable;
 use FarhanShares\MediaMan\MediaChannel;
 use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Collection;
@@ -84,7 +85,7 @@ trait HasMedia
      * @param mixed $media
      * @param string $channel
      * @param array $conversions
-     * @return void
+     * @return int|null
      */
     public function attachMedia($media, string $channel = 'default', array $conversions = [])
     {
@@ -114,10 +115,19 @@ trait HasMedia
             });
         }
 
-        // todo: use sync($ids, false)
-        $this->media()->attach($ids, [
-            'channel' => $channel,
-        ]);
+
+        $mappedIds = [];
+        foreach ($ids as $id) {
+            $mappedIds[$id] = ['channel' => $channel];
+        }
+
+        try {
+            $res = $this->media()->sync($mappedIds, false);
+            $attached  = count($res['attached']);
+            return $attached > 0 ? $attached : null;
+        } catch (Throwable $th) {
+            return null;
+        }
     }
 
     /**
@@ -179,11 +189,13 @@ trait HasMedia
      * Detach the specified media.
      *
      * @param mixed $media
-     * @return void
+     * @return int|null
      */
     public function detachMedia($media = null)
     {
-        $this->media()->detach($media);
+        $count =  $this->media()->detach($media);
+
+        return $count > 0 ? $count : null;
     }
 
     /**
