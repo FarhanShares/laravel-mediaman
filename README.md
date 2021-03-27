@@ -267,7 +267,7 @@ Though the original media URL is appended with the Media model, it's nice to kno
 $media =  $post->getMedia('featured-image');
 // getUrl() accepts only one optional argument: name of the conversion
 // leave it empty to get the original media URL
-$mediaOneURL = $media[0]->getUrl();
+$mediaOneUrl = $media[0]->getUrl();
 ```
 
 It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
@@ -285,6 +285,7 @@ $post->getFirstMediaUrl();
 // URL of the first media item from the specified channel
 $post->getFirstMediaUrl('featured-image');
 ```
+*Tip:* getFirstMediaUrl() accepts two optional arguments: channel name & conversion name
 
 ### Disassociate media
 You can use `detachMedia()` method which is also shipped with HasMedia trait to disassociate media from model.
@@ -444,18 +445,23 @@ class Post extends Model
 From now on, whenever a media item is attached to the "gallery" channel, a converted image will be generated. You can get the url of the converted image as demonstrated below:
 
 ```php
-// The 'thumb' conversion URL of the first image from the 'gallery' channel
+// getFirstMediaUrl() accepts two optional arguments: channel name & conversion name
+// you should provide channel name & conversion name to get the url
 $post->getFirstMediaUrl('gallery', 'thumb');
 ```
 
+*Tip:* The default channel name is `default`.
+
+
 ```php
-// if you have multiple media associated & need to retrieve URLs you can do it:
+// if you have multiple media associated & need to retrieve URLs you can do it with getUrl():
 $media = $post->getMedia();
 // getUrl() accepts only one optional argument: name of the conversion
 // you should provide the conversion name to get the url
 $mediaOneThumb = $media[0]->getUrl('thumb');
 ```
 
+*Tip:* The `media_url` is always appended & it's the original media URL.
 
 ## License
 The MIT License (MIT). Please read [License File](LICENSE.md) for more information.
