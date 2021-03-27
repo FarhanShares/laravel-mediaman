@@ -34,7 +34,7 @@ There are a few key concepts that need to be understood before continuing:
 
 * **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's being created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
 
-* **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can use it to create groups of media without really associating media to your app models.
+* **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can use it to create groups of media without really associating media to your App Models.
 
 * **Association**: Media need be attached to a model for an association to be made. MediaMan exposes helpers to easily get the job done. Many-to-many polymorphic relationships allow any number of media to be associated to any number of other models without the need of modifying their schema.
 
@@ -78,13 +78,11 @@ php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProv
 ## Configuration
 MediaMan works out of the box. If you want to tweak it, MediaMan ships with a config/mediaman.php. One common need of tweaking could be to store media in a dedicated Storage.
 
-MediaMan supports all of the storage driver that are supported by Laravel.
-
-For i.e. Let's configure a local media disk for MediaMan.
+MediaMan supports all of the storage driver that are supported by Laravel. For i.e. Let's configure a local media disk for MediaMan.
 
 ```php
 // file: config/filesystems.php
-// add the lines in disks array
+// add the lines in the disks array
 'media' => [
     'driver' => 'local',
     'root' => storage_path('app/media'),
@@ -208,7 +206,7 @@ Media::destroy([1, 2, 3]);
 ## Media & Models
 
 ### Associate media
-MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your app model & you are good to go.
+MediaMan exposes easy to use API via `FarhanShares\MediaMan\HasMedia` trait for associating media items to models. Use the trait in your App Model & you are good to go.
 
 ```php
 use Illuminate\Database\Eloquent\Model;
@@ -238,7 +236,8 @@ $post->attachMedia($media, 'featured-image');
 `attachMedia()` returns number of media attached (int) on success & null on failure.
 
 ### Retrieve media of a model
-Apart from that, `HasMedia` trait enables your app models retrieving media conveniently.
+Apart from that, `HasMedia` trait enables your App Models retrieving media conveniently.
+
 ```php
 // All media from the default channel
 $post->getMedia();
@@ -252,16 +251,16 @@ It might be a common scenario for most of the Laravel apps to use the first medi
 // First media item from the default channel
 $post->getFirstMedia();
 // First media item from the specified channel
-$post->getFirstMedia('avatar');
+$post->getFirstMedia('featured-image');
 
 // URL of the first media item from the default channel
 $post->getFirstMediaUrl();
 // URL of the first media item from the specified channel
-$post->getFirstMediaUrl('avatar');
+$post->getFirstMediaUrl('featured-image');
 ```
 
 ### Disassociate media
-You can use `detachMedia()` to disassociate media from model.
+You can use `detachMedia()` method which is also shipped with HasMedia trait to disassociate media from model.
 
 ```php
 // Detach the specified media
@@ -375,6 +374,53 @@ $collection->syncMedia([]);
 
 
 ## Conversions
+It can be referred to as Manipulation as well. You can specify a model to perform "conversions" when a media is attached to a group.
+
+MediaMan provides a fluent api to manipulate images. It uses the popular [intervention/image](https://github.com/Intervention/image) library under the hood. Resizing, adding watermark, converting to a different format or anything that is supported can be done. In short, You can utilize all functionalities from the library.
+
 Conversions are registered globally. This means that they can be reused across your application, i.e a Post and a User can have the same sized thumbnail without having to register the same conversion twice.
 
-Note: Docs are being updated asap! Keep an eye here :)
+To get started, you should first register a conversion in one of your application's service providers:
+
+```php
+use Intervention\Image\Image;
+use FarhanShares\MediaMan\Facades\Conversion;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot()
+    {
+        Conversion::register('thumb', function (Image $image) {
+            // you have access to intervention/image library
+            // perform your desired conversion / manipulation here
+            return $image->fit(64, 64);
+        });
+    }
+}
+```
+
+Once you've registered a conversion, you should configure a media channel to perform the conversion when media is attached to your model.
+
+```php
+class Post extends Model
+{
+    use HasMedia;
+
+    public function registerMediaChannels()
+    {
+        $this->addMediaChannel('gallery')
+             ->performConversions('thumb');
+    }
+}
+```
+
+From now on, whenever a media item is attached to the "gallery" channel, a converted image will be generated. You can get the url of the converted image as demonstrated below:
+
+```php
+// The thumbnail of the first image from the gallery group
+$post->getFirstMediaUrl('gallery', 'thumb');
+```
+
+
+## License
+The MIT License (MIT). Please read [License File](LICENSE.md) for more information.
