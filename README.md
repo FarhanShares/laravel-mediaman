@@ -95,7 +95,7 @@ MediaMan supports all of the storage drivers that are supported by Laravel. For 
 // update the disk config to use our recently created media disk
 'disk' => 'media'
 ```
-
+Now, run `php artisan storage:link` to create the symbolic link of our newly created media disk.
 
 
 ## Media
@@ -152,20 +152,23 @@ $media = Media::with('collections')->find(1);
 ```
 
 An instance of Media has the following attributes:
-- id
-- name
-- file_name
-- extension
-- type
-- mime_type
-- size (in bytes)
-- friendly_size (in human readable format)
-- url
-- disk
-- data
-- created_at
-- updated_at
-- collections
+
+```php
+'id' => int
+'name' => string
+'file_name' => string
+'extension' => string
+'type' => string
+'mime_type' => string
+'size' =>  int // in bytes
+'friendly_size' => string // in human readable format
+'media_url' =>  string // original media url
+'disk' =>  string
+'data' => array // casts as array
+'created_at' =>  string
+'updated_at' => string
+'collections' => object // eloquent collection
+```
 
 
 ### Update media
