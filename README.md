@@ -260,6 +260,16 @@ $post->getMedia();
 $post->getMedia('featured-image');
 ```
 
+
+Though the original media URL is appended with the Media model, it's nice to know that you have a getUrl() method available.
+
+```php
+$media =  $post->getMedia('featured-image');
+// getUrl() accepts only one optional argument: name of the conversion
+// leave it empty to get the original media URL
+$mediaOneURL = $media[0]->getUrl();
+```
+
 It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
 
 ```php
@@ -441,8 +451,9 @@ $post->getFirstMediaUrl('gallery', 'thumb');
 ```php
 // if you have multiple media associated & need to retrieve URLs you can do it:
 $media = $post->getMedia();
-// getUrl() accepts two arguments: name of the channel & name of the conversion
-$mediaOneThumb = $media[0]->getUrl('gallery', 'thumb');
+// getUrl() accepts only one optional argument: name of the conversion
+// you should provide the conversion name to get the url
+$mediaOneThumb = $media[0]->getUrl('thumb');
 ```
 
 
