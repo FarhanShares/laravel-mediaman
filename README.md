@@ -172,14 +172,11 @@ An instance of Media has the following attributes:
 
 You have access to some methods along with the attributes:
 ```php
-// get original media url
-$media->getUrl()
-
-// converted media url
-$media->getUrl('conversion-name');
-
 // $media->mime_type => 'image/jpg'
 $media->isOfType('image') // true
+
+// get the media url, accepts optional '$conversionName' argument
+$media->getUrl('conversion-name')
 
 // get the path to the file on disk, accepts optional '$conversionName' argument
 $media->getPath('conversion-name')
