@@ -55,6 +55,12 @@ There are a few key concepts that need to be understood before continuing:
 
 
 
+## Requirements
+
+- PHP v7.3 | v7.4 | v8.0
+- Laravel v7 | v8
+- Composer v1 | v2
+
 ## Installation
 
 You can install the package via composer:
@@ -62,7 +68,7 @@ You can install the package via composer:
 ```bash
 composer require farhanshares/laravel-mediaman
 ```
-The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the service provider to your config/app.php file:
+The package should be auto discovered by Laravel unless you've disabled auto-discovery mode. In that case, add the service provider to your config/app.php:
 
 `FarhanShares\MediaMan\MediaManServiceProvider::class`
 
