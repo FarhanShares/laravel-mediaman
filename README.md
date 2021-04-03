@@ -53,6 +53,7 @@ There are a few key concepts that need to be understood before continuing:
   * [Collections](#collections)
   * [Media & Collections](#media--collections)
   * [Media, Models & Conversions](#conversions)
+  * [What's unique?](#whats-unique-why-use-this-package)
 
 
 
@@ -489,7 +490,7 @@ $mediaOneThumb = $media[0]->getUrl('thumb');
 *Tip:* The `media_url` is always appended & it's the original media URL.
 
 
-## What's unique? Why use this package?
+### What's unique? Why use this package?
 
 Most of the Laravel app deals with media / files at some point of it's development cycle. I was enjoying [Spatie's Laravel MediaLibrary](https://github.com/spatie/laravel-medialibrary). Then I found [Optix's Laravel Media](https://github.com/optixsolutions/laravel-media), which is a good one too. Both has differences with pros & cons.
 
