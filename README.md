@@ -487,5 +487,24 @@ $mediaOneThumb = $media[0]->getUrl('thumb');
 
 *Tip:* The `media_url` is always appended & it's the original media URL.
 
+
+## What's unique? Why use this package?
+
+Most of the Laravel app deals with media / files at some point of it's development cycle. I was enjoying [Spatie's Laravel MediaLibrary](https://github.com/spatie/laravel-medialibrary). Then I found [Optix's Laravel Media](https://github.com/optixsolutions/laravel-media), which is a good one too. Both has differences with pros & cons.
+
+I was searching for a solution to suit my needs & ended up developing the package. It's highly inspired from the above two packages. MediaMan is lightweight, elegant & featureful. It can be used as simple hassle-free media attachment-detachment solution for any model or it can be a powerful media manager's backend. It'll continue to receive updates whenever needed..
+
+
+| Comparison                        | Spatie              | Optix          | MediaMan        |
+|-----------------------------------|---------------------|----------------|-----------------|
+| **Relationship type**             | One to many         | Many to many   | Many to many    |
+| **Reuse media with another model**| No                  | Yes            | Yes             |
+| **Virtual directory**             | No                  | No             | Yes             |
+| **Auto delete media with model**  | Yes                 | No             | Yes             |
+| **Image manipulation**            | Yes                 | Yes            | Yes             |
+| **Manipulation type**             | Specific to a model | Global registry| Global registry |
+
+
+If you encounter a bug, please consider opening an issue. Feature Requests & PRs are welcome.
 ## License
 The MIT License (MIT). Please read [License File](LICENSE.md) for more information.
