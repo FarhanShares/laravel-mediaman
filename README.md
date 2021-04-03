@@ -8,7 +8,7 @@
 </p>
 
 # Laravel MediaMan</h1>
-MediaMan is an elegant & powerful media management package for any Laravel App with support for painless `uploader`, virtual `collection` & automatic `conversion` plus an on demand `association` with specific broadcasting `channel`s of your app models.
+MediaMan is an elegant & powerful media management package for Laravel Apps with support for painless `uploader`, virtual `collection` & automatic `conversion` plus an on demand `association` with specific broadcasting `channel`s of your app models.
 
 MediaMan is UI agnostic & provides a fluent API to manage your app's media, which means you've total control over your media, the look & feel & a hassle free dev experience. It's a perfect suit for your App or API server.
 
