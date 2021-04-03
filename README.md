@@ -57,7 +57,7 @@ There are a few key concepts that need to be understood before continuing:
 
 
 
-### Requirements
+## Requirements
 
 - PHP v7.3 | v7.4 | v8.0
 - Laravel v7 | v8
