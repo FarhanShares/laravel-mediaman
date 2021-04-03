@@ -8,10 +8,9 @@
 </p>
 
 # Laravel MediaMan</h1>
-The most elegant & powerful media management package for Laravel!
+MediaMan is an elegant & powerful media management package for any Laravel App with support for painless `uploader`, virtual `collection` & automatic `conversion` plus an on demand `association` with specific broadcasting `channel`s of your app models.
 
-
-
+MediaMan is UI agnostic & provides a fluent API to manage your app's media, which means you've total control over your media, the look & feel & a hassle free dev experience. It's a perfect suit for your App or API server.
 
 ## In a hurry? Here's a quick example:
 
@@ -21,7 +20,7 @@ $media = MediaUploader::source($request->file->('file'))
             ->upload();
 
 $post = Post::find(1);
-$post->attachMedia($media, 'featured-image');
+$post->attachMedia($media, 'featured-image-channel');
 ```
 
 
@@ -34,13 +33,13 @@ There are a few key concepts that need to be understood before continuing:
 
 * **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's being created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
 
-* **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can use it to create groups of media without really associating media to your App Models.
+* **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can create collections / virtual directories / groups of media & later on retrieve a group to check what it contains or do.
 
-* **Association**: Media need be attached to a model for an association to be made. MediaMan exposes helpers to easily get the job done. Many-to-many polymorphic relationships allow any number of media to be associated to any number of other models without the need of modifying their schema.
+* **Association**: Media items need be attached to a model for an association to be made. MediaMan exposes helpers to easily get the job done. Many-to-many polymorphic relationships allow any number of media to be associated to any number of other models without the need of modifying the existing database schema.
 
-* **Channel**: Media items are bound to a "channel" of a model during association. Thus you can easily associate multiple types of media to a model. For example, a "User" model might have an "avatar" and a "documents" media channel.
+* **Channel**: Media items are bound to a "channel" of a model during association. Thus you can easily associate multiple types of media to a model. For example, a "User" model might have an "avatar" and a "documents" media channel. If your head is spinning, simply think of "channels" as :tags" for a specific model. Channels are also needed to perform conversions.
 
-* **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item (image) is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
+* **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
 
 
 
