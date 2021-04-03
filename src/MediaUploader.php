@@ -125,7 +125,7 @@ class MediaUploader
      */
     public function setFileName(string $fileName)
     {
-        $this->fileName = $this->sanitiseFileName($fileName);
+        $this->fileName = $this->sanitizeFileName($fileName);
 
         return $this;
     }
@@ -140,12 +140,12 @@ class MediaUploader
     }
 
     /**
-     * Sanitise the file name.
+     * Sanitize the file name.
      *
      * @param string $fileName
      * @return string
      */
-    protected function sanitiseFileName(string $fileName)
+    protected function sanitizeFileName(string $fileName)
     {
         return str_replace(['#', '/', '\\', ' '], '-', $fileName);
     }
