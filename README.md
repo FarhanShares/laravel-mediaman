@@ -497,14 +497,14 @@ Most of the Laravel app deals with media / files at some point of it's developme
 I was searching for a solution to suit my needs & ended up developing the package. It's highly inspired from the above two packages. MediaMan is lightweight, elegant & featureful. It can be used as simple hassle-free media attachment-detachment solution for any model or it can be a powerful media manager's backend. It'll continue to receive updates whenever needed..
 
 
-| Comparison                        | Spatie              | Optix          | MediaMan        |
-|-----------------------------------|---------------------|----------------|-----------------|
-| **Relationship type**             | One to many         | Many to many   | Many to many    |
-| **Reuse media with another model**| No                  | Yes            | Yes             |
-| **Virtual directory**             | No                  | No             | Yes             |
-| **Auto delete media with model**  | Yes                 | No             | Yes             |
-| **Image manipulation**            | Yes                 | Yes            | Yes             |
-| **Manipulation type**             | Specific to a model | Global registry| Global registry |
+| Comparison                        | Spatie              | Optix          | MediaMan            |
+|-----------------------------------|---------------------|----------------|---------------------|
+| **Relationship type**             | One to many         | Many to many   | **Many to many**    |
+| **Reuse media with another model**| No                  | Yes            | **Yes**             |
+| **Virtual directory**             | No                  | No             | **Yes**             |
+| **Auto delete media with model**  | Yes                 | No             | **Yes**             |
+| **Image manipulation**            | Yes                 | Yes            | **Yes**             |
+| **Manipulation type**             | Specific to a model | Global registry| **Global registry** |
 
 
 If you encounter a bug, please consider opening an issue. Feature Requests & PRs are welcome.
