@@ -80,19 +80,30 @@ php artisan migrate
 
 
 ## Configuration
-MediaMan works out of the box. If you want to tweak it, MediaMan ships with a config/mediaman.php. One common need of tweaking could be to store media in a dedicated Storage.
+MediaMan works out of the box. If you want to tweak it, MediaMan ships with a `config/mediaman.php`. One common need of tweaking could be to store media in a dedicated Storage.
 
-MediaMan supports all of the storage drivers that are supported by Laravel. For i.e. Let's configure a local media disk for MediaMan.
+MediaMan supports all of the storage drivers that are supported by Laravel (for i.e. Local, S3, SFTP, FTP, Dropbox & so on).
+
+Here's an example configuration to use a dedicated local media disk for MediaMan.
 
 ```php
 // file: config/filesystems.php
-// add the lines in the disks array
-'media' => [
-    'driver' => 'local',
-    'root' => storage_path('app/media'),
-    'url' => env('APP_URL') . '/media',
-    'visibility' => 'public',
-  ],
+// define a new disk
+'disks' => [
+    ...
+    'media' =>
+        'driver' => 'local',
+        'root' => storage_path('app/media'),
+        'url' => env('APP_URL') . '/media',
+        'visibility' => 'public',
+    ],
+]
+
+// define the symbolic link
+'links' => [
+    ...
+    public_path('media') => storage_path('app/media'),
+],
 
 
 // file: config/mediaman.php
