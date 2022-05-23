@@ -8,10 +8,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.0, 7.4, 7.3]
-        laravel: [8.*, 7.*]
+        php: [8.1, 7.4, 7.3]
+        laravel: [9.*, 8.*, 7.*]
         dependency-versions: [prefer-stable]
         include:
+          - laravel: 9.*
+            testbench: 7.*
           - laravel: 8.*
             testbench: 6.*
           - laravel: 7.*
