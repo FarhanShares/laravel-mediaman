@@ -23,6 +23,21 @@ $post = Post::find(1);
 $post->attachMedia($media, 'featured-image-channel');
 ```
 
+## Why Choose MediaMan? What Sets It Apart?
+
+While many Laravel applications grapple with media and file management, I've often found solace in [Spatie's Laravel MediaLibrary](https://github.com/spatie/laravel-medialibrary). Yet, despite its capabilities, there were aspects it didn't address, features I yearned for.
+
+**Enter MediaMan:** Sleek, lightweight, and brimming with functionality. Whether you need a straightforward solution for attaching and detaching media or the robust backbone for an extensive media manager, MediaMan adapts to your needs. And rest assured, its evolution will be guided by the ever-changing requirements of modern applications, whether they are Monolithic, API-driven, enhanced with Livewire/InertiaJS integrations, or built upon Serverless architectures.
+
+
+| Comparison                        | **MediaMan**        | Spatie              |
+|-----------------------------------|---------------------|---------------------|
+| **Relationship type**             | **Many to many**    | One to many         |
+| **Reuse media with another model**| **Yes**             | No                  |
+| **Virtual directory**             | **Yes**             | No                  |
+| **Auto delete media with model**  | **Yes**             | Yes                 |
+| **Image manipulation**            | **Yes**             | Yes                 |
+| **Manipulation type**             | **Global registry** | Specific to a model |
 
 
 ## Overview & Key concepts
@@ -53,7 +68,7 @@ There are a few key concepts that need to be understood before continuing:
   * [Collections](#collections)
   * [Media & Collections](#media--collections)
   * [Media, Models & Conversions](#conversions)
-  * [What's unique?](#whats-unique-why-use-this-package)
+  * [Contribution and License](#contribution-and-license)
 
 
 
@@ -77,7 +92,8 @@ The package should be auto discovered by Laravel unless you've disabled auto-dis
 Once installed, you should publish the provided assets to create the necessary migration and config files.
 
 ```bash
-php artisan vendor:publish --provider="FarhanShares\MediaMan\MediaManServiceProvider"
+php artisan mediaman:publish-config
+php artisan mediaman:publish-migrations
 ```
 
 Run the migration & you are all set.
@@ -85,6 +101,10 @@ Run the migration & you are all set.
 php artisan migrate
 ```
 
+Ensure storage is linked by running:
+```bash
+php artisan storage:link`
+```
 
 ## Configuration
 MediaMan works out of the box. If you want to tweak it, MediaMan ships with a `config/mediaman.php`. One common need of tweaking could be to store media in a dedicated Storage.
@@ -549,24 +569,8 @@ $mediaOneThumb = $media[0]->getUrl('thumb');
 
 *Tip:* The `media_url` is always appended & it's the original media URL.
 
-
-### What's unique? Why use this package?
-
-Most of the Laravel app deals with media / files at some point of it's development cycle. I was enjoying [Spatie's Laravel MediaLibrary](https://github.com/spatie/laravel-medialibrary). Then I found [Optix's Laravel Media](https://github.com/optixsolutions/laravel-media), which is a good one too. Both has differences with pros & cons.
-
-I was searching for a solution to suit my needs & ended up developing the package. It's highly inspired from the above two packages. MediaMan is lightweight, elegant & featureful. It can be used as simple hassle-free media attachment-detachment solution for any model or it can be a powerful media manager's backend. It'll continue to receive updates whenever needed..
-
-
-| Comparison                        | Spatie              | Optix          | MediaMan            |
-|-----------------------------------|---------------------|----------------|---------------------|
-| **Relationship type**             | One to many         | Many to many   | **Many to many**    |
-| **Reuse media with another model**| No                  | Yes            | **Yes**             |
-| **Virtual directory**             | No                  | No             | **Yes**             |
-| **Auto delete media with model**  | Yes                 | No             | **Yes**             |
-| **Image manipulation**            | Yes                 | Yes            | **Yes**             |
-| **Manipulation type**             | Specific to a model | Global registry| **Global registry** |
-
+## Contribution and License
 
 If you encounter a bug, please consider opening an issue. Feature Requests & PRs are welcome.
-## License
+
 The MIT License (MIT). Please read [License File](LICENSE.md) for more information.
