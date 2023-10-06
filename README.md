@@ -34,14 +34,13 @@ While many Laravel applications grapple with media and file management, I've oft
 |------------------------------------|-------------------------------------------|---------------------|
 | **Relationship type**              | **Many to many**                          | One to many         |
 | **Reuse media with another model** | **Yes**                                   | No                  |
-| **Virtual directory (collections)**| **Yes**                                   | No                  |
 | **Multiple Disk Support**          | **Yes**                                   | No                  |
+| **Channels (file tags)**           | **Yes**                                   | No                  |
+| **Collections (file groups)**      | **Yes**                                   | Specific to version |
 | **Auto delete media with model**   | **Yes, with options to keep**             | Yes                 |
 | **Image manipulation**             | **Yes, at ease**                          | Yes                 |
 | **Manipulation type**              | **Global registry**                       | Specific to a model |
 | **Custom Conversion Support**      | **Yes**                                   | Limited             |
-| **Integrations**                   | **Optimized for APIs/Livewire/InertiaJS** | Basic               |
-| **Maintenance and Updates**        | **Actively Maintained**                   | Periodically Updated|
 
 
 ## Overview & Key concepts
@@ -52,11 +51,11 @@ There are a few key concepts that need to be understood before continuing:
 
 * **MediaUploader**: Media items are uploaded as its own entity. It does not belong to any other model in the system when it's being created, so items can be managed independently (which makes it the perfect engine for a media manager). MediaMan provides "MediaUploader" for creating records in the database & storing in the filesystem as well.
 
-* **MediaCollection**: Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can create collections / virtual directories / groups of media & later on retrieve a group to check what it contains or do.
+* **MediaCollection**: It can be also referred to as a group of files. Media items can be bundled to any "collection". Media & Collections will form many-to-many relation. You can create collections / virtual directories / groups of media & later on retrieve a group to check what it contains or do.
 
 * **Association**: Media items need be attached to a model for an association to be made. MediaMan exposes helpers to easily get the job done. Many-to-many polymorphic relationships allow any number of media to be associated to any number of other models without the need of modifying the existing database schema.
 
-* **Channel**: Media items are bound to a "channel" of a model during association. Thus you can easily associate multiple types of media to a model. For example, a "User" model might have an "avatar" and a "documents" media channel. If your head is spinning, simply think of "channels" as :tags" for a specific model. Channels are also needed to perform conversions.
+* **Channel**: It can be also referred to as a tag of files. Media items are bound to a "channel" of a model during association. Thus you can easily associate multiple types of media to a model. For example, a "User" model might have an "avatar" and a "documents" media channel. If your head is spinning, simply think of "channels" as :tags" for a specific model. Channels are also needed to perform conversions.
 
 * **Conversion**: You can manipulate images using conversions, conversions will be performed when a media item is associated to a model. For example, you can register a "thumbnail" conversion to run when images are attached to the "gallery" channel of a model.
 
