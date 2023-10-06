@@ -216,7 +216,54 @@ $media->data = ['additional_data' => 'new additional data']
 $media->save()
 ```
 
-**Note:** Support for updating file name & disk will be added soon.
+Certainly! Here's an update to your documentation that includes the new features:
+
+---
+
+### Update Media
+
+With an instance of `Media`, you can perform various update operations:
+
+#### Update Media Name:
+
+```php
+$media = Media::first();
+$media->name = 'New Display Name';
+$media->save();
+```
+
+#### Update Additional Data:
+
+```php
+$media->data = ['additional_data' => 'new additional data'];
+$media->save();
+```
+
+#### Update Media File Name:
+
+Updating the media file name will also rename the actual file in storage.
+
+```php
+$media->file_name = 'new_filename.jpg';
+$media->save();
+```
+
+#### Change Media Storage Disk:
+
+Moving the media to another storage disk will transfer the actual file to the specified disk.
+
+```php
+$media->disk = 's3';  // Example disk name, ensure it exists
+$media->save();
+```
+
+**Heads Up!** There's a config regarding disk accessibility checks for read-write operations: `check_disk_accessibility`.
+
+**Disk Accessibility Checks**:
+- *Pros*: Identifies potential disk issues early on.
+- *Cons*: Can introduce performance delays.
+
+**Tip**: Enabling this check can preemptively spot storage issues, but may add minor operational delays. Consider your system's needs and decide accordingly.
 
 **Heads Up!** If you need to deal with collections, please read the docs below. Do not update anything other than `name` & `data` using the Media instance for the time being.
 

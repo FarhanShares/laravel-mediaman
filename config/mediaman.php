@@ -57,4 +57,18 @@ return [
         'collection_media' => 'mediaman_collection_media',
         'mediables'        => 'mediaman_mediables',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Accessibility Check Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This configuration determines whether the package should perform an
+    | accessibility check (i.e., write and delete) when ensuring the disk is
+    | writable. If set to true, a temporary file will be created and deleted
+    | to validate write permissions on the specified disk.
+    |
+    */
+
+    'check_disk_accessibility' => env('MEDIAMAN_CHECK_DISK_ACCESSIBILITY', false),
 ];

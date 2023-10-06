@@ -49,6 +49,42 @@ class Media extends Model
             // if failed, try deleting the file then
             !$deleted && Storage::disk($media->disk)->delete($media->getPath());
         });
+
+        static::updating(function ($media) {
+            // If the disk attribute is changed, validate the new disk usability
+            if ($media->isDirty('disk')) {
+                $newDisk = $media->disk; // updated disk
+                self::ensureDiskUsability($newDisk);
+            }
+        });
+
+        static::updated(function ($media) {
+            $originalDisk = $media->getOriginal('disk');
+            $newDisk = $media->disk;
+
+            $originalFileName = $media->getOriginal('file_name');
+            $newFileName = $media->file_name;
+
+            $path = $media->getDirectory();
+
+            // If the disk has changed, move the file to the new disk first
+            if ($media->isDirty('disk')) {
+                $filePathOnOriginalDisk = $path . '/' . $originalFileName;
+                $fileContent = Storage::disk($originalDisk)->get($filePathOnOriginalDisk);
+
+                // Store the file to the new disk
+                Storage::disk($newDisk)->put($filePathOnOriginalDisk, $fileContent);
+
+                // Delete the original file
+                Storage::disk($originalDisk)->delete($filePathOnOriginalDisk);
+            }
+
+            // If the filename has changed, rename the file on the disk it currently resides
+            if ($media->isDirty('file_name')) {
+                // Rename the file in the storage
+                Storage::disk($newDisk)->move($path . '/' . $originalFileName, $path . '/' . $newFileName);
+            }
+        });
     }
 
     /**
@@ -286,6 +322,48 @@ class Media extends Model
         }
 
         return null;
+    }
+
+    /**
+     * Ensure the specified disk exists and is writable.
+     *
+     * This method first checks if the provided disk name exists in the
+     * filesystems configuration. Next, it ensures that the disk is accessible
+     * by attempting to write and then delete a temporary file.
+     *
+     * @param  string  $diskName  The name of the disk as defined in the filesystems configuration.
+     *
+     * @throws \InvalidArgumentException  If the disk is not defined in the filesystems configuration.
+     * @throws \Exception  If there's an error writing to or deleting from the disk.
+     *
+     * @return void
+     */
+    protected static function ensureDiskUsability($diskName)
+    {
+        $allDisks = config('filesystems.disks');
+
+        if (!array_key_exists($diskName, $allDisks)) {
+            throw new \InvalidArgumentException("Disk [{$diskName}] is not defined in the filesystems configuration.");
+        }
+
+        // Early return if accessibility check is disabled
+        if (!config('mediaman.check_disk_accessibility', false)) {
+            return;
+        }
+
+        // Accessibility checks for read-write operations
+        $disk = Storage::disk($diskName);
+        $tempFileName = 'temp_check_file_' . uniqid();
+
+        try {
+            // Attempt to write to the disk
+            $disk->put($tempFileName, 'check');
+
+            // Now, attempt to delete the temporary file
+            $disk->delete($tempFileName);
+        } catch (\Exception $e) {
+            throw new \Exception("Failed to write or delete on the disk [{$diskName}]. Error: " . $e->getMessage(), 0, $e);
+        }
     }
 
 
