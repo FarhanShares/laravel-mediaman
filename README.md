@@ -97,7 +97,7 @@ Once installed, you should publish the provided assets to create the necessary m
 
 ```bash
 php artisan mediaman:publish-config
-php artisan mediaman:publish-migrations
+php artisan mediaman:publish-migration
 ```
 
 Run the migration & you are all set.
