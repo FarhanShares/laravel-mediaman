@@ -82,6 +82,83 @@ class MediaTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_media_and_related_files_from_storage_when_media_is_deleted()
+    {
+        $media = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->useDisk('default')
+            ->upload();
+        $mediaFilePath = $media->getPath();
+
+        $media->delete();
+
+        $this->assertNull(Media::find($media->id));
+        Storage::disk($media->disk)->assertMissing($mediaFilePath);
+    }
+
+    /** @test */
+    public function it_moves_file_to_new_disk_on_disk_update()
+    {
+        $newDiskName = 'newValidDisk';
+        Storage::fake($newDiskName);
+
+        config()->set("filesystems.disks.$newDiskName", [
+            'driver' => 'local',
+            'root' => storage_path("app/$newDiskName"),
+        ]);
+
+        $media = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->useDisk('default')
+            ->upload();
+
+        $originalDisk = $media->disk;
+        $originalPath = $media->getPath();
+
+        $media->update(['disk' => $newDiskName]);
+
+        Storage::disk($originalDisk)->assertMissing($originalPath);
+        Storage::disk($newDiskName)->assertExists($media->getPath());
+    }
+
+    /** @test */
+    public function it_renames_file_in_storage_on_filename_update()
+    {
+        $media = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->useDisk('default')
+            ->upload();
+
+        $oldPath = $media->getPath();
+        $media->update(['file_name' => 'new_name']);
+        $newPath = $media->getPath();
+
+        Storage::disk($media->disk)->assertMissing($oldPath);
+        Storage::disk($media->disk)->assertExists($newPath);
+    }
+
+    /** @test */
+    public function it_validates_disk_usability_for_valid_disk()
+    {
+        Storage::fake('newValidDisk');
+
+        config()->set('filesystems.disks.newValidDisk', [
+            'driver' => 'local',
+            'root' => storage_path('app/newValidDisk'),
+        ]);
+
+        $this->assertNull(Media::ensureDiskUsability('newValidDisk'));
+    }
+
+    /** @test */
+    public function it_throws_exception_for_invalid_disk_in_disk_usability_check()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        Media::ensureDiskUsability('invalidDisk');
+    }
+
+    /** @test */
     public function it_has_an_extension_accessor()
     {
         $image = new Media();

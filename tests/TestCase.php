@@ -18,6 +18,10 @@ class TestCase extends BaseTestCase
 
     protected $file;
 
+    protected $fileOne;
+
+    protected $fileTwo;
+
     protected $media;
 
     protected $mediaCollection;
