@@ -383,8 +383,18 @@ $post->clearMediaChannel('channel-name');
 `detachMedia()` returns number of media detached (int) on success & null on failure.
 
 ### Synchronize association / disassociation
-This feature will be added soon.
+You can sync media of a specified channel using the syncMedia() method. This provides a flexible way to maintain the association between your model and the related media records. The default method signature look like this: `syncMedia($media, string $channel = 'default', array $conversions = [], $detaching = true)`
 
+This will remove the media that aren't in the provided list and add those which aren't already attached if $detaching is truthy.
+
+```php
+$post = Post::first();
+$media = Media::find(1); // model instance or just an media id: 1, or array of id: [1, 2, 3] or a collection of media models
+
+// Sync media in the default channel (the $post will have only $media and others will be removed)
+$post->syncMedia($media);
+```
+**Heads Up!:** None of the attachMedia, detachMedia or syncMedia methods deletes the file, it just does as it means. Refer to delete media section to know how to delete a media.
 
 -----
 ## Collections
