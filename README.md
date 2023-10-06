@@ -102,7 +102,7 @@ php artisan mediaman:publish-migration
 
 Ensure the storage is linked.
 ```bash
-php artisan storage:link`
+php artisan storage:link
 ```
 
 Run the migration and you are all set.
