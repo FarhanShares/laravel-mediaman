@@ -212,13 +212,9 @@ You can update a media name with an instance of Media.
 ```php
 $media = Media::first();
 $media->name = 'New name';
-$media->data = ['additional_data' => 'new additional data']
+$media->data = ['additional_data' => 'additional data']
 $media->save()
 ```
-
-Certainly! Here's an update to your documentation that includes the new features:
-
----
 
 ### Update Media
 
@@ -236,6 +232,13 @@ $media->save();
 
 ```php
 $media->data = ['additional_data' => 'new additional data'];
+$media->save();
+```
+
+#### You can also remove all data:
+
+```php
+$media->data = [];
 $media->save();
 ```
 

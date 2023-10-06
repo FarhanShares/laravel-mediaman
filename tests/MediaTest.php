@@ -36,9 +36,21 @@ class MediaTest extends TestCase
             ])
             ->upload();
 
-        $fetch = Media::find($mediaOne->id);
+        $fetch = Media::with('collections')->find($mediaOne->id);
 
         $this->assertEquals($fetch->id, $mediaOne->id);
+
+        $this->assertEquals('image', $mediaOne->name);
+        $this->assertEquals('image.jpg', $mediaOne->file_name);
+        $this->assertEquals('default', $mediaOne->disk);
+
+        // test disks
+        $this->assertEquals('one', $mediaOne->collections->first()->name);
+        // todo: support multiple disks
+
+        $this->assertEquals('extra data value', $fetch->data['extraData']);
+        $this->assertEquals('additional data value', $fetch->data['additional_data']);
+        $this->assertEquals('anything else?', $fetch->data['something-else']);
     }
 
     /** @test */
@@ -51,11 +63,25 @@ class MediaTest extends TestCase
         $this->assertEquals('image', $mediaOne->name);
 
         $mediaOne->name = 'new-name';
-        $mediaOne->data = ['newData' => 'new value'];
+        $mediaOne->data = ['metadata' => 'file metadata'];
         $mediaOne->save();
 
         $this->assertEquals('new-name', $mediaOne->name);
-        $this->assertEquals(['newData' => 'new value'], $mediaOne->data);
+        $this->assertEquals(['metadata' => 'file metadata'], $mediaOne->data);
+
+        // update data
+        $mediaOne->data = [
+            'metadata'         => 'updated existing key data',
+            'extra_data'       => 'new extra data',
+        ];
+        $mediaOne->save();
+
+        $this->assertEquals('new extra data', $mediaOne->data['extra_data']);
+        $this->assertEquals('updated existing key data', $mediaOne->data['metadata']);
+
+        $mediaOne->data = [];
+        $mediaOne->save();
+        $this->assertEquals(0, count($mediaOne->data));
 
         // todo: make a fluent api like the following?
         // $mediaOne->rename('new-file')
