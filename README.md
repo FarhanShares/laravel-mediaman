@@ -100,14 +100,14 @@ php artisan mediaman:publish-config
 php artisan mediaman:publish-migration
 ```
 
-Run the migration & you are all set.
-```bash
-php artisan migrate
-```
-
-Ensure storage is linked by running:
+Ensure the storage is linked.
 ```bash
 php artisan storage:link`
+```
+
+Run the migration and you are all set.
+```bash
+php artisan migrate
 ```
 
 ## Configuration
