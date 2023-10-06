@@ -8,6 +8,8 @@ use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Collection;
 use FarhanShares\MediaMan\Jobs\PerformConversions;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection as BaseCollection;
 
 trait HasMedia
 {
@@ -89,45 +91,16 @@ trait HasMedia
      */
     public function attachMedia($media, string $channel = 'default', array $conversions = [])
     {
-        $this->registerMediaChannels();
+        // Utilize syncMedia with detaching set to false to achieve the attach behavior
+        $syncResult = $this->syncMedia($media, $channel, $conversions, false);
 
-        $ids = $this->parseMediaIds($media);
+        if (!isset($syncResult['attached'])) return null;
 
-        $mediaChannel = $this->getMediaChannel($channel);
+        // Count the number of attached media from the sync result
+        $attached  = count($syncResult['attached'] ?? []);
 
-        if ($mediaChannel && $mediaChannel->hasConversions()) {
-            $conversions = array_merge(
-                $conversions,
-                $mediaChannel->getConversions()
-            );
-        }
-
-        if (!empty($conversions)) {
-            $model = config('mediaman.models.media');
-
-            $media = $model::findMany($ids);
-
-            $media->each(function ($media) use ($conversions) {
-                PerformConversions::dispatch(
-                    $media,
-                    $conversions
-                );
-            });
-        }
-
-
-        $mappedIds = [];
-        foreach ($ids as $id) {
-            $mappedIds[$id] = ['channel' => $channel];
-        }
-
-        try {
-            $res = $this->media()->sync($mappedIds, false);
-            $attached  = count($res['attached']);
-            return $attached > 0 ? $attached : null;
-        } catch (Throwable $th) {
-            return null;
-        }
+        // Return the count of attached media if there's any, otherwise return null
+        return $attached > 0 ? $attached : null;
     }
 
     /**
@@ -207,5 +180,84 @@ trait HasMedia
     public function clearMediaChannel(string $channel = 'default')
     {
         $this->media()->wherePivot('channel', $channel)->detach();
+    }
+
+
+    /**
+     * Sync media to the specified channel.
+     *
+     * This will remove the media that aren't in the provided list
+     * and add those which aren't already attached if $detaching is truthy.
+     *
+     * @param mixed $media
+     * @param string $channel
+     * @param array $conversions
+     * @param bool $detaching
+     * @return array|null
+     */
+    public function syncMedia($media, string $channel = 'default', array $conversions = [], $detaching = true)
+    {
+        $this->registerMediaChannels();
+
+        if ($detaching === true && $this->shouldDetachAll($media)) {
+            return $this->media()->sync([]);
+        }
+
+        $ids = $this->parseMediaIds($media);
+
+        $mediaChannel = $this->getMediaChannel($channel);
+
+        if ($mediaChannel && $mediaChannel->hasConversions()) {
+            $conversions = array_merge(
+                $conversions,
+                $mediaChannel->getConversions()
+            );
+        }
+
+        if (!empty($conversions)) {
+            $model = config('mediaman.models.media');
+
+            $mediaInstances = $model::findMany($ids);
+
+            $mediaInstances->each(function ($mediaInstance) use ($conversions) {
+                PerformConversions::dispatch(
+                    $mediaInstance,
+                    $conversions
+                );
+            });
+        }
+
+        $mappedIds = [];
+        foreach ($ids as $id) {
+            $mappedIds[$id] = ['channel' => $channel];
+        }
+
+        try {
+            $res = $this->media()->sync($mappedIds, $detaching);
+            return $res; // this should give an array containing 'attached', 'detached', and 'updated'
+        } catch (Throwable $th) {
+            return null;
+        }
+    }
+
+    /**
+     * Check if all media should be detached
+     *
+     * bool|null|empty-string|empty-array to detach all media
+     *
+     * @param mixed $collections
+     * @return boolean
+     */
+    protected function shouldDetachAll($media): bool
+    {
+        if (is_bool($media) || is_null($media) || empty($media)) {
+            return true;
+        }
+
+        if (is_countable($media) && count($media) === 0) {
+            return true;
+        }
+
+        return false;
     }
 }

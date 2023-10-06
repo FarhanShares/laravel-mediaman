@@ -3,13 +3,15 @@
 namespace FarhanShares\MediaMan\Tests;
 
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use FarhanShares\MediaMan\Models\Media;
+use FarhanShares\MediaMan\MediaUploader;
+use FarhanShares\MediaMan\Tests\Models\Subject;
+use FarhanShares\MediaMan\Jobs\PerformConversions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use FarhanShares\MediaMan\Models\Media;
-use FarhanShares\MediaMan\Tests\Models\Subject;
-use FarhanShares\MediaMan\Jobs\PerformConversions;
 
 class HasMediaTest extends TestCase
 {
@@ -80,15 +82,19 @@ class HasMediaTest extends TestCase
     {
         $media = factory(Media::class)->create();
 
-        $attached = $this->subject->attachMedia($media, 'custom');
+        $attachedCount = $this->subject->attachMedia($media, 'custom');
 
-        $this->assertEquals(1, $attached);
+        $this->assertEquals(1, $attachedCount);
 
-        // todo: couldn't test null return type with sqlite test environment
-        // todo: as sqlite doesn't have relationship, it won't fail, but it works on relational db
-        // try attaching a non-existing media record
-        // $attached = $this->subject->attachMedia(5, 'custom');
-        // $this->assertEquals(null, $attached);
+        if (DB::connection() instanceof \Illuminate\Database\SQLiteConnection) {
+            // SQLite doesn't enforce foreign key constraints by default, so this test won't fail as expected in an SQLite environment.
+            // However, it should work as expected on other relational databases that enforce these constraints.
+            $this->markTestSkipped('Skipping test for SQLite connection.');
+        } else {
+            // try attaching a non-existing media record
+            $attached = $this->subject->attachMedia(5, 'custom');
+            $this->assertEquals(null, $attached);
+        }
     }
 
     /** @test */
@@ -104,6 +110,74 @@ class HasMediaTest extends TestCase
         // try detaching a non-existing media record
         $detached = $this->subject->detachMedia(100);
         $this->assertEquals(null, $detached);
+    }
+
+    public function it_can_attach_media_and_returns_number_of_media_attached()
+    {
+        $media = factory(Media::class)->create();
+
+        $attachedCount = $this->subject->attachMedia($media);
+
+        $this->assertEquals(1, $attachedCount);
+
+        $attachedMedia = $this->subject->media()->first();
+        $this->assertEquals($media->id, $attachedMedia->id);
+    }
+
+    /** @test */
+    public function it_can_detach_media_and_returns_number_of_media_detached()
+    {
+        $media = factory(Media::class)->create();
+        $this->subject->attachMedia($media);
+
+        $detachedCount = $this->subject->detachMedia($media);
+
+        $this->assertEquals(1, $detachedCount);
+        $this->assertNull($this->subject->media()->first());
+    }
+
+    /** @test */
+    public function it_can_sync_media_and_returns_sync_status()
+    {
+        $media1 = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->useCollection('default')
+            ->useDisk('default')
+            ->upload();
+        $media2 = MediaUploader::source($this->fileOne)
+            ->useName('image')
+            ->useCollection('default')
+            ->useDisk('default')
+            ->upload();
+
+        // Initially attach media1
+        $this->subject->attachMedia($media1);
+
+        // Now, sync to media2
+        $syncStatus = $this->subject->syncMedia($media2);
+
+        $this->assertArrayHasKey('updated', $syncStatus);
+        $this->assertArrayHasKey('attached', $syncStatus);
+        $this->assertArrayHasKey('detached', $syncStatus);
+
+        $this->assertEquals([$media2->id], $syncStatus['attached']);
+        $this->assertEquals([$media1->id], $syncStatus['detached']);
+
+        $syncStatus = $this->subject->syncMedia([]); // should detach all
+        $this->assertEquals(1, count($syncStatus['detached']));
+    }
+
+    /** @test */
+    public function it_can_sync_collections_for_a_media_instance()
+    {
+        $media = factory(Media::class)->create();
+        $collections = ['collection1', 'collection2'];
+
+        $syncStatus = $media->syncCollections($collections);
+
+        $this->assertArrayHasKey('attached', $syncStatus);
+        $this->assertArrayHasKey('detached', $syncStatus);
+        $this->assertArrayHasKey('updated', $syncStatus);
     }
 
     /** @test */
