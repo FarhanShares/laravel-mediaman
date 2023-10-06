@@ -3,6 +3,7 @@
 namespace FarhanShares\MediaMan;
 
 use Illuminate\Support\ServiceProvider;
+use FarhanShares\MediaMan\Console\Commands\MediamanPublishCommand;
 
 class MediaManServiceProvider extends ServiceProvider
 {
@@ -38,5 +39,11 @@ class MediaManServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/mediaman.php' => config_path('mediaman.php'),
         ], 'config');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                MediamanPublishCommand::class,
+            ]);
+        }
     }
 }
