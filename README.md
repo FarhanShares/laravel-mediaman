@@ -60,7 +60,7 @@ There are a few key concepts that need to be understood before continuing:
 ## Requirements
 
 - PHP v7.3 | v7.4 | v8.0 | v8.1
-- Laravel v7 | v8 | v9
+- Laravel v7 | v8 | v9 | v10
 - Composer v1 | v2
 
 ## Installation

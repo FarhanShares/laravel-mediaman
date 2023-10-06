@@ -4,7 +4,6 @@
 .DS_Store
 .phpunit.result.cache
 phpunit.xml
-composer.lock
 yarn.lock
 package.lock
 npm-debug.log
