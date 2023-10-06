@@ -30,14 +30,18 @@ While many Laravel applications grapple with media and file management, I've oft
 **Enter MediaMan:** Sleek, lightweight, and brimming with functionality. Whether you need a straightforward solution for attaching and detaching media or the robust backbone for an extensive media manager, MediaMan adapts to your needs. And rest assured, its evolution will be guided by the ever-changing requirements of modern applications, whether they are Monolithic, API-driven, enhanced with Livewire/InertiaJS integrations, or built upon Serverless architectures.
 
 
-| Comparison                        | **MediaMan**        | Spatie              |
-|-----------------------------------|---------------------|---------------------|
-| **Relationship type**             | **Many to many**    | One to many         |
-| **Reuse media with another model**| **Yes**             | No                  |
-| **Virtual directory**             | **Yes**             | No                  |
-| **Auto delete media with model**  | **Yes**             | Yes                 |
-| **Image manipulation**            | **Yes**             | Yes                 |
-| **Manipulation type**             | **Global registry** | Specific to a model |
+| Comparison                         | **MediaMan**                              | Spatie              |
+|------------------------------------|-------------------------------------------|---------------------|
+| **Relationship type**              | **Many to many**                          | One to many         |
+| **Reuse media with another model** | **Yes**                                   | No                  |
+| **Virtual directory (collections)**| **Yes**                                   | No                  |
+| **Multiple Disk Support**          | **Yes**                                   | No                  |
+| **Auto delete media with model**   | **Yes, with options to keep**             | Yes                 |
+| **Image manipulation**             | **Yes, at ease**                          | Yes                 |
+| **Manipulation type**              | **Global registry**                       | Specific to a model |
+| **Custom Conversion Support**      | **Yes**                                   | Limited             |
+| **Integrations**                   | **Optimized for APIs/Livewire/InertiaJS** | Basic               |
+| **Maintenance and Updates**        | **Actively Maintained**                   | Periodically Updated|
 
 
 ## Overview & Key concepts
