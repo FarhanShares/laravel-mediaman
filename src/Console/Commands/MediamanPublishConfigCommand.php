@@ -5,7 +5,7 @@ namespace FarhanShares\MediaMan\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
-class MediamanPublishCommand extends Command
+class MediamanPublishConfigCommand extends Command
 {
     protected $signature = 'mediaman:publish-config';
 
@@ -23,12 +23,13 @@ class MediamanPublishCommand extends Command
 
         if (File::exists($destinationConfigPath)) {
             if (!$this->confirm('The mediaman config file already exists. Do you want to overwrite it?')) {
-                $this->info('Config file was not overwritten.');
+                $this->info('Migration file was not overwritten.');
                 return;
             }
         }
 
         File::copy($sourceConfigPath, $destinationConfigPath);
-        $this->info('Published mediaman config file.');
+        $relativePath = str_replace(base_path() . '/', '', $destinationConfigPath);
+        $this->info('Published mediaman config file to: ' . $relativePath);
     }
 }

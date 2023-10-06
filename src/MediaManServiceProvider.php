@@ -3,7 +3,8 @@
 namespace FarhanShares\MediaMan;
 
 use Illuminate\Support\ServiceProvider;
-use FarhanShares\MediaMan\Console\Commands\MediamanPublishCommand;
+use FarhanShares\MediaMan\Console\Commands\MediamanPublishConfigCommand;
+use FarhanShares\MediaMan\Console\Commands\MediamanPublishMigrationCommand;
 
 class MediaManServiceProvider extends ServiceProvider
 {
@@ -42,7 +43,8 @@ class MediaManServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                MediamanPublishCommand::class,
+                MediamanPublishConfigCommand::class,
+                MediamanPublishMigrationCommand::class,
             ]);
         }
     }
