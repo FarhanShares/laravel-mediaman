@@ -230,7 +230,7 @@ $media->getPath('conversion-name')
 $media->getDirectory()
 ```
 ### Update media
-You can update a media name with an instance of Media.
+With an instance of `Media`, you can perform various update operations:
 
 ```php
 $media = Media::first();
@@ -238,10 +238,6 @@ $media->name = 'New name';
 $media->data = ['additional_data' => 'additional data']
 $media->save()
 ```
-
-### Update Media
-
-With an instance of `Media`, you can perform various update operations:
 
 #### Update Media Name:
 
@@ -258,7 +254,7 @@ $media->data = ['additional_data' => 'new additional data'];
 $media->save();
 ```
 
-#### You can also remove all data:
+#### Remove All Additional Data:
 
 ```php
 $media->data = [];
@@ -290,11 +286,6 @@ $media->save();
 - *Cons*: Can introduce performance delays.
 
 **Tip**: Enabling this check can preemptively spot storage issues, but may add minor operational delays. Consider your system's needs and decide accordingly.
-
-**Heads Up!** If you need to deal with collections, please read the docs below. Do not update anything other than `name` & `data` using the Media instance for the time being.
-
-
-
 
 ### Delete media
 You can delete a media by calling delete() method on an instance of Media.
