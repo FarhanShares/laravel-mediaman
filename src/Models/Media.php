@@ -38,7 +38,7 @@ class Media extends Model
      *
      * @var array
      */
-    protected $appends = ['friendly_size',  'media_url', 'type', 'extension'];
+    protected $appends = ['friendly_size',  'media_uri', 'media_url', 'type', 'extension'];
 
 
     public static function booted()
@@ -154,6 +154,16 @@ class Media extends Model
      * @return string
      */
     public function getMediaUrlAttribute()
+    {
+        return asset($this->filesystem()->url($this->getPath()));
+    }
+
+    /**
+     * Get the original media uri.
+     *
+     * @return string
+     */
+    public function getMediaUriAttribute()
     {
         return $this->filesystem()->url($this->getPath());
     }
