@@ -207,7 +207,7 @@ An instance of Media has the following attributes:
 'mime_type' => string
 'size' =>  int // in bytes
 'friendly_size' => string // in human readable format
-'media_url' =>  string // original media url
+'media_url' => string  // media storage URL for the original media file. Usage in Blade: {{ asset($media->media_url) }}.
 'disk' =>  string
 'data' => array // casts as array
 'created_at' =>  string
