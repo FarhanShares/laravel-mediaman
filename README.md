@@ -564,6 +564,49 @@ $mediaOneThumb = $media[0]->getUrl('thumb');
 
 *Tip:* The `media_uri` and `media_url` are always appended with an instance of `Media`, these reflect the original file (and not the conversions).
 
+## Upgrade Guide to MediaMan v1.x
+
+If you're upgrading from a previous version of MediaMan, rest assured that the transition is fairly straightforward. Here's what you need to know:
+
+### Changes:
+
+- **Introduction of `media_uri`**:
+  In this release, we've introduced a new attribute called `media_uri`. This provides the URI for the original file. When you want to generate a full URL for use in Blade, you'd use it like so:
+  ```blade
+  {{ asset($media->media_uri) }}
+  ```
+
+- **Modification to `media_url`**:
+  In previous versions, `media_url` used to act like what `media_uri` does now. Starting from v1.0.0, `media_url` will directly give you the absolute URL for the original file.
+
+### Steps to Upgrade:
+
+1. **Update the Package**:
+   Run the composer update command to get the latest version.
+   ```bash
+   composer update farhanshares/laravel-mediaman
+   ```
+
+2. **Review Your Blade Files**:
+   If you previously used `media_url` with the `asset()` helper, like:
+   ```blade
+   {{ asset($media->media_url) }}
+   ```
+   Update it to:
+   ```blade
+   {{ asset($media->media_uri) }}
+   ```
+
+   If you used `media_url` without `asset()`, there's no change required.
+
+3. **Run Any New Migrations** (if applicable):
+   Always check for new migrations and run them to ensure your database schema is up-to-date.
+
+4. **Test Your Application**:
+   As always, after an upgrade, ensure you test your application thoroughly, especially the parts where media files are used, to make sure everything works as expected.
+
+Thank you for using MediaMan and we hope you enjoy the improvements in v1.0.0! If you face any issues, feel free to open a ticket on GitHub.
+
 ## Contribution and License
 
 If you encounter a bug, please consider opening an issue. Feature Requests & PRs are welcome.
