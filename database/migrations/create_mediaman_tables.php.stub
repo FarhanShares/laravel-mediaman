@@ -75,9 +75,9 @@ class CreateMediaManTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(config('mediaman.tables.collections'));
-        Schema::dropIfExists(config('mediaman.tables.media'));
         Schema::dropIfExists(config('mediaman.tables.collection_media'));
         Schema::dropIfExists(config('mediaman.tables.mediables'));
+        Schema::dropIfExists(config('mediaman.tables.collections'));
+        Schema::dropIfExists(config('mediaman.tables.media'));
     }
 }
