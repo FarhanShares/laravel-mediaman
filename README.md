@@ -71,6 +71,7 @@ There are a few key concepts that need to be understood before continuing:
   * [Collections](#collections)
   * [Media & Collections](#media--collections)
   * [Media, Models & Conversions](#conversions)
+  * [Upgrade Guide to MediaMan v1.x](#upgrade-guide-to-mediaman-v1x)
   * [Contribution and License](#contribution-and-license)
 
 
