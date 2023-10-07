@@ -207,7 +207,8 @@ An instance of Media has the following attributes:
 'mime_type' => string
 'size' =>  int // in bytes
 'friendly_size' => string // in human readable format
-'media_url' => string  // media storage URL for the original media file. Usage in Blade: {{ asset($media->media_url) }}.
+'media_uri' => string  // media URI for the original file. Usage in Blade: {{ asset($media->media_url) }}.
+'media_url' => string  // direct URL for the original file.
 'disk' =>  string
 'data' => array // casts as array
 'created_at' =>  string
@@ -561,7 +562,7 @@ $media = $post->getMedia();
 $mediaOneThumb = $media[0]->getUrl('thumb');
 ```
 
-*Tip:* The `media_url` is always appended & it's the original media URL.
+*Tip:* The `media_uri` and `media_url` are always appended with an instance of `Media`, these reflect the original file (and not the conversions).
 
 ## Contribution and License
 
