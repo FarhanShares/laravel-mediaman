@@ -37,6 +37,7 @@ class ImageManipulatorTest extends TestCase
 
         $manipulator = new ImageManipulator($conversionRegistry, $imageManager);
 
+        /** @var \FarhanShares\MediaMan\Models\Media|\Mockery\MockInterface $media */
         $media = Mockery::mock(Media::class)->makePartial();
         $media->file_name = 'file-name.png';
         $media->mime_type = 'image/png';
@@ -109,6 +110,7 @@ class ImageManipulatorTest extends TestCase
 
         $manipulator = new ImageManipulator($conversionRegistry, $imageManager);
 
+        /** @var \FarhanShares\MediaMan\Models\Media|\Mockery\MockInterface $media */
         $media = Mockery::mock(Media::class)->makePartial();
         $media->file_name = 'file-name.png';
         $media->mime_type = 'image/png';
