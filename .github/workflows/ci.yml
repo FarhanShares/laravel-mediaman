@@ -9,9 +9,11 @@ jobs:
       fail-fast: false
       matrix:
         php: [7.3, 7.4, 8.0, 8.1, 8.2]
-        laravel: [7.*, 8.*,  9.*, 10.*]
+        laravel: [7.*, 8.*,  9.*, 10.*, 11.*]
         dependency-versions: [prefer-stable]
         include:
+          - laravel: 11.*
+            testbench: 11.*
           - laravel: 10.*
             testbench: 10.*
           - laravel: 9.*
@@ -30,26 +32,34 @@ jobs:
 
           - php: 8.1
             laravel: 7.*
+          - php: 8.1
+            laravel: 11.*
 
           - php: 8.0
             laravel: 10.*
+          - php: 8.0
+            laravel: 11.*
 
           - php: 7.4
             laravel: 9.*
           - php: 7.4
             laravel: 10.*
+          - php: 7.4
+            laravel: 11.*
 
           - php: 7.3
             laravel: 9.*
           - php: 7.3
             laravel: 10.*
+          - php: 7.3
+            laravel: 11.*
 
 
     name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }} / ${{ matrix.dependency-versions }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
@@ -64,7 +74,7 @@ jobs:
         id: composer_cache
 
       - name: Cache composer dependencies
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v3.3.2
         with:
           path: ${{ steps.composer_cache.outputs.COMPOSER_CACHE_DIR }}
           key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
