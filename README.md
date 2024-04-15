@@ -78,8 +78,8 @@ There are a few key concepts that need to be understood before continuing:
 
 ## Requirements
 
-- PHP v7.3 | v7.4 | v8.0 | v8.1
-- Laravel v7 | v8 | v9 | v10
+- PHP v7.3 | v7.4 | v8.0 | v8.1 | v8.2
+- Laravel v7 | v8 | v9 | v10 | v11
 - Composer v1 | v2
 
 ## Installation
@@ -208,7 +208,7 @@ An instance of Media has the following attributes:
 'mime_type' => string
 'size' =>  int // in bytes
 'friendly_size' => string // in human readable format
-'media_uri' => string  // media URI for the original file. Usage in Blade: {{ asset($media->media_url) }}.
+'media_uri' => string  // media URI for the original file. Usage in Blade: {{ asset($media->media_uri) }}.
 'media_url' => string  // direct URL for the original file.
 'disk' =>  string
 'data' => array // casts as array

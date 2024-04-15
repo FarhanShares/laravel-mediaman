@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use FarhanShares\MediaMan\MediaManServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class TestCase extends BaseTestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     const DEFAULT_DISK = 'default';
 
@@ -65,5 +66,8 @@ class TestCase extends BaseTestCase
             'database' => ':memory:',
             'prefix'   => '',
         ]);
+
+        // Load migrations
+        $app['migrator']->path(__DIR__ . '/../database/migrations');
     }
 }
