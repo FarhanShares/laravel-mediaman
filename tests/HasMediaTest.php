@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class HasMediaTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected $subject;
 
