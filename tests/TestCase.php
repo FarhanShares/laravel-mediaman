@@ -13,7 +13,10 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class TestCase extends BaseTestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, RefreshDatabase {
+        RefreshDatabase::setUp as setUpRefreshDatabase;
+        DatabaseMigrations::setUp as setUpDatabaseMigrations;
+    }
 
     const DEFAULT_DISK = 'default';
 
@@ -30,6 +33,12 @@ class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        if (version_compare(app()->version(), '11.0.0', '>=')) {
+            $this->setUpRefreshDatabase();
+        } else {
+            $this->setUpDatabaseMigrations();
+        }
 
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->withFactories(__DIR__ . '/database/factories');
