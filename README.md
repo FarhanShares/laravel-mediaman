@@ -491,7 +491,7 @@ This won't delete the media from disk but the bindings will be removed from data
 
 *Heads Up!* deleteWithMedia() is a conceptual method that hasn't implemented yet, create a feature request if you need this. PRs are very much appreciated.
 
-------;
+------
 
 ## Media & Collections
 
