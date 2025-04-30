@@ -10,7 +10,7 @@ use FarhanShares\MediaMan\Exceptions\InvalidConversion;
 class ConversionRegistryTest extends TestCase
 {
     /** @test */
-    public function it_can_register_and_retrieve_specific_conversions()
+    public function test_it_can_register_and_retrieve_specific_conversions()
     {
         $conversionRegistry = new ConversionRegistry();
 
@@ -24,7 +24,7 @@ class ConversionRegistryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_retrieve_all_the_registered_conversions()
+    public function test_it_can_retrieve_all_the_registered_conversions()
     {
         $conversionRegistry = new ConversionRegistry();
 
@@ -44,7 +44,7 @@ class ConversionRegistryTest extends TestCase
     }
 
     /** @test */
-    public function there_can_only_be_one_conversion_registered_with_the_same_name()
+    public function test_there_can_only_be_one_conversion_registered_with_the_same_name()
     {
         $conversionRegistry = new ConversionRegistry();
 
@@ -61,7 +61,7 @@ class ConversionRegistryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_if_a_conversion_has_been_registered()
+    public function test_it_can_determine_if_a_conversion_has_been_registered()
     {
         $conversionRegistry = new ConversionRegistry();
 
@@ -74,7 +74,7 @@ class ConversionRegistryTest extends TestCase
     }
 
     /** @test */
-    public function it_will_error_when_attempting_to_retrieve_an_unregistered_conversion()
+    public function test_it_will_error_when_attempting_to_retrieve_an_unregistered_conversion()
     {
         $this->expectException(InvalidConversion::class);
 

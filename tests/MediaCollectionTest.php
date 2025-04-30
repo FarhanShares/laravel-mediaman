@@ -9,7 +9,7 @@ use FarhanShares\MediaMan\MediaUploader;
 class MediaCollectionTest extends TestCase
 {
     /** @test */
-    public function it_can_create_a_collection()
+    public function test_it_can_create_a_collection()
     {
         $collection = $this->mediaCollection::firstOrCreate([
             'name' => 'test-collection'
@@ -20,7 +20,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_update_a_collection()
+    public function test_it_can_update_a_collection()
     {
         $collection = $this->mediaCollection::firstOrCreate([
             'name' => 'test-collection'
@@ -32,7 +32,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_delete_a_collection_with_associated_pivot_table_data()
+    public function test_it_can_delete_a_collection_with_associated_pivot_table_data()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
             ->useName('images-1')
@@ -54,7 +54,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_retrieve_media_of_a_collection()
+    public function test_it_can_retrieve_media_of_a_collection()
     {
 
         MediaUploader::source($this->fileOne)
@@ -79,7 +79,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_media_of_a_collection()
+    public function test_it_can_sync_media_of_a_collection()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
             ->useName('video-1')
@@ -145,7 +145,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_attach_media_to_a_collection()
+    public function test_it_can_attach_media_to_a_collection()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
             ->useName('image-0')
@@ -191,7 +191,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_can_detach_media_from_a_collection()
+    public function test_it_can_detach_media_from_a_collection()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
             ->useName('image-0')
@@ -242,7 +242,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_false_for_non_existing_or_already_attached_media_when_attaching()
+    public function test_it_returns_false_for_non_existing_or_already_attached_media_when_attaching()
     {
         MediaUploader::source($this->fileOne)
             ->useName('image-1')
@@ -258,7 +258,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_number_of_attached_media_if_at_least_one_of_these_is_existing_media_and_not_already_attached_when_attaching()
+    public function test_it_returns_number_of_attached_media_if_at_least_one_of_these_is_existing_media_and_not_already_attached_when_attaching()
     {
         MediaUploader::source($this->fileOne)
             ->useName('others-1')
@@ -289,7 +289,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_false_if_all_are_non_existing_or_already_detached_media_when_detaching()
+    public function test_it_returns_false_if_all_are_non_existing_or_already_detached_media_when_detaching()
     {
         MediaUploader::source($this->fileOne)
             ->useName('image-1')
@@ -306,7 +306,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_number_of_detached_media_if_at_least_one_of_these_is_existing_attached_media_and_not_already_detached_when_detaching()
+    public function test_it_returns_number_of_detached_media_if_at_least_one_of_these_is_existing_attached_media_and_not_already_detached_when_detaching()
     {
         MediaUploader::source($this->fileOne)
             ->useName('image-1')
@@ -330,7 +330,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_false_if_it_is_a_non_existing_media_when_synchronizing()
+    public function test_it_returns_false_if_it_is_a_non_existing_media_when_synchronizing()
     {
         MediaUploader::source($this->fileOne)
             ->useName('image-1')
@@ -345,7 +345,7 @@ class MediaCollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_detailed_array_when_synchronizing_with_existing_non_existing_and_already_attached_media_array()
+    public function test_it_returns_detailed_array_when_synchronizing_with_existing_non_existing_and_already_attached_media_array()
     {
         MediaUploader::source($this->fileOne)
             ->useName('image-1')

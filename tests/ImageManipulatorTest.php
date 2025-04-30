@@ -16,7 +16,7 @@ use FarhanShares\MediaMan\Exceptions\InvalidConversion;
 class ImageManipulatorTest extends TestCase
 {
     /** @test */
-    public function it_will_apply_registered_conversions()
+    public function test_it_will_apply_registered_conversions()
     {
         $conversionRegistry = new ConversionRegistry();
 
@@ -55,7 +55,7 @@ class ImageManipulatorTest extends TestCase
     }
 
     /** @test */
-    public function it_will_only_apply_conversions_to_an_image()
+    public function test_it_will_only_apply_conversions_to_an_image()
     {
         $conversionRegistry = new ConversionRegistry();
 
@@ -76,7 +76,7 @@ class ImageManipulatorTest extends TestCase
     }
 
     /** @test */
-    public function it_will_ignore_unregistered_conversions()
+    public function test_it_will_ignore_unregistered_conversions()
     {
         $this->expectException(InvalidConversion::class);
 
@@ -95,7 +95,7 @@ class ImageManipulatorTest extends TestCase
     }
 
     /** @test */
-    public function it_will_skip_conversions_if_the_converted_image_already_exists()
+    public function test_it_will_skip_conversions_if_the_converted_image_already_exists()
     {
         $conversionRegistry = new ConversionRegistry();
 
