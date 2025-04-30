@@ -75,13 +75,16 @@ There are a few key concepts that need to be understood before continuing:
 
 | Laravel Version | Package Version | PHP Version        |
 |-----------------|-----------------|--------------------|
-| v7              | 1.x             | 7.3 - 8.0          |
-| v8              | 1.x             | 7.3 - 8.1          |
-| v9              | 1.x             | 8.0 - 8.2          |
-| v10             | 1.x             | 8.1 - 8.3          |
-| v11             | 1.x             | 8.2 - 8.3          |
+| v7              | 1.0.0-stable    | 7.3 - 8.0          |
+| v8              | 1.0.0-stable    | 7.3 - 8.1          |
+| v9              | 1.0.0-stable    | 8.0 - 8.2          |
+| v10             | 1.x.x           | 8.1 - 8.3          |
+| v11             | 1.x.x           | 8.2 - 8.4          |
+| v12             | 1.x.x           | 8.2 - 8.4          |
 
-Note: From version 2.x of the Laravel Mediaman package, only Laravel 10 and higher versions will be supported; please consider upgrading as official support for previous versions has ended.
+Note: The `1.0.0-stable` and `1.x.x` versions of the package are functionally identical and both considered stable. However, starting from version `1.0.0` (without the `-stable` suffix), support for Laravel 9 and below has been **dropped**.
+If your project uses Laravel 9 or an earlier version, you should use `1.0.0-stable`. For Laravel 10 and above, you can use the latest `1.x.x` version.
+We strongly recommend upgrading your Laravel version to maintain compatibility with future package updates.
 
 ## Installation
 
