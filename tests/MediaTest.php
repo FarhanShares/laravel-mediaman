@@ -20,7 +20,7 @@ class MediaTest extends TestCase
 
 
     /** @test */
-    public function it_can_create_a_media_record_with_media_uploader()
+    public function test_it_can_create_a_media_record_with_media_uploader()
     {
         // use api
         $mediaOne = MediaUploader::source($this->fileOne)
@@ -54,7 +54,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_update_a_media_record()
+    public function test_it_can_update_a_media_record()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
             ->useName('image')
@@ -92,7 +92,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_delete_a_media_record()
+    public function test_it_can_delete_a_media_record()
     {
         $media = MediaUploader::source($this->fileOne)
             ->useName('image')
@@ -108,7 +108,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_deletes_media_and_related_files_from_storage_when_media_is_deleted()
+    public function test_it_deletes_media_and_related_files_from_storage_when_media_is_deleted()
     {
         $media = MediaUploader::source($this->fileOne)
             ->useName('image')
@@ -123,7 +123,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_moves_file_to_new_disk_on_disk_update()
+    public function test_it_moves_file_to_new_disk_on_disk_update()
     {
         $newDiskName = 'newValidDisk';
         Storage::fake($newDiskName);
@@ -148,7 +148,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_renames_file_in_storage_on_filename_update()
+    public function test_it_renames_file_in_storage_on_filename_update()
     {
         $media = MediaUploader::source($this->fileOne)
             ->useName('image')
@@ -164,7 +164,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_disk_usability_for_valid_disk()
+    public function test_it_validates_disk_usability_for_valid_disk()
     {
         Storage::fake('newValidDisk');
 
@@ -177,7 +177,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_invalid_disk_in_disk_usability_check()
+    public function test_it_throws_exception_for_invalid_disk_in_disk_usability_check()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -198,7 +198,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_has_a_type_accessor()
+    public function test_it_has_a_type_accessor()
     {
         $image = new Media();
         $image->mime_type = 'image/png';
@@ -211,7 +211,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_its_type()
+    public function test_it_can_determine_its_type()
     {
         $media = new Media();
         $media->mime_type = 'image/png';
@@ -221,7 +221,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_path_on_disk_to_the_file()
+    public function test_it_can_get_the_path_on_disk_to_the_file()
     {
         $media = new Media();
         $media->id = 1;
@@ -232,7 +232,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_path_on_disk_to_a_converted_image()
+    public function test_it_can_get_the_path_on_disk_to_a_converted_image()
     {
         $media = new Media();
         $media->id = 1;
@@ -246,7 +246,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_full_path_to_the_file()
+    public function test_it_can_get_the_full_path_to_the_file()
     {
         $media = Mockery::mock(Media::class)->makePartial();
 
@@ -261,7 +261,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_full_path_to_a_converted_image()
+    public function test_it_can_get_the_full_path_to_a_converted_image()
     {
         $media = Mockery::mock(Media::class)->makePartial();
 
@@ -276,7 +276,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_url_to_the_file()
+    public function test_it_can_get_the_url_to_the_file()
     {
         $media = Mockery::mock(Media::class)->makePartial();
 
@@ -291,7 +291,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_the_url_to_a_converted_image()
+    public function test_it_can_get_the_url_to_a_converted_image()
     {
         $media = Mockery::mock(Media::class)->makePartial();
 
@@ -306,7 +306,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_a_collection_by_id()
+    public function test_it_can_sync_a_collection_by_id()
     {
         $collection = $this->mediaCollection::firstOrCreate([
             'name' => 'Test Collection'
@@ -322,7 +322,7 @@ class MediaTest extends TestCase
 
 
     /** @test */
-    public function it_can_sync_a_collection_by_name()
+    public function test_it_can_sync_a_collection_by_name()
     {
         $collection = $this->mediaCollection::firstOrCreate([
             'name' => 'Test Collection'
@@ -337,7 +337,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_multiple_collections_by_name()
+    public function test_it_can_sync_multiple_collections_by_name()
     {
         $this->mediaCollection::firstOrCreate([
             'name' => 'Test Collection'
@@ -353,7 +353,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sync_multiple_collections_by_id()
+    public function test_it_can_sync_multiple_collections_by_id()
     {
         $this->mediaCollection::firstOrCreate([
             'name' => 'Test Collection'
@@ -369,7 +369,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_attach_a_media_to_a_collection_using_collection_id()
+    public function test_it_can_attach_a_media_to_a_collection_using_collection_id()
     {
         $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
         $collectionTwo = $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
@@ -386,7 +386,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_attach_a_media_to_a_collection_using_collection_name()
+    public function test_it_can_attach_a_media_to_a_collection_using_collection_name()
     {
         $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
         $collectionTwo = $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);
@@ -403,7 +403,7 @@ class MediaTest extends TestCase
     }
 
     /** @test */
-    public function it_can_attach_a_media_to_a_collection_using_collection_object()
+    public function test_it_can_attach_a_media_to_a_collection_using_collection_object()
     {
         $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
         $collectionTwo = $this->mediaCollection::firstOrCreate(['name' => 'another-collection']);

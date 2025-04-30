@@ -8,7 +8,7 @@ use FarhanShares\MediaMan\MediaChannel;
 class MediaChannelTest extends TestCase
 {
     /** @test */
-    public function it_can_register_and_retrieve_conversions()
+    public function test_it_can_register_and_retrieve_conversions()
     {
         $mediaChannel = new MediaChannel();
 
@@ -21,7 +21,7 @@ class MediaChannelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_determine_if_any_conversions_have_been_registered()
+    public function test_it_can_determine_if_any_conversions_have_been_registered()
     {
         $mediaChannel = new MediaChannel();
 

@@ -11,7 +11,7 @@ use FarhanShares\MediaMan\MediaUploader;
 class MediaUploaderTest extends TestCase
 {
     /** @test */
-    public function it_can_upload_a_file_to_the_default_disk()
+    public function test_it_can_upload_a_file_to_the_default_disk()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
 
@@ -26,7 +26,7 @@ class MediaUploaderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_upload_a_file_to_a_specific_disk()
+    public function test_it_can_upload_a_file_to_a_specific_disk()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
 
@@ -48,7 +48,7 @@ class MediaUploaderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_change_the_name_of_the_media_model()
+    public function test_it_can_change_the_name_of_the_media_model()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
 
@@ -60,7 +60,7 @@ class MediaUploaderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_rename_the_file_before_it_gets_uploaded()
+    public function test_it_can_rename_the_file_before_it_gets_uploaded()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
 
@@ -72,7 +72,7 @@ class MediaUploaderTest extends TestCase
     }
 
     /** @test */
-    public function it_will_sanitize_the_file_name()
+    public function test_it_will_sanitize_the_file_name()
     {
         $file = UploadedFile::fake()->image('bad file name#023.jpg');
 
@@ -82,7 +82,7 @@ class MediaUploaderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_save_data_to_the_media_model()
+    public function test_it_can_save_data_to_the_media_model()
     {
         $file = UploadedFile::fake()->image('image.jpg');
 
