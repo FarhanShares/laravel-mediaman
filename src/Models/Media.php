@@ -295,6 +295,164 @@ class Media extends Model
         return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
     }
 
+    /**
+     * Get all versions of this media
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function versions()
+    {
+        return $this->hasMany(MediaVersion::class)->orderBy('version_number', 'desc');
+    }
+
+    /**
+     * Get tags for this media
+     *
+     * @return BelongsToMany
+     */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Tag::class,
+            config('mediaman.tables.media_tags', 'mediaman_media_tags'),
+            'media_id',
+            'tag_id'
+        )->withTimestamps()->withPivot(['tagged_by', 'user_id']);
+    }
+
+    /**
+     * Create a new version of this media
+     *
+     * @param string|null $reason
+     * @param int|null $userId
+     * @return MediaVersion
+     */
+    public function createVersion(?string $reason = null, ?int $userId = null): MediaVersion
+    {
+        if (!config('mediaman.versioning.enabled', false)) {
+            return null;
+        }
+
+        $latestVersion = $this->versions()->first();
+        $versionNumber = $latestVersion ? $latestVersion->version_number + 1 : 1;
+
+        // Copy current file to version location
+        $versionPath = $this->getDirectory() . '/versions/' . $versionNumber . '/' . $this->file_name;
+        $currentContent = $this->filesystem()->get($this->getPath());
+        $this->filesystem()->put($versionPath, $currentContent);
+
+        return $this->versions()->create([
+            'version_number' => $versionNumber,
+            'file_name' => $this->file_name,
+            'disk' => $this->disk,
+            'size' => $this->size,
+            'mime_type' => $this->mime_type,
+            'data' => $this->data,
+            'reason' => $reason,
+            'created_by' => $userId ?? auth()->id(),
+        ]);
+    }
+
+    /**
+     * Attach tags to media
+     *
+     * @param array|string $tags
+     * @param string $taggedBy
+     * @return void
+     */
+    public function attachTags($tags, string $taggedBy = 'user'): void
+    {
+        $tags = is_array($tags) ? $tags : [$tags];
+        $tagIds = [];
+
+        foreach ($tags as $tagName) {
+            $tag = Tag::findOrCreateByName($tagName);
+            $tag->incrementUsage();
+            $tagIds[$tag->id] = [
+                'tagged_by' => $taggedBy,
+                'user_id' => auth()->id(),
+            ];
+        }
+
+        $this->tags()->syncWithoutDetaching($tagIds);
+    }
+
+    /**
+     * Detach tags from media
+     *
+     * @param array|string|null $tags
+     * @return void
+     */
+    public function detachTags($tags = null): void
+    {
+        if ($tags === null) {
+            // Detach all tags
+            foreach ($this->tags as $tag) {
+                $tag->decrementUsage();
+            }
+            $this->tags()->detach();
+            return;
+        }
+
+        $tags = is_array($tags) ? $tags : [$tags];
+        foreach ($tags as $tagName) {
+            $tag = Tag::findBySlug(Str::slug($tagName));
+            if ($tag) {
+                $tag->decrementUsage();
+                $this->tags()->detach($tag->id);
+            }
+        }
+    }
+
+    /**
+     * Sync tags (replace all existing tags)
+     *
+     * @param array $tags
+     * @param string $taggedBy
+     * @return void
+     */
+    public function syncTags(array $tags, string $taggedBy = 'user'): void
+    {
+        // Decrement usage for old tags
+        foreach ($this->tags as $tag) {
+            $tag->decrementUsage();
+        }
+
+        $tagIds = [];
+        foreach ($tags as $tagName) {
+            $tag = Tag::findOrCreateByName($tagName);
+            $tag->incrementUsage();
+            $tagIds[$tag->id] = [
+                'tagged_by' => $taggedBy,
+                'user_id' => auth()->id(),
+            ];
+        }
+
+        $this->tags()->sync($tagIds);
+    }
+
+    /**
+     * Scope for full-text search
+     *
+     * @param $query
+     * @param string $term
+     * @return mixed
+     */
+    public function scopeSearch($query, string $term)
+    {
+        return $query->where(function ($q) use ($term) {
+            $q->where('name', 'like', "%{$term}%")
+                ->orWhere('file_name', 'like', "%{$term}%");
+
+            // Search in tags if relationship is loaded
+            if (config('mediaman.search.include_tags', true)) {
+                $q->orWhereHas('tags', function ($tagQuery) use ($term) {
+                    $tagQuery->where('name', 'like', "%{$term}%");
+                });
+            }
+        });
+    }
+
 
     /**
      * Sync collections of a media

@@ -1,0 +1,50 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateMediaVersionsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create(config('mediaman.tables.versions', 'mediaman_versions'), function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('media_id')->index();
+            $table->uuid('uuid')->unique()->nullable();
+            $table->integer('version_number')->default(1);
+            $table->string('file_name');
+            $table->string('disk');
+            $table->unsignedBigInteger('size');
+            $table->string('mime_type');
+            $table->json('data')->nullable();
+            $table->text('reason')->nullable(); // Why this version was created
+            $table->unsignedBigInteger('created_by')->nullable(); // User who created this version
+            $table->timestamps();
+
+            $table->foreign('media_id')
+                ->references('id')
+                ->on(config('mediaman.tables.media'))
+                ->onDelete('cascade');
+
+            // Indexes for performance
+            $table->index(['media_id', 'version_number'], 'idx_versions_media_version');
+            $table->index('created_at', 'idx_versions_created');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists(config('mediaman.tables.versions', 'mediaman_versions'));
+    }
+}
