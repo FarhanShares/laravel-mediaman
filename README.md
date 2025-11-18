@@ -13,22 +13,27 @@ MediaMan is an elegant & powerful media management package for Laravel Apps with
 
 MediaMan is UI agnostic & provides a fluent API to manage your app's media, which means you've total control over your media, the look & feel & a hassle free dev experience. It's a perfect suit for your App or API server.
 
-## 🚀 MediaMan Pro Features
-
-MediaMan Pro extends the core package with enterprise-grade features for production applications:
+## ✨ Key Features
 
 - **🔐 Enhanced Security**: UUID support, MIME validation, signed URLs, filename sanitization
 - **⚡ Performance Optimization**: Database indexing, query caching, batch operations, lazy loading
 - **🎨 Advanced Image Processing**: Responsive images, WebP conversion, BlurHash, watermarks, smart cropping
 - **📦 Versioning System**: File history tracking with restore capabilities
-- **🏷️ Full Tagging System**: AI-powered and manual tagging with usage analytics
+- **🏷️ Full Tagging System**: Organize media with tags and usage analytics
 - **🚦 Rate Limiting**: Configurable rate limiting with multiple strategies
 - **📊 Monitoring & Logging**: Comprehensive event tracking, metrics collection, audit trails
 - **🔄 Batch Operations**: Queue-based batch uploads with progress tracking
 - **📚 API Documentation**: Auto-generated OpenAPI/Swagger documentation
-- **🎯 License Management**: Localhost detection with API-based validation
-- **🎭 UI Components**: Ready-to-use Vue 3, React, Svelte, and Blade components
 - **🔧 Maximum Customizability**: Everything configurable through environment variables and config files
+
+## 🎭 UI Components (Separate Packages)
+
+MediaMan provides ready-to-use UI components for popular frontend frameworks, published as separate npm packages:
+
+- **[@mediaman/vue](https://npmjs.com/package/@mediaman/vue)** - Vue 3 Composition API components
+- **[@mediaman/react](https://npmjs.com/package/@mediaman/react)** - React Hooks components
+- **[@mediaman/blade](https://npmjs.com/package/@mediaman/blade)** - Laravel Blade components with Alpine.js
+- **[@mediaman/core](https://npmjs.com/package/@mediaman/core)** - Framework-agnostic JavaScript library
 
 ## In a hurry? Here's a quick example
 
@@ -42,15 +47,16 @@ $post = Post::find(1);
 $post->attachMedia($media, 'featured-image-channel');
 ```
 
-**MediaMan Pro Usage:**
+**Advanced Features:**
 ```php
-use FarhanShares\MediaMan\MediaUploaderPro;
+use FarhanShares\MediaMan\MediaUploader;
+use FarhanShares\MediaMan\BatchUploader;
 
-// Upload with advanced features
-$media = MediaUploaderPro::source($request->file('image'))
-    ->withConversions(['responsive', 'webp', 'blurhash'])
+// Upload with conversions and tags
+$media = MediaUploader::source($request->file('image'))
+    ->withConversions(['responsive', 'webp', 'thumbnail'])
     ->withTags(['nature', 'landscape'])
-    ->withAI(['auto_tag', 'extract_text'])
+    ->toCollection('gallery')
     ->upload();
 
 // Batch upload with progress tracking
@@ -82,33 +88,13 @@ While many Laravel applications grapple with media and file management, I've oft
 | **Image manipulation**             | **Yes, at ease**                          | Yes                 |
 | **Manipulation type**              | **Global registry**                       | Specific to a model |
 | **Custom Conversion Support**      | **Yes**                                   | Limited             |
-
-### MediaMan Core vs Pro
-
-| Feature                            | **MediaMan Core**  | **MediaMan Pro**    |
-|------------------------------------|-------------------|---------------------|
-| **Basic Upload & Storage**         | ✅ Yes            | ✅ Yes              |
-| **Collections & Channels**         | ✅ Yes            | ✅ Yes              |
-| **Image Conversions**              | ✅ Yes            | ✅ Enhanced         |
-| **UUID Support**                   | ❌ No             | ✅ Yes              |
-| **Responsive Images**              | ❌ No             | ✅ Yes              |
-| **WebP Conversion**                | ❌ No             | ✅ Yes              |
-| **BlurHash Placeholders**          | ❌ No             | ✅ Yes              |
-| **Watermarking**                   | ❌ No             | ✅ Yes              |
-| **Smart Cropping**                 | ❌ No             | ✅ Yes              |
-| **Versioning System**              | ❌ No             | ✅ Yes              |
-| **Tagging System**                 | ❌ No             | ✅ Yes              |
-| **AI-Powered Features**            | ❌ No             | ✅ Yes              |
-| **Batch Operations**               | ❌ No             | ✅ Yes              |
-| **Query Caching**                  | ❌ No             | ✅ Yes              |
-| **Rate Limiting**                  | ❌ No             | ✅ Yes              |
-| **Signed URLs**                    | ❌ No             | ✅ Yes              |
-| **MIME Validation**                | ❌ No             | ✅ Yes              |
-| **Monitoring & Logging**           | ❌ No             | ✅ Yes              |
-| **Performance Indexes**            | ❌ No             | ✅ Yes (40+ indexes)|
-| **UI Components**                  | ❌ No             | ✅ Vue/React/Blade  |
-| **API Documentation**              | ❌ No             | ✅ OpenAPI/Swagger  |
-| **License Management**             | ❌ No             | ✅ Yes              |
+| **UUID Support**                   | **Yes**                                   | No                  |
+| **Versioning System**              | **Yes**                                   | No                  |
+| **Tagging System**                 | **Yes**                                   | No                  |
+| **Batch Operations**               | **Yes**                                   | Limited             |
+| **Query Caching**                  | **Yes**                                   | No                  |
+| **Rate Limiting**                  | **Yes**                                   | No                  |
+| **Monitoring & Logging**           | **Yes**                                   | No                  |
 
 ## Overview & Key concepts
 
@@ -136,7 +122,7 @@ There are a few key concepts that need to be understood before continuing:
 * [Collections](#collections)
 * [Media & Collections](#media--collections)
 * [Media, Models & Conversions](#conversions)
-* [MediaMan Pro Features](#mediaman-pro-features-1)
+* [Advanced Features](#advanced-features)
   * [UUID Support](#uuid-support)
   * [Advanced Image Processing](#advanced-image-processing)
   * [Versioning System](#versioning-system)
@@ -146,9 +132,8 @@ There are a few key concepts that need to be understood before continuing:
   * [Rate Limiting](#rate-limiting)
   * [Security Features](#security-features)
   * [Monitoring & Logging](#monitoring--logging)
-  * [UI Components](#ui-components)
   * [API Documentation](#api-documentation)
-  * [License Management](#license-management)
+* [UI Components](#ui-components)
 * [Performance Optimization](#performance-optimization)
 * [Upgrade Guide to MediaMan v1.x](#upgrade-guide-to-mediaman-v1x)
 * [Contribution and License](#contribution-and-license)
@@ -187,7 +172,7 @@ php artisan mediaman:publish-config
 php artisan mediaman:publish-migration
 ```
 
-**For MediaMan Pro features**, publish the Pro migrations:
+**For advanced features**, publish the additional migrations:
 
 ```bash
 php artisan vendor:publish --tag=mediaman-migrations
@@ -211,13 +196,7 @@ Run the migrations:
 php artisan migrate
 ```
 
-**Optional: Publish UI components** (Vue, React, Blade)
-
-```bash
-php artisan vendor:publish --tag=mediaman-ui
-```
-
-**CI/CD Setup**: MediaMan Pro includes a GitHub Actions workflow (`.github/workflows/tests.yml`) for automated testing across PHP 8.1, 8.2, 8.3 and Laravel 10, 11, 12.
+**UI Components**: MediaMan UI components are available as separate npm packages. See the [UI Components](#ui-components) section below.
 
 ## Configuration
 
@@ -254,9 +233,9 @@ Here's an example configuration to use a dedicated local media disk for MediaMan
 
 Now, run `php artisan storage:link` to create the symbolic link of our newly created media disk.
 
-### MediaMan Pro Configuration
+### Advanced Configuration
 
-MediaMan Pro adds extensive configuration options. Here are the key environment variables you can set in your `.env` file:
+MediaMan provides extensive configuration options. Here are the key environment variables you can set in your `.env` file:
 
 ```bash
 # UUID Support
@@ -335,15 +314,9 @@ MEDIAMAN_OPENAPI_ROUTE=mediaman/docs
 MEDIAMAN_OPENAPI_TITLE="MediaMan API"
 MEDIAMAN_OPENAPI_VERSION=1.0.0
 
-# License Management (Optional)
-MEDIAMAN_LICENSE_ENABLED=false
-MEDIAMAN_LICENSE_KEY=your-license-key-here
-MEDIAMAN_LICENSE_URL=https://api.mediaman.dev/validate
-MEDIAMAN_ALLOW_LOCALHOST=true
-MEDIAMAN_LICENSE_CACHE_TTL=86400
 ```
 
-For detailed configuration options, see the [MediaMan Pro Features](#mediaman-pro-features-1) section.
+For detailed configuration options, see the [Advanced Features](#advanced-features) section.
 
 ## Media
 
@@ -803,23 +776,23 @@ $mediaOneThumb = $media[0]->getUrl('thumb');
 
 -----
 
-## MediaMan Pro Features
+## Advanced Features
 
-MediaMan Pro provides enterprise-grade features for production applications. All Pro features are designed with maximum customizability and can be enabled/disabled through configuration.
+MediaMan provides enterprise-grade features for production applications. All features are designed with maximum customizability and can be enabled/disabled through configuration.
 
 ### Installation & Setup
 
-After installing MediaMan, publish the Pro migrations:
+After installing MediaMan, publish the additional migrations for advanced features:
 
 ```bash
-# Publish Pro migrations
+# Publish advanced feature migrations
 php artisan vendor:publish --tag=mediaman-migrations
 
 # Run migrations
 php artisan migrate
 ```
 
-**Available Pro Migrations:**
+**Available Migrations:**
 - `add_uuid_to_mediaman_media.php` - Adds UUID support
 - `add_performance_indexes_to_mediaman.php` - Performance optimization indexes
 - `create_media_versions_table.php` - Versioning system
@@ -839,10 +812,10 @@ Use UUIDs instead of auto-incrementing IDs for obfuscated, non-sequential identi
 **Usage:**
 
 ```php
-use FarhanShares\MediaMan\MediaUploaderPro;
+use FarhanShares\MediaMan\MediaUploader;
 
 // Upload with automatic UUID generation
-$media = MediaUploaderPro::source($request->file('file'))->upload();
+$media = MediaUploader::source($request->file('file'))->upload();
 
 // Access UUID
 echo $media->uuid; // "9b3c5e8a-4f2d-4a1b-9c3e-5d8a4f2d4a1b"
@@ -893,9 +866,9 @@ MediaMan Pro includes powerful image processing features powered by Intervention
 **Responsive Images:**
 
 ```php
-use FarhanShares\MediaMan\MediaUploaderPro;
+use FarhanShares\MediaMan\MediaUploader;
 
-$media = MediaUploaderPro::source($request->file('image'))
+$media = MediaUploader::source($request->file('image'))
     ->withConversions([
         'responsive' => [
             'breakpoints' => [320, 640, 1024, 1920],
@@ -911,7 +884,7 @@ $urls = $media->getResponsiveUrls(); // Returns array of breakpoint URLs
 **WebP Conversion:**
 
 ```php
-$media = MediaUploaderPro::source($request->file('image'))
+$media = MediaUploader::source($request->file('image'))
     ->withConversions([
         'webp' => [
             'quality' => 85,
@@ -926,7 +899,7 @@ $webpUrl = $media->getUrl('webp');
 **BlurHash (Image Placeholders):**
 
 ```php
-$media = MediaUploaderPro::source($request->file('image'))
+$media = MediaUploader::source($request->file('image'))
     ->withConversions(['blurhash' => true])
     ->upload();
 
@@ -937,7 +910,7 @@ $blurHash = $media->data['blurhash'] ?? null;
 **Watermarking:**
 
 ```php
-$media = MediaUploaderPro::source($request->file('image'))
+$media = MediaUploader::source($request->file('image'))
     ->withConversions([
         'watermark' => [
             'path' => 'watermarks/logo.png',
@@ -951,7 +924,7 @@ $media = MediaUploaderPro::source($request->file('image'))
 **Smart Cropping:**
 
 ```php
-$media = MediaUploaderPro::source($request->file('image'))
+$media = MediaUploader::source($request->file('image'))
     ->withConversions([
         'thumbnail' => [
             'width' => 300,
@@ -1004,11 +977,11 @@ echo $version->created_by; // User ID who created version
 **Automatic Versioning on Upload:**
 
 ```php
-use FarhanShares\MediaMan\MediaUploaderPro;
+use FarhanShares\MediaMan\MediaUploader;
 
 // Replace existing media (creates version automatically)
 $media = Media::find(1);
-$newMedia = MediaUploaderPro::source($request->file('file'))
+$newMedia = MediaUploader::source($request->file('file'))
     ->replacingMedia($media)
     ->upload();
 
@@ -1036,10 +1009,10 @@ Organize media with tags, track usage, and enable powerful search.
 ```php
 use FarhanShares\MediaMan\Models\Media;
 use FarhanShares\MediaMan\Models\Tag;
-use FarhanShares\MediaMan\MediaUploaderPro;
+use FarhanShares\MediaMan\MediaUploader;
 
 // Upload with tags
-$media = MediaUploaderPro::source($request->file('image'))
+$media = MediaUploader::source($request->file('image'))
     ->withTags(['nature', 'landscape', 'mountains'])
     ->upload();
 
@@ -1074,18 +1047,6 @@ $popularTags = Tag::popular(10)->get(); // Top 10 most used tags
 $media = Media::whereHas('tags', function ($query) {
     $query->whereIn('slug', ['nature', 'landscape']);
 })->get();
-```
-
-**AI-Powered Tagging:**
-
-```php
-// Upload with AI tagging
-$media = MediaUploaderPro::source($request->file('image'))
-    ->withAI(['auto_tag', 'extract_text'])
-    ->upload();
-
-// AI-generated tags are automatically marked as type 'ai-generated'
-$aiTags = $media->tags()->where('type', 'ai-generated')->get();
 ```
 
 ### Batch Operations
@@ -1322,11 +1283,11 @@ Enterprise-grade security features to protect your application.
 **MIME Type Validation:**
 
 ```php
-use FarhanShares\MediaMan\MediaUploaderPro;
+use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Exceptions\InvalidMimeTypeException;
 
 try {
-    $media = MediaUploaderPro::source($request->file('file'))
+    $media = MediaUploader::source($request->file('file'))
         ->validateMime(['image/jpeg', 'image/png'])
         ->upload();
 } catch (InvalidMimeTypeException $e) {
@@ -1357,7 +1318,7 @@ if ($security->verifySignedUrl($url, $signature)) {
 
 ```php
 // Automatic sanitization during upload
-$media = MediaUploaderPro::source($request->file('file'))
+$media = MediaUploader::source($request->file('file'))
     ->upload();
 
 // Special characters removed, lowercase applied
@@ -1469,104 +1430,6 @@ class CustomMetricCollector implements MetricCollector
 ],
 ```
 
-### UI Components
-
-Ready-to-use UI components for Vue 3, React, Svelte, and Blade.
-
-**Publish UI Assets:**
-
-```bash
-php artisan vendor:publish --tag=mediaman-ui
-```
-
-**Vue 3 Component:**
-
-```vue
-<template>
-  <MediaUploader
-    :collection="'products'"
-    :conversions="['thumbnail', 'webp']"
-    :tags="['product-images']"
-    :multiple="true"
-    :max-files="10"
-    @upload-complete="handleUploadComplete"
-    @upload-error="handleUploadError"
-  />
-</template>
-
-<script setup>
-import MediaUploader from '@/mediaman/vue/MediaUploader.vue';
-
-const handleUploadComplete = (media) => {
-  console.log('Uploaded:', media);
-};
-
-const handleUploadError = (error) => {
-  console.error('Upload failed:', error);
-};
-</script>
-```
-
-**React Component:**
-
-```jsx
-import MediaUploader from './mediaman/react/MediaUploader';
-
-function App() {
-  const handleUploadComplete = (media) => {
-    console.log('Uploaded:', media);
-  };
-
-  return (
-    <MediaUploader
-      collection="products"
-      conversions={['thumbnail', 'webp']}
-      tags={['product-images']}
-      multiple={true}
-      maxFiles={10}
-      onUploadComplete={handleUploadComplete}
-      onUploadError={(error) => console.error(error)}
-    />
-  );
-}
-```
-
-**Blade Component (Alpine.js):**
-
-```blade
-<x-mediaman-upload
-    collection="products"
-    :conversions="['thumbnail', 'webp']"
-    :tags="['product-images']"
-    :multiple="true"
-    :max-files="10"
-/>
-```
-
-**Framework-Agnostic Core:**
-
-```javascript
-import MediaManCore from './mediaman/core/MediaManCore';
-
-const uploader = new MediaManCore({
-  uploadUrl: '/mediaman/upload',
-  collection: 'products',
-  conversions: ['thumbnail', 'webp'],
-});
-
-uploader.upload(files, {
-  onProgress: (percent) => {
-    console.log(`Upload progress: ${percent}%`);
-  },
-  onComplete: (media) => {
-    console.log('Upload complete:', media);
-  },
-  onError: (error) => {
-    console.error('Upload failed:', error);
-  },
-});
-```
-
 ### API Documentation
 
 Auto-generated OpenAPI/Swagger documentation for your MediaMan API.
@@ -1613,60 +1476,142 @@ php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"
 MEDIAMAN_ENABLE_API=false
 ```
 
-### License Management
+-----
 
-Built-in license validation for commercial deployments.
+## UI Components
 
-**Enable License Validation:**
+MediaMan provides ready-to-use UI components for popular frontend frameworks. These are published as separate npm packages that can be used with the MediaMan Laravel backend.
 
-```php
-// config/mediaman.php
-'license' => [
-    'enabled' => env('MEDIAMAN_LICENSE_ENABLED', false),
-    'key' => env('MEDIAMAN_LICENSE_KEY', null),
-    'validation_url' => env('MEDIAMAN_LICENSE_URL', 'https://api.mediaman.dev/validate'),
-    'allow_localhost' => env('MEDIAMAN_ALLOW_LOCALHOST', true),
-    'cache_ttl' => env('MEDIAMAN_LICENSE_CACHE_TTL', 86400), // 24 hours
-],
+### Installation
+
+Install the UI component package for your preferred framework:
+
+```bash
+# Vue 3
+npm install @mediaman/vue
+
+# React
+npm install @mediaman/react
+
+# Blade (published with Laravel package)
+php artisan vendor:publish --tag=mediaman-ui
+
+# Framework-agnostic core
+npm install @mediaman/core
 ```
 
-**Usage:**
+### Vue 3 Component
 
-```php
-use FarhanShares\MediaMan\Managers\LicenseManager;
+```vue
+<template>
+  <MediaUploader
+    :collection="'products'"
+    :conversions="['thumbnail', 'webp']"
+    :tags="['product-images']"
+    :multiple="true"
+    :max-files="10"
+    @upload-complete="handleUploadComplete"
+    @upload-error="handleUploadError"
+  />
+</template>
 
-$license = app(LicenseManager::class);
+<script setup>
+import { MediaUploader } from '@mediaman/vue';
 
-// Validate license
-if ($license->isValid()) {
-    // License is valid
-    $features = $license->getEnabledFeatures();
-}
+const handleUploadComplete = (media) => {
+  console.log('Uploaded:', media);
+};
 
-// Check specific feature
-if ($license->hasFeature('batch-upload')) {
-    // Feature is available
-}
-
-// Get license info
-$info = $license->getLicenseInfo();
-echo $info['type']; // 'pro', 'enterprise'
-echo $info['expires_at']; // '2025-12-31'
-echo $info['domain']; // 'yourapp.com'
+const handleUploadError = (error) => {
+  console.error('Upload failed:', error);
+};
+</script>
 ```
 
-**License Validation Flow:**
+### React Component
 
-1. Localhost domains are automatically allowed
-2. Production domains validate against license server
-3. Validation results are cached for 24 hours
-4. Features are gated based on license type
+```jsx
+import { MediaUploader } from '@mediaman/react';
+
+function App() {
+  const handleUploadComplete = (media) => {
+    console.log('Uploaded:', media);
+  };
+
+  return (
+    <MediaUploader
+      collection="products"
+      conversions={['thumbnail', 'webp']}
+      tags={['product-images']}
+      multiple={true}
+      maxFiles={10}
+      onUploadComplete={handleUploadComplete}
+      onUploadError={(error) => console.error(error)}
+    />
+  );
+}
+```
+
+### Blade Component (Alpine.js)
+
+```blade
+<x-mediaman-upload
+    collection="products"
+    :conversions="['thumbnail', 'webp']"
+    :tags="['product-images']"
+    :multiple="true"
+    :max-files="10"
+/>
+```
+
+### Framework-Agnostic Core
+
+```javascript
+import { MediaManCore } from '@mediaman/core';
+
+const uploader = new MediaManCore({
+  uploadUrl: '/mediaman/upload',
+  collection: 'products',
+  conversions: ['thumbnail', 'webp'],
+});
+
+uploader.upload(files, {
+  onProgress: (percent) => {
+    console.log(`Upload progress: ${percent}%`);
+  },
+  onComplete: (media) => {
+    console.log('Upload complete:', media);
+  },
+  onError: (error) => {
+    console.error('Upload failed:', error);
+  },
+});
+```
+
+### Publishing UI Components to npm
+
+If you want to publish your own customized UI components, the MediaMan repository is set up for monorepo publishing:
+
+```bash
+# Build all UI packages
+npm run build
+
+# Publish to npm (requires authentication)
+cd packages/vue && npm publish --access public
+cd packages/react && npm publish --access public
+cd packages/core && npm publish --access public
+```
+
+Each package has its own `package.json` with proper configuration:
+- **@mediaman/vue**: `packages/vue/package.json`
+- **@mediaman/react**: `packages/react/package.json`
+- **@mediaman/core**: `packages/core/package.json`
 
 -----
 
 ## Performance Optimization
 
-MediaMan Pro includes comprehensive performance optimizations:
+MediaMan includes comprehensive performance optimizations:
 
 ### Database Indexes
 
