@@ -9,11 +9,13 @@ export default {
       file: 'dist/index.js',
       format: 'cjs',
       sourcemap: true,
+      exports: 'named',
     },
     {
       file: 'dist/index.esm.js',
       format: 'es',
       sourcemap: true,
+      exports: 'named',
     },
   ],
   external: ['react', 'react-dom', '@mediaman/core'],

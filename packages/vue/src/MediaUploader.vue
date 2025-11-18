@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { MediaManCore, type MediaResponse } from '@mediaman/core';
+import { MediaManCore, MediaResponse } from '@mediaman/core';
 
 interface Props {
   uploadUrl?: string;
