@@ -319,4 +319,26 @@ return [
         'watermark_position' => 'bottom-right',
         'driver' => 'gd', // gd or imagick
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | License Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure license validation for MediaMan. Set enabled to false to
+    | disable license checks. Localhost domains are always allowed.
+    |
+    */
+
+    'licensing' => [
+        'enabled' => env('MEDIAMAN_LICENSE_ENABLED', false),
+        'key' => env('MEDIAMAN_LICENSE_KEY', null),
+        'cache_ttl' => env('MEDIAMAN_LICENSE_CACHE_TTL', 3600), // 1 hour
+
+        // LemonSqueezy integration (optional)
+        'lemonsqueezy' => [
+            'product_id' => env('LEMONSQUEEZY_PRODUCT_ID', null),
+            'store_id' => env('LEMONSQUEEZY_STORE_ID', null),
+        ],
+    ],
 ];

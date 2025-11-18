@@ -1,0 +1,43 @@
+{
+  "name": "@mediaman/core",
+  "version": "1.0.0",
+  "description": "Framework-agnostic JavaScript library for MediaMan Laravel package",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mediaman",
+    "media",
+    "upload",
+    "laravel",
+    "file-upload",
+    "media-library"
+  ],
+  "author": "Farhan Israq <hello@farhanshares.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FarhanShares/laravel-mediaman",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/FarhanShares/laravel-mediaman/issues"
+  },
+  "homepage": "https://github.com/FarhanShares/laravel-mediaman#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "rollup": "^4.9.4",
+    "typescript": "^5.3.3"
+  }
+}

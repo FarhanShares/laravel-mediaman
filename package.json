@@ -1,0 +1,40 @@
+{
+  "name": "laravel-mediaman-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MediaMan Laravel Package - Monorepo for UI components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FarhanShares/laravel-mediaman.git"
+  },
+  "author": "Farhan Israq <hello@farhanshares.com>",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd packages/core && npm install && cd ../vue && npm install && cd ../react && npm install",
+    "build": "npm run build --workspaces",
+    "build:core": "cd packages/core && npm run build",
+    "build:vue": "cd packages/vue && npm run build",
+    "build:react": "cd packages/react && npm run build",
+    "dev:core": "cd packages/core && npm run dev",
+    "dev:vue": "cd packages/vue && npm run dev",
+    "dev:react": "cd packages/react && npm run dev",
+    "clean": "rm -rf packages/*/dist packages/*/node_modules",
+    "publish:core": "cd packages/core && npm publish --access public",
+    "publish:vue": "cd packages/vue && npm publish --access public",
+    "publish:react": "cd packages/react && npm publish --access public",
+    "publish:all": "npm run build && npm run publish:core && npm run publish:vue && npm run publish:react",
+    "version:patch": "npm version patch --workspaces",
+    "version:minor": "npm version minor --workspaces",
+    "version:major": "npm version major --workspaces"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "rollup": "^4.9.4",
+    "typescript": "^5.3.3"
+  }
+}

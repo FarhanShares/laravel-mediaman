@@ -1,0 +1,40 @@
+# Development files
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+rollup.config.js
+
+# Tests
+tests/
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Build tools
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation (keep README)
+docs/
+
+# Dependencies
+node_modules/
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db

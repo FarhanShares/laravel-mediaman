@@ -1,0 +1,54 @@
+{
+  "name": "@mediaman/vue",
+  "version": "1.0.0",
+  "description": "Vue 3 components for MediaMan Laravel package",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mediaman",
+    "vue",
+    "vue3",
+    "media",
+    "upload",
+    "laravel",
+    "file-upload",
+    "media-library"
+  ],
+  "author": "Farhan Israq <hello@farhanshares.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FarhanShares/laravel-mediaman",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/FarhanShares/laravel-mediaman/issues"
+  },
+  "homepage": "https://github.com/FarhanShares/laravel-mediaman#readme",
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "@mediaman/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@vue/compiler-sfc": "^3.4.15",
+    "rollup": "^4.9.4",
+    "rollup-plugin-vue": "^6.0.0",
+    "typescript": "^5.3.3",
+    "vue": "^3.4.15"
+  }
+}
