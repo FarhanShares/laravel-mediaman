@@ -13,15 +13,56 @@ MediaMan is an elegant & powerful media management package for Laravel Apps with
 
 MediaMan is UI agnostic & provides a fluent API to manage your app's media, which means you've total control over your media, the look & feel & a hassle free dev experience. It's a perfect suit for your App or API server.
 
+## 🚀 MediaMan Pro Features
+
+MediaMan Pro extends the core package with enterprise-grade features for production applications:
+
+- **🔐 Enhanced Security**: UUID support, MIME validation, signed URLs, filename sanitization
+- **⚡ Performance Optimization**: Database indexing, query caching, batch operations, lazy loading
+- **🎨 Advanced Image Processing**: Responsive images, WebP conversion, BlurHash, watermarks, smart cropping
+- **📦 Versioning System**: File history tracking with restore capabilities
+- **🏷️ Full Tagging System**: AI-powered and manual tagging with usage analytics
+- **🚦 Rate Limiting**: Configurable rate limiting with multiple strategies
+- **📊 Monitoring & Logging**: Comprehensive event tracking, metrics collection, audit trails
+- **🔄 Batch Operations**: Queue-based batch uploads with progress tracking
+- **📚 API Documentation**: Auto-generated OpenAPI/Swagger documentation
+- **🎯 License Management**: Localhost detection with API-based validation
+- **🎭 UI Components**: Ready-to-use Vue 3, React, Svelte, and Blade components
+- **🔧 Maximum Customizability**: Everything configurable through environment variables and config files
+
 ## In a hurry? Here's a quick example
 
+**Basic Usage:**
 ```php
-$media = MediaUploader::source($request->file->('file'))
+$media = MediaUploader::source($request->file('file'))
             ->useCollection('Posts')
             ->upload();
 
 $post = Post::find(1);
 $post->attachMedia($media, 'featured-image-channel');
+```
+
+**MediaMan Pro Usage:**
+```php
+use FarhanShares\MediaMan\MediaUploaderPro;
+
+// Upload with advanced features
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withConversions(['responsive', 'webp', 'blurhash'])
+    ->withTags(['nature', 'landscape'])
+    ->withAI(['auto_tag', 'extract_text'])
+    ->upload();
+
+// Batch upload with progress tracking
+$batchId = BatchUploader::source($request->file('images'))
+    ->toCollection('gallery')
+    ->withConversions(['thumbnail', 'webp'])
+    ->upload();
+
+// Get cached media with tags and versions
+$media = app(MediaCacheManager::class)->getMedia($id);
+$tags = $media->tags;
+$versions = $media->versions;
 ```
 
 ## Why Choose MediaMan? What Sets It Apart?
@@ -41,6 +82,33 @@ While many Laravel applications grapple with media and file management, I've oft
 | **Image manipulation**             | **Yes, at ease**                          | Yes                 |
 | **Manipulation type**              | **Global registry**                       | Specific to a model |
 | **Custom Conversion Support**      | **Yes**                                   | Limited             |
+
+### MediaMan Core vs Pro
+
+| Feature                            | **MediaMan Core**  | **MediaMan Pro**    |
+|------------------------------------|-------------------|---------------------|
+| **Basic Upload & Storage**         | ✅ Yes            | ✅ Yes              |
+| **Collections & Channels**         | ✅ Yes            | ✅ Yes              |
+| **Image Conversions**              | ✅ Yes            | ✅ Enhanced         |
+| **UUID Support**                   | ❌ No             | ✅ Yes              |
+| **Responsive Images**              | ❌ No             | ✅ Yes              |
+| **WebP Conversion**                | ❌ No             | ✅ Yes              |
+| **BlurHash Placeholders**          | ❌ No             | ✅ Yes              |
+| **Watermarking**                   | ❌ No             | ✅ Yes              |
+| **Smart Cropping**                 | ❌ No             | ✅ Yes              |
+| **Versioning System**              | ❌ No             | ✅ Yes              |
+| **Tagging System**                 | ❌ No             | ✅ Yes              |
+| **AI-Powered Features**            | ❌ No             | ✅ Yes              |
+| **Batch Operations**               | ❌ No             | ✅ Yes              |
+| **Query Caching**                  | ❌ No             | ✅ Yes              |
+| **Rate Limiting**                  | ❌ No             | ✅ Yes              |
+| **Signed URLs**                    | ❌ No             | ✅ Yes              |
+| **MIME Validation**                | ❌ No             | ✅ Yes              |
+| **Monitoring & Logging**           | ❌ No             | ✅ Yes              |
+| **Performance Indexes**            | ❌ No             | ✅ Yes (40+ indexes)|
+| **UI Components**                  | ❌ No             | ✅ Vue/React/Blade  |
+| **API Documentation**              | ❌ No             | ✅ OpenAPI/Swagger  |
+| **License Management**             | ❌ No             | ✅ Yes              |
 
 ## Overview & Key concepts
 
@@ -68,6 +136,20 @@ There are a few key concepts that need to be understood before continuing:
 * [Collections](#collections)
 * [Media & Collections](#media--collections)
 * [Media, Models & Conversions](#conversions)
+* [MediaMan Pro Features](#mediaman-pro-features-1)
+  * [UUID Support](#uuid-support)
+  * [Advanced Image Processing](#advanced-image-processing)
+  * [Versioning System](#versioning-system)
+  * [Tagging System](#tagging-system)
+  * [Batch Operations](#batch-operations)
+  * [Query Caching](#query-caching)
+  * [Rate Limiting](#rate-limiting)
+  * [Security Features](#security-features)
+  * [Monitoring & Logging](#monitoring--logging)
+  * [UI Components](#ui-components)
+  * [API Documentation](#api-documentation)
+  * [License Management](#license-management)
+* [Performance Optimization](#performance-optimization)
 * [Upgrade Guide to MediaMan v1.x](#upgrade-guide-to-mediaman-v1x)
 * [Contribution and License](#contribution-and-license)
 
@@ -105,17 +187,37 @@ php artisan mediaman:publish-config
 php artisan mediaman:publish-migration
 ```
 
-Ensure the storage is linked.
+**For MediaMan Pro features**, publish the Pro migrations:
+
+```bash
+php artisan vendor:publish --tag=mediaman-migrations
+```
+
+This will publish:
+- `add_uuid_to_mediaman_media.php` - UUID support
+- `add_performance_indexes_to_mediaman.php` - Performance optimization indexes
+- `create_media_versions_table.php` - Versioning system
+- `create_media_tags_tables.php` - Tagging system
+
+Ensure the storage is linked:
 
 ```bash
 php artisan storage:link
 ```
 
-Run the migration and you are all set.
+Run the migrations:
 
 ```bash
 php artisan migrate
 ```
+
+**Optional: Publish UI components** (Vue, React, Blade)
+
+```bash
+php artisan vendor:publish --tag=mediaman-ui
+```
+
+**CI/CD Setup**: MediaMan Pro includes a GitHub Actions workflow (`.github/workflows/tests.yml`) for automated testing across PHP 8.1, 8.2, 8.3 and Laravel 10, 11, 12.
 
 ## Configuration
 
@@ -151,6 +253,97 @@ Here's an example configuration to use a dedicated local media disk for MediaMan
 ```
 
 Now, run `php artisan storage:link` to create the symbolic link of our newly created media disk.
+
+### MediaMan Pro Configuration
+
+MediaMan Pro adds extensive configuration options. Here are the key environment variables you can set in your `.env` file:
+
+```bash
+# UUID Support
+MEDIAMAN_USE_UUID=true
+
+# API & UI Control
+MEDIAMAN_ENABLE_API=true
+MEDIAMAN_ENABLE_UI=true
+
+# Versioning
+MEDIAMAN_VERSIONING_ENABLED=true
+MEDIAMAN_MAX_VERSIONS=10
+MEDIAMAN_VERSION_AUTO_CLEANUP=true
+
+# Tagging
+MEDIAMAN_TAGGING_ENABLED=true
+MEDIAMAN_TAG_AUTO_SLUG=true
+
+# Rate Limiting
+MEDIAMAN_RATE_LIMITING_ENABLED=true
+MEDIAMAN_RATE_KEY_STRATEGY=user
+MEDIAMAN_RATE_UPLOAD_REQUESTS=60
+MEDIAMAN_RATE_UPLOAD_MINUTES=1
+MEDIAMAN_RATE_API_REQUESTS=100
+MEDIAMAN_RATE_API_MINUTES=1
+MEDIAMAN_RATE_BATCH_REQUESTS=10
+MEDIAMAN_RATE_BATCH_MINUTES=60
+
+# Batch Operations
+MEDIAMAN_BATCH_ENABLED=true
+MEDIAMAN_BATCH_USE_QUEUE=true
+MEDIAMAN_BATCH_QUEUE=media
+MEDIAMAN_MAX_BATCH_FILES=100
+MEDIAMAN_BATCH_CHUNK_SIZE=10
+
+# Caching
+MEDIAMAN_CACHE_ENABLED=true
+MEDIAMAN_CACHE_DRIVER=redis
+MEDIAMAN_CACHE_TTL=3600
+MEDIAMAN_CACHE_PREFIX=mediaman
+MEDIAMAN_CACHE_TAGS=true
+
+# Image Conversions
+MEDIAMAN_CONVERSION_DRIVER=gd
+MEDIAMAN_CONVERSION_QUALITY=90
+MEDIAMAN_WEBP_ENABLED=true
+MEDIAMAN_WEBP_QUALITY=85
+MEDIAMAN_RESPONSIVE_ENABLED=true
+MEDIAMAN_BLURHASH_ENABLED=true
+MEDIAMAN_WATERMARK_ENABLED=false
+MEDIAMAN_WATERMARK_PATH=watermark.png
+
+# Security
+MEDIAMAN_MIME_VALIDATION=true
+MEDIAMAN_MIME_STRICT=true
+MEDIAMAN_SIGNED_URLS=false
+MEDIAMAN_SIGNED_URL_EXPIRATION=3600
+MEDIAMAN_SANITIZE_FILENAME=true
+MEDIAMAN_FILENAME_LOWERCASE=true
+MEDIAMAN_REMOVE_SPECIAL_CHARS=true
+
+# Monitoring & Logging
+MEDIAMAN_MONITORING_ENABLED=true
+MEDIAMAN_LOG_CHANNEL=stack
+MEDIAMAN_LOG_UPLOAD=true
+MEDIAMAN_LOG_DELETE=true
+MEDIAMAN_LOG_CONVERSION=true
+MEDIAMAN_LOG_SECURITY=true
+MEDIAMAN_METRICS_ENABLED=true
+MEDIAMAN_AUDIT_ENABLED=true
+MEDIAMAN_AUDIT_TRACK_USER=true
+
+# OpenAPI Documentation
+MEDIAMAN_OPENAPI_ENABLED=true
+MEDIAMAN_OPENAPI_ROUTE=mediaman/docs
+MEDIAMAN_OPENAPI_TITLE="MediaMan API"
+MEDIAMAN_OPENAPI_VERSION=1.0.0
+
+# License Management (Optional)
+MEDIAMAN_LICENSE_ENABLED=false
+MEDIAMAN_LICENSE_KEY=your-license-key-here
+MEDIAMAN_LICENSE_URL=https://api.mediaman.dev/validate
+MEDIAMAN_ALLOW_LOCALHOST=true
+MEDIAMAN_LICENSE_CACHE_TTL=86400
+```
+
+For detailed configuration options, see the [MediaMan Pro Features](#mediaman-pro-features-1) section.
 
 ## Media
 
@@ -607,6 +800,941 @@ $mediaOneThumb = $media[0]->getUrl('thumb');
 ```
 
 *Tip:* The `media_uri` and `media_url` are always appended with an instance of `Media`, these reflect the original file (and not the conversions).
+
+-----
+
+## MediaMan Pro Features
+
+MediaMan Pro provides enterprise-grade features for production applications. All Pro features are designed with maximum customizability and can be enabled/disabled through configuration.
+
+### Installation & Setup
+
+After installing MediaMan, publish the Pro migrations:
+
+```bash
+# Publish Pro migrations
+php artisan vendor:publish --tag=mediaman-migrations
+
+# Run migrations
+php artisan migrate
+```
+
+**Available Pro Migrations:**
+- `add_uuid_to_mediaman_media.php` - Adds UUID support
+- `add_performance_indexes_to_mediaman.php` - Performance optimization indexes
+- `create_media_versions_table.php` - Versioning system
+- `create_media_tags_tables.php` - Tagging system
+
+### UUID Support
+
+Use UUIDs instead of auto-incrementing IDs for obfuscated, non-sequential identifiers.
+
+**Enable UUID:**
+
+```php
+// config/mediaman.php
+'use_uuid' => env('MEDIAMAN_USE_UUID', true),
+```
+
+**Usage:**
+
+```php
+use FarhanShares\MediaMan\MediaUploaderPro;
+
+// Upload with automatic UUID generation
+$media = MediaUploaderPro::source($request->file('file'))->upload();
+
+// Access UUID
+echo $media->uuid; // "9b3c5e8a-4f2d-4a1b-9c3e-5d8a4f2d4a1b"
+
+// Find by UUID
+$media = Media::where('uuid', $uuid)->first();
+```
+
+**Benefits:**
+- Non-sequential IDs prevent enumeration attacks
+- Globally unique identifiers
+- Safe for public-facing URLs
+- Compatible with distributed systems
+
+### Advanced Image Processing
+
+MediaMan Pro includes powerful image processing features powered by Intervention Image.
+
+**Configuration:**
+
+```php
+// config/mediaman.php
+'conversions' => [
+    'driver' => env('MEDIAMAN_CONVERSION_DRIVER', 'gd'), // gd or imagick
+    'quality' => env('MEDIAMAN_CONVERSION_QUALITY', 90),
+    'webp' => [
+        'enabled' => env('MEDIAMAN_WEBP_ENABLED', true),
+        'quality' => env('MEDIAMAN_WEBP_QUALITY', 85),
+    ],
+    'responsive' => [
+        'enabled' => env('MEDIAMAN_RESPONSIVE_ENABLED', true),
+        'breakpoints' => [320, 640, 768, 1024, 1366, 1920],
+    ],
+    'blurhash' => [
+        'enabled' => env('MEDIAMAN_BLURHASH_ENABLED', true),
+        'components_x' => 4,
+        'components_y' => 3,
+    ],
+    'watermark' => [
+        'enabled' => env('MEDIAMAN_WATERMARK_ENABLED', false),
+        'path' => env('MEDIAMAN_WATERMARK_PATH', 'watermark.png'),
+        'position' => 'bottom-right',
+        'opacity' => 50,
+    ],
+],
+```
+
+**Responsive Images:**
+
+```php
+use FarhanShares\MediaMan\MediaUploaderPro;
+
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withConversions([
+        'responsive' => [
+            'breakpoints' => [320, 640, 1024, 1920],
+            'quality' => 85,
+        ]
+    ])
+    ->upload();
+
+// Get responsive URLs
+$urls = $media->getResponsiveUrls(); // Returns array of breakpoint URLs
+```
+
+**WebP Conversion:**
+
+```php
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withConversions([
+        'webp' => [
+            'quality' => 85,
+        ]
+    ])
+    ->upload();
+
+// Get WebP URL
+$webpUrl = $media->getUrl('webp');
+```
+
+**BlurHash (Image Placeholders):**
+
+```php
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withConversions(['blurhash' => true])
+    ->upload();
+
+// Get BlurHash string
+$blurHash = $media->data['blurhash'] ?? null;
+```
+
+**Watermarking:**
+
+```php
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withConversions([
+        'watermark' => [
+            'path' => 'watermarks/logo.png',
+            'position' => 'bottom-right', // center, top-left, top-right, bottom-left, bottom-right
+            'opacity' => 50,
+        ]
+    ])
+    ->upload();
+```
+
+**Smart Cropping:**
+
+```php
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withConversions([
+        'thumbnail' => [
+            'width' => 300,
+            'height' => 300,
+            'crop' => 'smart', // Automatically detects focal point
+        ]
+    ])
+    ->upload();
+```
+
+### Versioning System
+
+Track file history and restore previous versions.
+
+**Enable Versioning:**
+
+```php
+// config/mediaman.php
+'versioning' => [
+    'enabled' => env('MEDIAMAN_VERSIONING_ENABLED', true),
+    'max_versions' => env('MEDIAMAN_MAX_VERSIONS', 10),
+    'auto_cleanup' => env('MEDIAMAN_VERSION_AUTO_CLEANUP', true),
+],
+```
+
+**Usage:**
+
+```php
+use FarhanShares\MediaMan\Models\Media;
+
+$media = Media::find(1);
+
+// Create a new version
+$version = $media->createVersion('Updated header image', auth()->id());
+
+// Get all versions
+$versions = $media->versions; // Ordered by version number DESC
+
+// Restore a previous version
+$oldVersion = $media->versions()->where('version_number', 2)->first();
+$oldVersion->restore(); // Creates backup and restores
+
+// Get version details
+echo $version->version_number; // 1, 2, 3, etc.
+echo $version->reason; // "Updated header image"
+echo $version->file_path; // Path to versioned file
+echo $version->created_by; // User ID who created version
+```
+
+**Automatic Versioning on Upload:**
+
+```php
+use FarhanShares\MediaMan\MediaUploaderPro;
+
+// Replace existing media (creates version automatically)
+$media = Media::find(1);
+$newMedia = MediaUploaderPro::source($request->file('file'))
+    ->replacingMedia($media)
+    ->upload();
+
+// Original file is saved as version 1
+// New file becomes the current media
+```
+
+### Tagging System
+
+Organize media with tags, track usage, and enable powerful search.
+
+**Enable Tagging:**
+
+```php
+// config/mediaman.php
+'tagging' => [
+    'enabled' => env('MEDIAMAN_TAGGING_ENABLED', true),
+    'auto_slug' => env('MEDIAMAN_TAG_AUTO_SLUG', true),
+    'types' => ['user-defined', 'ai-generated', 'system'],
+],
+```
+
+**Usage:**
+
+```php
+use FarhanShares\MediaMan\Models\Media;
+use FarhanShares\MediaMan\Models\Tag;
+use FarhanShares\MediaMan\MediaUploaderPro;
+
+// Upload with tags
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withTags(['nature', 'landscape', 'mountains'])
+    ->upload();
+
+// Attach tags to existing media
+$media->attachTags(['sunset', 'golden-hour'], 'user-defined');
+
+// Sync tags (removes old, adds new)
+$media->syncTags(['nature', 'photography'], 'user-defined');
+
+// Detach specific tags
+$media->detachTags(['mountains']);
+
+// Detach all tags
+$media->detachAllTags();
+
+// Get media tags
+$tags = $media->tags;
+foreach ($tags as $tag) {
+    echo $tag->name; // "nature"
+    echo $tag->slug; // "nature"
+    echo $tag->type; // "user-defined"
+    echo $tag->usage_count; // 42
+}
+
+// Find or create tags
+$tag = Tag::findOrCreateByName('wildlife', 'user-defined');
+
+// Popular tags
+$popularTags = Tag::popular(10)->get(); // Top 10 most used tags
+
+// Search media by tags
+$media = Media::whereHas('tags', function ($query) {
+    $query->whereIn('slug', ['nature', 'landscape']);
+})->get();
+```
+
+**AI-Powered Tagging:**
+
+```php
+// Upload with AI tagging
+$media = MediaUploaderPro::source($request->file('image'))
+    ->withAI(['auto_tag', 'extract_text'])
+    ->upload();
+
+// AI-generated tags are automatically marked as type 'ai-generated'
+$aiTags = $media->tags()->where('type', 'ai-generated')->get();
+```
+
+### Batch Operations
+
+Upload multiple files efficiently with queue-based processing.
+
+**Enable Batch Operations:**
+
+```php
+// config/mediaman.php
+'batch' => [
+    'enabled' => env('MEDIAMAN_BATCH_ENABLED', true),
+    'use_queue' => env('MEDIAMAN_BATCH_USE_QUEUE', true),
+    'queue_name' => env('MEDIAMAN_BATCH_QUEUE', 'media'),
+    'max_files_per_batch' => env('MEDIAMAN_MAX_BATCH_FILES', 100),
+    'chunk_size' => env('MEDIAMAN_BATCH_CHUNK_SIZE', 10),
+],
+```
+
+**Usage:**
+
+```php
+use FarhanShares\MediaMan\BatchUploader;
+
+$files = $request->file('files'); // Array of uploaded files
+
+// Synchronous batch upload
+$results = BatchUploader::source($files)
+    ->toCollection('product-images')
+    ->synchronously()
+    ->upload();
+
+foreach ($results as $media) {
+    echo $media->id;
+}
+
+// Asynchronous batch upload (uses queues)
+$batchId = BatchUploader::source($files)
+    ->toCollection('product-images')
+    ->withConversions(['thumbnail', 'webp'])
+    ->withTags(['products', '2024'])
+    ->onProgress(function ($processed, $total) {
+        // Update progress bar or notification
+    })
+    ->upload();
+
+// Check batch status
+$status = BatchUploader::getBatchStatus($batchId);
+echo $status['status']; // 'pending', 'processing', 'completed', 'failed'
+echo $status['progress']; // 0-100
+echo $status['processed']; // Number of files processed
+echo $status['total']; // Total files
+echo $status['errors']; // Array of errors if any
+```
+
+**Batch Upload with Progress Tracking:**
+
+```php
+// In your controller
+public function uploadBatch(Request $request)
+{
+    $batchId = BatchUploader::source($request->file('files'))
+        ->toCollection('gallery')
+        ->upload();
+
+    return response()->json(['batch_id' => $batchId]);
+}
+
+// Check progress endpoint
+public function batchProgress($batchId)
+{
+    $status = BatchUploader::getBatchStatus($batchId);
+    return response()->json($status);
+}
+```
+
+### Query Caching
+
+Improve performance with intelligent query caching and automatic invalidation.
+
+**Enable Caching:**
+
+```php
+// config/mediaman.php
+'cache' => [
+    'enabled' => env('MEDIAMAN_CACHE_ENABLED', true),
+    'driver' => env('MEDIAMAN_CACHE_DRIVER', 'redis'), // redis, memcached, file
+    'ttl' => env('MEDIAMAN_CACHE_TTL', 3600), // 1 hour
+    'prefix' => env('MEDIAMAN_CACHE_PREFIX', 'mediaman'),
+    'tags_enabled' => env('MEDIAMAN_CACHE_TAGS', true), // Requires Redis/Memcached
+],
+```
+
+**Usage:**
+
+```php
+use FarhanShares\MediaMan\Cache\MediaCacheManager;
+
+$cacheManager = app(MediaCacheManager::class);
+
+// Get media from cache (auto-caches if not exists)
+$media = $cacheManager->getMedia(1);
+$mediaByUuid = $cacheManager->getMedia($uuid, true);
+
+// Cache media URL
+$url = $cacheManager->cacheUrl($mediaId, 'thumbnail');
+
+// Warm cache for multiple media
+$cacheManager->warmCache([1, 2, 3, 4, 5]);
+
+// Invalidate specific media cache
+$cacheManager->invalidateMedia($media);
+
+// Invalidate collection cache
+$cacheManager->invalidateCollection('product-images');
+
+// Clear all media cache
+$cacheManager->flush();
+```
+
+**Automatic Cache Invalidation:**
+
+Cache is automatically invalidated when:
+- Media is updated or deleted
+- Media associations change
+- Conversions are processed
+- Tags are modified
+
+### Rate Limiting
+
+Protect your application from abuse with flexible rate limiting.
+
+**Enable Rate Limiting:**
+
+```php
+// config/mediaman.php
+'rate_limiting' => [
+    'enabled' => env('MEDIAMAN_RATE_LIMITING_ENABLED', true),
+    'key_strategy' => env('MEDIAMAN_RATE_KEY_STRATEGY', 'user'), // user, ip, session, fingerprint
+
+    'limiters' => [
+        'upload' => [
+            'requests' => env('MEDIAMAN_RATE_UPLOAD_REQUESTS', 60),
+            'per_minutes' => env('MEDIAMAN_RATE_UPLOAD_MINUTES', 1),
+        ],
+        'api' => [
+            'requests' => env('MEDIAMAN_RATE_API_REQUESTS', 100),
+            'per_minutes' => env('MEDIAMAN_RATE_API_MINUTES', 1),
+        ],
+        'batch' => [
+            'requests' => env('MEDIAMAN_RATE_BATCH_REQUESTS', 10),
+            'per_minutes' => env('MEDIAMAN_RATE_BATCH_MINUTES', 60),
+        ],
+    ],
+],
+```
+
+**Apply to Routes:**
+
+```php
+use FarhanShares\MediaMan\Http\Middleware\MediaManRateLimiter;
+
+// Apply to upload routes
+Route::post('/upload', [UploadController::class, 'upload'])
+    ->middleware(MediaManRateLimiter::class . ':upload');
+
+// Apply to batch uploads
+Route::post('/upload/batch', [UploadController::class, 'uploadBatch'])
+    ->middleware(MediaManRateLimiter::class . ':batch');
+
+// Apply to API routes
+Route::middleware([MediaManRateLimiter::class . ':api'])
+    ->prefix('api/mediaman')
+    ->group(function () {
+        Route::get('/media', [MediaController::class, 'index']);
+    });
+```
+
+**Rate Limit Strategies:**
+
+- **user**: Rate limit per authenticated user ID (falls back to IP for guests)
+- **ip**: Rate limit per IP address
+- **session**: Rate limit per session ID
+- **fingerprint**: Rate limit per request fingerprint
+
+**Custom Rate Limiters:**
+
+```php
+// config/mediaman.php
+'rate_limiting' => [
+    'limiters' => [
+        'download' => [
+            'requests' => 1000,
+            'per_minutes' => 60,
+        ],
+    ],
+],
+
+// Apply in routes
+Route::get('/media/{id}/download', [MediaController::class, 'download'])
+    ->middleware(MediaManRateLimiter::class . ':download');
+```
+
+### Security Features
+
+Enterprise-grade security features to protect your application.
+
+**Security Configuration:**
+
+```php
+// config/mediaman.php
+'security' => [
+    'mime_validation' => [
+        'enabled' => env('MEDIAMAN_MIME_VALIDATION', true),
+        'strict' => env('MEDIAMAN_MIME_STRICT', true),
+        'allowed_mimes' => [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+            'application/pdf', 'video/mp4',
+            // Add your allowed MIME types
+        ],
+    ],
+    'signed_urls' => [
+        'enabled' => env('MEDIAMAN_SIGNED_URLS', false),
+        'expiration' => env('MEDIAMAN_SIGNED_URL_EXPIRATION', 3600), // 1 hour
+    ],
+    'filename_sanitization' => [
+        'enabled' => env('MEDIAMAN_SANITIZE_FILENAME', true),
+        'lowercase' => env('MEDIAMAN_FILENAME_LOWERCASE', true),
+        'remove_special_chars' => env('MEDIAMAN_REMOVE_SPECIAL_CHARS', true),
+    ],
+],
+```
+
+**MIME Type Validation:**
+
+```php
+use FarhanShares\MediaMan\MediaUploaderPro;
+use FarhanShares\MediaMan\Exceptions\InvalidMimeTypeException;
+
+try {
+    $media = MediaUploaderPro::source($request->file('file'))
+        ->validateMime(['image/jpeg', 'image/png'])
+        ->upload();
+} catch (InvalidMimeTypeException $e) {
+    return response()->json(['error' => 'Invalid file type'], 422);
+}
+```
+
+**Signed URLs:**
+
+```php
+use FarhanShares\MediaMan\Managers\SecurityManager;
+
+$security = app(SecurityManager::class);
+
+// Generate signed URL (expires in 1 hour)
+$signedUrl = $security->generateSignedUrl($media);
+
+// Generate signed URL with custom expiration
+$signedUrl = $security->generateSignedUrl($media, now()->addHours(24));
+
+// Verify signed URL (automatic in middleware)
+if ($security->verifySignedUrl($url, $signature)) {
+    // URL is valid
+}
+```
+
+**Filename Sanitization:**
+
+```php
+// Automatic sanitization during upload
+$media = MediaUploaderPro::source($request->file('file'))
+    ->upload();
+
+// Special characters removed, lowercase applied
+// "My Photo (1).JPG" becomes "my-photo-1.jpg"
+```
+
+### Monitoring & Logging
+
+Comprehensive monitoring and logging infrastructure for production applications.
+
+**Enable Monitoring:**
+
+```php
+// config/mediaman.php
+'monitoring' => [
+    'enabled' => env('MEDIAMAN_MONITORING_ENABLED', true),
+    'log_channel' => env('MEDIAMAN_LOG_CHANNEL', 'stack'),
+
+    'events' => [
+        'upload' => env('MEDIAMAN_LOG_UPLOAD', true),
+        'delete' => env('MEDIAMAN_LOG_DELETE', true),
+        'conversion' => env('MEDIAMAN_LOG_CONVERSION', true),
+        'security' => env('MEDIAMAN_LOG_SECURITY', true),
+    ],
+
+    'metrics' => [
+        'enabled' => env('MEDIAMAN_METRICS_ENABLED', true),
+        'collectors' => [
+            // 'FarhanShares\MediaMan\Monitoring\Collectors\StorageCollector',
+            // 'FarhanShares\MediaMan\Monitoring\Collectors\PerformanceCollector',
+        ],
+    ],
+
+    'audit' => [
+        'enabled' => env('MEDIAMAN_AUDIT_ENABLED', true),
+        'track_user' => env('MEDIAMAN_AUDIT_TRACK_USER', true),
+    ],
+],
+```
+
+**Usage:**
+
+```php
+use FarhanShares\MediaMan\Monitoring\MediaMonitor;
+
+$monitor = app(MediaMonitor::class);
+
+// Log upload event
+$monitor->logUpload($media, [
+    'user_id' => auth()->id(),
+    'ip' => request()->ip(),
+    'user_agent' => request()->userAgent(),
+]);
+
+// Log deletion
+$monitor->logDelete($media, [
+    'reason' => 'User requested deletion',
+]);
+
+// Log conversion
+$monitor->logConversion($media, ['thumbnail', 'webp'], $duration);
+
+// Log security event
+$monitor->logSecurityEvent('invalid_mime_type', [
+    'file' => $file->getClientOriginalName(),
+    'mime' => $file->getMimeType(),
+]);
+
+// Get storage statistics
+$stats = $monitor->getStorageStats();
+echo $stats['total_files']; // 1542
+echo $stats['total_size']; // 5368709120 (bytes)
+echo $stats['by_disk']['s3']; // 3221225472
+echo $stats['by_mime_type']['image/jpeg']; // 2147483648
+```
+
+**Event Listeners:**
+
+MediaMan Pro automatically logs events:
+- `MediaUploaded` - Logged with user, IP, and file details
+- `MediaDeleted` - Logged with reason and context
+- `ConversionProcessed` - Logged with duration and conversion types
+- `SecurityViolation` - Logged with violation type and details
+
+**Custom Metrics Collectors:**
+
+```php
+namespace App\Monitoring\Collectors;
+
+use FarhanShares\MediaMan\Monitoring\Contracts\MetricCollector;
+
+class CustomMetricCollector implements MetricCollector
+{
+    public function collect(): array
+    {
+        return [
+            'custom_metric' => 'value',
+        ];
+    }
+}
+
+// Register in config/mediaman.php
+'monitoring' => [
+    'metrics' => [
+        'collectors' => [
+            \App\Monitoring\Collectors\CustomMetricCollector::class,
+        ],
+    ],
+],
+```
+
+### UI Components
+
+Ready-to-use UI components for Vue 3, React, Svelte, and Blade.
+
+**Publish UI Assets:**
+
+```bash
+php artisan vendor:publish --tag=mediaman-ui
+```
+
+**Vue 3 Component:**
+
+```vue
+<template>
+  <MediaUploader
+    :collection="'products'"
+    :conversions="['thumbnail', 'webp']"
+    :tags="['product-images']"
+    :multiple="true"
+    :max-files="10"
+    @upload-complete="handleUploadComplete"
+    @upload-error="handleUploadError"
+  />
+</template>
+
+<script setup>
+import MediaUploader from '@/mediaman/vue/MediaUploader.vue';
+
+const handleUploadComplete = (media) => {
+  console.log('Uploaded:', media);
+};
+
+const handleUploadError = (error) => {
+  console.error('Upload failed:', error);
+};
+</script>
+```
+
+**React Component:**
+
+```jsx
+import MediaUploader from './mediaman/react/MediaUploader';
+
+function App() {
+  const handleUploadComplete = (media) => {
+    console.log('Uploaded:', media);
+  };
+
+  return (
+    <MediaUploader
+      collection="products"
+      conversions={['thumbnail', 'webp']}
+      tags={['product-images']}
+      multiple={true}
+      maxFiles={10}
+      onUploadComplete={handleUploadComplete}
+      onUploadError={(error) => console.error(error)}
+    />
+  );
+}
+```
+
+**Blade Component (Alpine.js):**
+
+```blade
+<x-mediaman-upload
+    collection="products"
+    :conversions="['thumbnail', 'webp']"
+    :tags="['product-images']"
+    :multiple="true"
+    :max-files="10"
+/>
+```
+
+**Framework-Agnostic Core:**
+
+```javascript
+import MediaManCore from './mediaman/core/MediaManCore';
+
+const uploader = new MediaManCore({
+  uploadUrl: '/mediaman/upload',
+  collection: 'products',
+  conversions: ['thumbnail', 'webp'],
+});
+
+uploader.upload(files, {
+  onProgress: (percent) => {
+    console.log(`Upload progress: ${percent}%`);
+  },
+  onComplete: (media) => {
+    console.log('Upload complete:', media);
+  },
+  onError: (error) => {
+    console.error('Upload failed:', error);
+  },
+});
+```
+
+### API Documentation
+
+Auto-generated OpenAPI/Swagger documentation for your MediaMan API.
+
+**Enable API Documentation:**
+
+```php
+// config/mediaman.php
+'openapi' => [
+    'enabled' => env('MEDIAMAN_OPENAPI_ENABLED', true),
+    'route' => env('MEDIAMAN_OPENAPI_ROUTE', 'mediaman/docs'),
+    'title' => env('MEDIAMAN_OPENAPI_TITLE', 'MediaMan API'),
+    'version' => env('MEDIAMAN_OPENAPI_VERSION', '1.0.0'),
+],
+
+'enable_api' => env('MEDIAMAN_ENABLE_API', true),
+```
+
+**Recommended: Using Scramble (Auto-Generation):**
+
+```bash
+composer require dedoc/scramble
+```
+
+```php
+// config/scramble.php
+'api_path' => 'api/mediaman',
+'api_domain' => null,
+```
+
+Access documentation at: `http://yourapp.test/docs/api`
+
+**Alternative: L5-Swagger:**
+
+```bash
+composer require darkaonline/l5-swagger
+php artisan vendor:publish --provider="L5Swagger\L5SwaggerServiceProvider"
+```
+
+**Disable API Routes:**
+
+```php
+// .env
+MEDIAMAN_ENABLE_API=false
+```
+
+### License Management
+
+Built-in license validation for commercial deployments.
+
+**Enable License Validation:**
+
+```php
+// config/mediaman.php
+'license' => [
+    'enabled' => env('MEDIAMAN_LICENSE_ENABLED', false),
+    'key' => env('MEDIAMAN_LICENSE_KEY', null),
+    'validation_url' => env('MEDIAMAN_LICENSE_URL', 'https://api.mediaman.dev/validate'),
+    'allow_localhost' => env('MEDIAMAN_ALLOW_LOCALHOST', true),
+    'cache_ttl' => env('MEDIAMAN_LICENSE_CACHE_TTL', 86400), // 24 hours
+],
+```
+
+**Usage:**
+
+```php
+use FarhanShares\MediaMan\Managers\LicenseManager;
+
+$license = app(LicenseManager::class);
+
+// Validate license
+if ($license->isValid()) {
+    // License is valid
+    $features = $license->getEnabledFeatures();
+}
+
+// Check specific feature
+if ($license->hasFeature('batch-upload')) {
+    // Feature is available
+}
+
+// Get license info
+$info = $license->getLicenseInfo();
+echo $info['type']; // 'pro', 'enterprise'
+echo $info['expires_at']; // '2025-12-31'
+echo $info['domain']; // 'yourapp.com'
+```
+
+**License Validation Flow:**
+
+1. Localhost domains are automatically allowed
+2. Production domains validate against license server
+3. Validation results are cached for 24 hours
+4. Features are gated based on license type
+
+-----
+
+## Performance Optimization
+
+MediaMan Pro includes comprehensive performance optimizations:
+
+### Database Indexes
+
+40+ strategically placed indexes for optimal query performance:
+
+```php
+// Automatically applied with migration:
+// add_performance_indexes_to_mediaman.php
+
+// Examples:
+// - Media table: disk, mime_type, created_at, composite indexes
+// - Media-Model pivot: model_type + model_id, channel
+// - Collections: name, created_at
+// - Versions: media_id + version_number
+// - Tags: slug, usage_count (for popular tags)
+// - Full-text search on media names (MySQL/PostgreSQL)
+```
+
+**Performance Gains:**
+- 10-100x faster queries on large datasets
+- Optimized collection lookups
+- Efficient tag-based searches
+- Fast version history retrieval
+
+### Query Optimization Best Practices
+
+```php
+// Use eager loading to avoid N+1 queries
+$media = Media::with(['collections', 'tags', 'versions'])->get();
+
+// Use caching for frequently accessed media
+$cacheManager->warmCache($mediaIds);
+
+// Use database indexes for searches
+$media = Media::where('disk', 's3')
+    ->where('mime_type', 'image/jpeg')
+    ->whereBetween('created_at', [$start, $end])
+    ->get(); // Uses composite index
+
+// Batch operations for bulk uploads
+BatchUploader::source($files)->upload(); // Uses queues
+```
+
+### Caching Strategy
+
+```php
+// Cache frequently accessed media
+$cacheManager->warmCache([1, 2, 3, 4, 5]);
+
+// Cache media URLs
+$url = $cacheManager->cacheUrl($mediaId, 'thumbnail');
+
+// Automatic invalidation on updates
+// No stale cache issues
+```
+
+### Lazy Loading
+
+```php
+// Load relationships only when needed
+$media = Media::find(1);
+$tags = $media->tags; // Loaded on-demand
+
+// Or use eager loading when you know you'll need them
+$media = Media::with('tags')->find(1);
+```
+
+-----
 
 ## Upgrade Guide to MediaMan v1.x
 
