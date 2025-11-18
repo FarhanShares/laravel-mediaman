@@ -21,7 +21,7 @@ class Media extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'file_name', 'mime_type', 'size', 'disk', 'data'
+        'name', 'file_name', 'mime_type', 'size', 'disk', 'data', 'uuid'
     ];
 
     /**
@@ -43,6 +43,14 @@ class Media extends Model
 
     public static function booted()
     {
+        static::creating(function ($media) {
+            // Auto-generate UUID if enabled
+            if (config('mediaman.use_uuid') && empty($media->uuid)) {
+                $media->uuid = (string) Str::uuid();
+            }
+        });
+
+
         static::deleted(static function ($media) {
             // delete the media directory
             $deleted = Storage::disk($media->disk)->deleteDirectory($media->getDirectory());
@@ -247,6 +255,33 @@ class Media extends Model
         }
 
         return $query->select($columns)->where('name', $names)->first();
+    }
+
+    /**
+     * Find a media by UUID
+     *
+     * @param $query
+     * @param string $uuid
+     * @param array $columns
+     * @return Media|null
+     */
+    public function scopeFindByUuid($query, string $uuid, array $columns = ['*'])
+    {
+        return $query->select($columns)->where('uuid', $uuid)->first();
+    }
+
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        if (config('mediaman.use_uuid') && config('mediaman.expose_uuid_in_routes')) {
+            return 'uuid';
+        }
+
+        return 'id';
     }
 
 

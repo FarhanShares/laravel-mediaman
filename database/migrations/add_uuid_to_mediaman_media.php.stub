@@ -1,0 +1,48 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddUuidToMediamanMedia extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table(config('mediaman.tables.media'), function (Blueprint $table) {
+            $table->uuid('uuid')->after('id')->nullable()->unique();
+            $table->index('uuid');
+        });
+
+        // Generate UUIDs for existing records
+        $mediaModel = config('mediaman.models.media');
+        $mediaModel::whereNull('uuid')->chunk(100, function ($mediaItems) {
+            foreach ($mediaItems as $media) {
+                $media->uuid = \Illuminate\Support\Str::uuid();
+                $media->save();
+            }
+        });
+
+        // Make uuid non-nullable after backfilling
+        Schema::table(config('mediaman.tables.media'), function (Blueprint $table) {
+            $table->uuid('uuid')->nullable(false)->change();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table(config('mediaman.tables.media'), function (Blueprint $table) {
+            $table->dropIndex(['uuid']);
+            $table->dropColumn('uuid');
+        });
+    }
+}
