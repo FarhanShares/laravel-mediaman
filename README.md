@@ -152,6 +152,30 @@ Here's an example configuration to use a dedicated local media disk for MediaMan
 
 Now, run `php artisan storage:link` to create the symbolic link of our newly created media disk.
 
+You can also override the model classes and table names from the same config file.
+If you need UUID primary keys everywhere, enable `use_uuids` before publishing or
+running the package migration.
+
+```php
+// file: config/mediaman.php
+'models' => [
+    'media' => App\Models\Media::class,
+    'collection' => App\Models\MediaCollection::class,
+],
+
+'tables' => [
+    'media' => 'mediaman_media',
+    'collections' => 'mediaman_collections',
+    'collection_media' => 'mediaman_collection_media',
+    'mediables' => 'mediaman_mediables',
+],
+
+'use_uuids' => true,
+```
+
+When `use_uuids` is enabled, the package models generate UUID primary keys and the
+published migration stub creates matching UUID columns and foreign keys.
+
 ## Media
 
 ### Upload media
@@ -185,11 +209,11 @@ If the collection doesn't exist, it'll be created on the fly. You can read more 
 
 **Q: What happens if I don't provide a unique file name in the above process?**
 
-A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stored in the disk in a way that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house.
+A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stored in the disk in a way that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house. This works with either integer IDs or UUIDs.
 
 **Q: But why? Won't I get a bunch of directories?**
 
-A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, hence users won't be able to guess & retrieve a random file. More on customization will be added later.
+A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. You can also switch the package to UUID primary keys by setting `use_uuids` to `true`. We recommend sticking to the default unless you need custom behavior, because a hash is added along with the mediaId, hence users won't be able to guess & retrieve a random file.
 
 **Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 
