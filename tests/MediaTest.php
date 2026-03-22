@@ -4,11 +4,15 @@ namespace FarhanShares\MediaMan\Tests;
 
 
 use Mockery;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
 use FarhanShares\MediaMan\Models\Media;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Tests\TestCase;
+use FarhanShares\MediaMan\Tests\Models\CustomMedia;
+use FarhanShares\MediaMan\Tests\Models\CustomMediaCollection;
 use Illuminate\Database\Eloquent\Collection as ElCollection;
 
 class MediaTest extends TestCase
@@ -747,5 +751,63 @@ class MediaTest extends TestCase
         // detach with empty-array resets back to zero collection
         $media->detachCollections([]);
         $this->assertEquals(0, $media->collections()->count());
+    }
+
+    /** @test */
+    public function test_it_respects_configured_collection_model_when_syncing_collections()
+    {
+        config()->set('mediaman.models.media', CustomMedia::class);
+        config()->set('mediaman.models.collection', CustomMediaCollection::class);
+
+        $collection = CustomMediaCollection::firstOrCreate([
+            'name' => 'Custom Collection',
+        ]);
+
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        $media->syncCollections($collection);
+
+        $this->assertInstanceOf(CustomMedia::class, $media);
+        $this->assertInstanceOf(CustomMediaCollection::class, $media->collections()->first());
+        $this->assertEquals($collection->getKey(), $media->collections()->first()->getKey());
+    }
+
+    /** @test */
+    public function test_it_generates_uuid_keys_for_default_models_when_configured()
+    {
+        config()->set('mediaman.use_uuids', true);
+        config()->set('mediaman.tables.media', 'uuid_mediaman_media');
+        config()->set('mediaman.tables.collections', 'uuid_mediaman_collections');
+
+        Schema::create(config('mediaman.tables.collections'), function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create(config('mediaman.tables.media'), function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('disk');
+            $table->string('name');
+            $table->string('file_name');
+            $table->string('mime_type');
+            $table->unsignedInteger('size');
+            $table->json('data')->nullable();
+            $table->timestamps();
+        });
+
+        $collection = $this->mediaCollection::create(['name' => 'UUID Collection']);
+        $media = MediaUploader::source($this->fileOne)->upload();
+
+        $this->assertFalse($media->getIncrementing());
+        $this->assertSame('string', $media->getKeyType());
+        $this->assertMatchesRegularExpression('/^[0-9a-f-]{36}$/i', $media->getKey());
+
+        $this->assertFalse($collection->getIncrementing());
+        $this->assertSame('string', $collection->getKeyType());
+        $this->assertMatchesRegularExpression('/^[0-9a-f-]{36}$/i', $collection->getKey());
+
+        Schema::dropIfExists(config('mediaman.tables.media'));
+        Schema::dropIfExists(config('mediaman.tables.collections'));
     }
 }

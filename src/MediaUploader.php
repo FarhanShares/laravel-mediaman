@@ -237,7 +237,9 @@ class MediaUploader
             // add to the default collection
             // todo: allow not to add in the default collection
             $collectionModel = $this->collectionModel();
-            $collection = $collectionModel::findByName(config('mediaman.collection'));
+            $collection = $collectionModel::query()
+                ->where('name', config('mediaman.collection'))
+                ->first();
             if ($collection) {
                 $media->collections()->attach($collection->getKey());
             }

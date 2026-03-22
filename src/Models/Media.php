@@ -313,11 +313,17 @@ class Media extends Model
         }
 
         $fetch = $this->fetchCollections($collections);
+        if (!$fetch) {
+            return false;
+        }
+
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id')->all();
+            $ids = $this->extractKeys($fetch);
             return ($this->collections()->sync($ids, $detaching));
-        } else {
-            return ($this->collections()->sync($fetch->id, $detaching));
+        }
+
+        if (method_exists($fetch, 'getKey')) {
+            return ($this->collections()->sync($fetch->getKey(), $detaching));
         }
 
         return false;
@@ -333,13 +339,19 @@ class Media extends Model
     public function attachCollections($collections)
     {
         $fetch = $this->fetchCollections($collections);
+        if (!$fetch) {
+            return null;
+        }
+
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id');
+            $ids = $this->extractKeys($fetch);
             $res = $this->collections()->sync($ids, false);
             $attached  = count($res['attached']);
             return $attached > 0 ? $attached : null;
-        } else {
-            $res = $this->collections()->sync($fetch->id, false);
+        }
+
+        if (method_exists($fetch, 'getKey')) {
+            $res = $this->collections()->sync($fetch->getKey(), false);
             $attached  = count($res['attached']);
             return $attached > 0 ? $attached : null;
         }
@@ -362,11 +374,17 @@ class Media extends Model
 
         // todo: check if null is returned on failure
         $fetch = $this->fetchCollections($collections);
+        if (!$fetch) {
+            return null;
+        }
+
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id')->all();
+            $ids = $this->extractKeys($fetch);
             return $this->collections()->detach($ids);
-        } else {
-            return $this->collections()->detach($fetch->id);
+        }
+
+        if (method_exists($fetch, 'getKey')) {
+            return $this->collections()->detach($fetch->getKey());
         }
 
         return null;
@@ -456,34 +474,65 @@ class Media extends Model
         }
         // todo: check for instance of media model / collection instead?
         if ($collections instanceof BaseCollection) {
-            $ids = $collections->pluck('id')->all();
-            return MediaCollection::find($ids);
+            $ids = $this->extractKeys($collections);
+            $model = $this->collectionModel();
+
+            return $model::find($ids);
         }
 
-        if (is_object($collections) && isset($collections->id)) {
-            return MediaCollection::find($collections->id);
+        if (is_object($collections) && method_exists($collections, 'getKey')) {
+            $model = $this->collectionModel();
+
+            return $model::find($collections->getKey());
         }
 
         if (is_numeric($collections)) {
-            return MediaCollection::find($collections);
+            $model = $this->collectionModel();
+
+            return $model::find($collections);
         }
 
         if (is_string($collections)) {
-            return MediaCollection::findByName($collections);
+            $model = $this->collectionModel();
+
+            return $model::findByName($collections);
         }
 
         // all array items should be of same type
         // find by id or name based on the type of first item in the array
         if (is_array($collections) && isset($collections[0])) {
             if (is_numeric($collections[0])) {
-                return MediaCollection::find($collections);
+                $model = $this->collectionModel();
+
+                return $model::find($collections);
             }
 
             if (is_string($collections[0])) {
-                return MediaCollection::findByName($collections);
+                $model = $this->collectionModel();
+
+                return $model::findByName($collections);
             }
         }
 
         return null;
+    }
+
+    /**
+     * Extract primary keys from an iterable of models or scalar keys.
+     *
+     * @param mixed $items
+     * @return array
+     */
+    private function extractKeys($items): array
+    {
+        if ($items instanceof EloquentCollection) {
+            return $items->modelKeys();
+        }
+
+        return collect($items)
+            ->map(function ($item) {
+                return method_exists($item, 'getKey') ? $item->getKey() : ($item->id ?? $item);
+            })
+            ->all();
     }
 }
