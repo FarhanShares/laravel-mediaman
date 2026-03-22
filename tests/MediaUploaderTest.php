@@ -7,6 +7,8 @@ use Illuminate\Http\UploadedFile;
 use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Support\Facades\Storage;
 use FarhanShares\MediaMan\MediaUploader;
+use FarhanShares\MediaMan\Tests\Models\CustomMedia;
+use FarhanShares\MediaMan\Tests\Models\CustomMediaCollection;
 
 class MediaUploaderTest extends TestCase
 {
@@ -96,5 +98,17 @@ class MediaUploaderTest extends TestCase
         $this->assertInstanceOf(Media::class, $media);
         $this->assertEquals('test data 01', $media->data['test-01']);
         $this->assertEquals('test data 02', $media->data['test-02']);
+    }
+
+    /** @test */
+    public function test_it_respects_configured_media_and_collection_models()
+    {
+        config()->set('mediaman.models.media', CustomMedia::class);
+        config()->set('mediaman.models.collection', CustomMediaCollection::class);
+
+        $media = MediaUploader::source(UploadedFile::fake()->image('image.jpg'))->upload();
+
+        $this->assertInstanceOf(CustomMedia::class, $media);
+        $this->assertInstanceOf(CustomMediaCollection::class, $media->collections()->first());
     }
 }

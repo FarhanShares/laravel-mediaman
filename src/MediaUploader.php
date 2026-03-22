@@ -2,7 +2,6 @@
 
 namespace FarhanShares\MediaMan;
 
-use FarhanShares\MediaMan\Models\MediaCollection;
 use Illuminate\Http\UploadedFile;
 
 class MediaUploader
@@ -206,7 +205,7 @@ class MediaUploader
      */
     public function upload()
     {
-        $model = config('mediaman.models.media');
+        $model = $this->mediaModel();
 
         $media = new $model();
 
@@ -227,20 +226,43 @@ class MediaUploader
 
         if (count($this->collections) > 0) {
             // todo: support multiple collections
-            $collection = MediaCollection::firstOrCreate([
+            $collectionModel = $this->collectionModel();
+
+            $collection = $collectionModel::firstOrCreate([
                 'name' => $this->collections[0]
             ]);
 
-            $media->collections()->attach($collection->id);
+            $media->collections()->attach($collection->getKey());
         } else {
             // add to the default collection
             // todo: allow not to add in the default collection
-            $collection = MediaCollection::findByName(config('mediaman.collection'));
+            $collectionModel = $this->collectionModel();
+            $collection = $collectionModel::findByName(config('mediaman.collection'));
             if ($collection) {
-                $media->collections()->attach($collection->id);
+                $media->collections()->attach($collection->getKey());
             }
         }
 
         return $media;
+    }
+
+    /**
+     * Resolve the configured media model class.
+     *
+     * @return string
+     */
+    protected function mediaModel(): string
+    {
+        return config('mediaman.models.media');
+    }
+
+    /**
+     * Resolve the configured collection model class.
+     *
+     * @return string
+     */
+    protected function collectionModel(): string
+    {
+        return config('mediaman.models.collection');
     }
 }

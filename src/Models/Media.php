@@ -8,13 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use FarhanShares\MediaMan\Models\MediaCollection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class Media extends Model
 {
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * The data type of the primary key.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
     /**
      * The attributes that are mass assignable.
      *
@@ -40,9 +52,25 @@ class Media extends Model
      */
     protected $appends = ['friendly_size',  'media_uri', 'media_url', 'type', 'extension'];
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        if (config('mediaman.use_uuids')) {
+            $this->incrementing = false;
+            $this->keyType = 'string';
+        }
+    }
+
 
     public static function booted()
     {
+        static::creating(function ($media) {
+            if (config('mediaman.use_uuids') && empty($media->getKey())) {
+                $media->setAttribute($media->getKeyName(), (string) Str::uuid());
+            }
+        });
+
         static::deleted(static function ($media) {
             // delete the media directory
             $deleted = Storage::disk($media->disk)->deleteDirectory($media->getDirectory());
@@ -257,7 +285,17 @@ class Media extends Model
      */
     public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
+        return $this->belongsToMany($this->collectionModel(), config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
+    }
+
+    /**
+     * Resolve the configured collection model class.
+     *
+     * @return string
+     */
+    protected function collectionModel(): string
+    {
+        return config('mediaman.models.collection');
     }
 
 
