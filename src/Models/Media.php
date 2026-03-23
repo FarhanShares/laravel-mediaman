@@ -8,13 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use FarhanShares\MediaMan\Models\MediaCollection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class Media extends Model
 {
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * The data type of the primary key.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
     /**
      * The attributes that are mass assignable.
      *
@@ -40,9 +52,25 @@ class Media extends Model
      */
     protected $appends = ['friendly_size',  'media_uri', 'media_url', 'type', 'extension'];
 
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        if (config('mediaman.use_uuids')) {
+            $this->incrementing = false;
+            $this->keyType = 'string';
+        }
+    }
+
 
     public static function booted()
     {
+        static::creating(function ($media) {
+            if (config('mediaman.use_uuids') && empty($media->getKey())) {
+                $media->setAttribute($media->getKeyName(), (string) Str::uuid());
+            }
+        });
+
         static::deleted(static function ($media) {
             // delete the media directory
             $deleted = Storage::disk($media->disk)->deleteDirectory($media->getDirectory());
@@ -136,16 +164,17 @@ class Media extends Model
     public function getFriendlySizeAttribute()
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $size = $this->size;
 
-        if ($this->size == 0) {
+        if ($size == 0) {
             return '0 ' . $units[1];
         }
 
-        for ($i = 0; $this->size > 1024; $i++) {
-            $this->size /= 1024;
+        for ($i = 0; $size > 1024; $i++) {
+            $size /= 1024;
         }
 
-        return round($this->size, 2) . ' ' . $units[$i];
+        return round($size, 2) . ' ' . $units[$i];
     }
 
     /**
@@ -257,7 +286,17 @@ class Media extends Model
      */
     public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(MediaCollection::class, config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
+        return $this->belongsToMany($this->collectionModel(), config('mediaman.tables.collection_media'), 'collection_id', 'media_id');
+    }
+
+    /**
+     * Resolve the configured collection model class.
+     *
+     * @return string
+     */
+    protected function collectionModel(): string
+    {
+        return config('mediaman.models.collection');
     }
 
 
@@ -275,11 +314,17 @@ class Media extends Model
         }
 
         $fetch = $this->fetchCollections($collections);
+        if (!$fetch) {
+            return false;
+        }
+
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id')->all();
+            $ids = $this->extractKeys($fetch);
             return ($this->collections()->sync($ids, $detaching));
-        } else {
-            return ($this->collections()->sync($fetch->id, $detaching));
+        }
+
+        if (method_exists($fetch, 'getKey')) {
+            return ($this->collections()->sync($fetch->getKey(), $detaching));
         }
 
         return false;
@@ -295,13 +340,19 @@ class Media extends Model
     public function attachCollections($collections)
     {
         $fetch = $this->fetchCollections($collections);
+        if (!$fetch) {
+            return null;
+        }
+
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id');
+            $ids = $this->extractKeys($fetch);
             $res = $this->collections()->sync($ids, false);
             $attached  = count($res['attached']);
             return $attached > 0 ? $attached : null;
-        } else {
-            $res = $this->collections()->sync($fetch->id, false);
+        }
+
+        if (method_exists($fetch, 'getKey')) {
+            $res = $this->collections()->sync($fetch->getKey(), false);
             $attached  = count($res['attached']);
             return $attached > 0 ? $attached : null;
         }
@@ -324,11 +375,17 @@ class Media extends Model
 
         // todo: check if null is returned on failure
         $fetch = $this->fetchCollections($collections);
+        if (!$fetch) {
+            return null;
+        }
+
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id')->all();
+            $ids = $this->extractKeys($fetch);
             return $this->collections()->detach($ids);
-        } else {
-            return $this->collections()->detach($fetch->id);
+        }
+
+        if (method_exists($fetch, 'getKey')) {
+            return $this->collections()->detach($fetch->getKey());
         }
 
         return null;
@@ -418,34 +475,81 @@ class Media extends Model
         }
         // todo: check for instance of media model / collection instead?
         if ($collections instanceof BaseCollection) {
-            $ids = $collections->pluck('id')->all();
-            return MediaCollection::find($ids);
+            $ids = $this->extractKeys($collections);
+            $model = $this->collectionModel();
+
+            return $model::find($ids);
         }
 
-        if (is_object($collections) && isset($collections->id)) {
-            return MediaCollection::find($collections->id);
+        if (is_object($collections) && method_exists($collections, 'getKey')) {
+            $model = $this->collectionModel();
+
+            return $model::find($collections->getKey());
         }
 
         if (is_numeric($collections)) {
-            return MediaCollection::find($collections);
+            $model = $this->collectionModel();
+
+            return $model::find($collections);
         }
 
         if (is_string($collections)) {
-            return MediaCollection::findByName($collections);
+            $model = $this->collectionModel();
+
+            return $this->findCollectionsByName($collections);
         }
 
         // all array items should be of same type
         // find by id or name based on the type of first item in the array
         if (is_array($collections) && isset($collections[0])) {
             if (is_numeric($collections[0])) {
-                return MediaCollection::find($collections);
+                $model = $this->collectionModel();
+
+                return $model::find($collections);
             }
 
             if (is_string($collections[0])) {
-                return MediaCollection::findByName($collections);
+                return $this->findCollectionsByName($collections);
             }
         }
 
         return null;
+    }
+
+    /**
+     * Find one or many collections by collection name.
+     *
+     * @param string|array $names
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null
+     */
+    private function findCollectionsByName($names)
+    {
+        $model = $this->collectionModel();
+        $query = $model::query();
+
+        if (is_array($names)) {
+            return $query->whereIn('name', $names)->get();
+        }
+
+        return $query->where('name', $names)->first();
+    }
+
+    /**
+     * Extract primary keys from an iterable of models or scalar keys.
+     *
+     * @param mixed $items
+     * @return array
+     */
+    private function extractKeys($items): array
+    {
+        if ($items instanceof EloquentCollection) {
+            return $items->modelKeys();
+        }
+
+        return collect($items)
+            ->map(function ($item) {
+                return method_exists($item, 'getKey') ? $item->getKey() : ($item->id ?? $item);
+            })
+            ->all();
     }
 }

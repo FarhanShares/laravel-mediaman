@@ -7,15 +7,15 @@ use Mockery;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Illuminate\Filesystem\Filesystem;
-
 use FarhanShares\MediaMan\Models\Media;
 use FarhanShares\MediaMan\ImageManipulator;
 use FarhanShares\MediaMan\ConversionRegistry;
 use FarhanShares\MediaMan\Exceptions\InvalidConversion;
+use PHPUnit\Framework\Attributes\Test;
 
 class ImageManipulatorTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function test_it_will_apply_registered_conversions()
     {
         $conversionRegistry = new ConversionRegistry();
@@ -54,7 +54,7 @@ class ImageManipulatorTest extends TestCase
         $manipulator->manipulate($media, ['resize'], $onlyIfMissing = false);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_only_apply_conversions_to_an_image()
     {
         $conversionRegistry = new ConversionRegistry();
@@ -75,7 +75,7 @@ class ImageManipulatorTest extends TestCase
         $manipulator->manipulate($media, ['resize'], $onlyIfMissing = false);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_ignore_unregistered_conversions()
     {
         $this->expectException(InvalidConversion::class);
@@ -94,7 +94,7 @@ class ImageManipulatorTest extends TestCase
         $manipulator->manipulate($media, ['unknown'], $onlyIfMissing = false);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_skip_conversions_if_the_converted_image_already_exists()
     {
         $conversionRegistry = new ConversionRegistry();

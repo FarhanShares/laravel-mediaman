@@ -9,9 +9,9 @@ use FarhanShares\MediaMan\Models\Media;
 use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Tests\Models\Subject;
 use FarhanShares\MediaMan\Jobs\PerformConversions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use PHPUnit\Framework\Attributes\Test;
 
 class HasMediaTest extends TestCase
 {
@@ -25,16 +25,16 @@ class HasMediaTest extends TestCase
         $this->subject = Subject::create();
     }
 
-    /** @test */
+    #[Test]
     public function test_it_registers_the_media_relationship()
     {
         $this->assertInstanceOf(MorphToMany::class, $this->subject->media());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_attach_media_to_the_default_channel()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media);
 
@@ -44,10 +44,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals('default', $attachedMedia->pivot->channel);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_attach_media_to_a_named_channel()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media, $channel = 'custom');
 
@@ -57,10 +57,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals($channel, $attachedMedia->pivot->channel);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_attach_a_collection_of_media()
     {
-        $media = factory(Media::class, 2)->create();
+        $media = $this->createMedia(2);
 
         $this->subject->attachMedia($media);
 
@@ -76,10 +76,10 @@ class HasMediaTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_number_of_attached_media_or_null_while_associating()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $attachedCount = $this->subject->attachMedia($media, 'custom');
 
@@ -92,14 +92,14 @@ class HasMediaTest extends TestCase
         } else {
             // try attaching a non-existing media record
             $attached = $this->subject->attachMedia(5, 'custom');
-            $this->assertEquals(null, $attached);
+            $this->assertNull($attached);
         }
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_number_of_detached_media_or_null_while_disassociating()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
         $this->subject->attachMedia($media, 'custom');
 
         $detached = $this->subject->detachMedia($media);
@@ -108,12 +108,12 @@ class HasMediaTest extends TestCase
 
         // try detaching a non-existing media record
         $detached = $this->subject->detachMedia(100);
-        $this->assertEquals(null, $detached);
+        $this->assertNull($detached);
     }
 
     public function test_it_can_attach_media_and_returns_number_of_media_attached()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $attachedCount = $this->subject->attachMedia($media);
 
@@ -123,10 +123,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals($media->id, $attachedMedia->id);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_detach_media_and_returns_number_of_media_detached()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
         $this->subject->attachMedia($media);
 
         $detachedCount = $this->subject->detachMedia($media);
@@ -135,7 +135,7 @@ class HasMediaTest extends TestCase
         $this->assertNull($this->subject->media()->first());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_sync_media_and_returns_sync_status()
     {
         $media1 = MediaUploader::source($this->fileOne)
@@ -166,10 +166,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals(1, count($syncStatus['detached']));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_sync_collections_for_a_media_instance()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
         $collections = ['collection1', 'collection2'];
 
         $syncStatus = $media->syncCollections($collections);
@@ -179,12 +179,12 @@ class HasMediaTest extends TestCase
         $this->assertArrayHasKey('updated', $syncStatus);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_perform_the_given_conversions_when_media_is_attached()
     {
         Queue::fake();
 
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $conversions = ['conversion'];
 
@@ -199,12 +199,12 @@ class HasMediaTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_perform_the_conversions_registered_by_the_channel_when_media_is_attached()
     {
         Queue::fake();
 
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media, $channel = 'converted-images');
 
@@ -221,10 +221,10 @@ class HasMediaTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_all_the_media_from_the_default_channel()
     {
-        $media = factory(Media::class, 2)->create();
+        $media = $this->createMedia(2);
 
         $this->subject->attachMedia($media);
 
@@ -234,10 +234,10 @@ class HasMediaTest extends TestCase
         $this->assertEmpty($media->diff($defaultMedia));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_all_the_media_from_the_specified_channel()
     {
-        $media = factory(Media::class, 2)->create();
+        $media = $this->createMedia(2);
 
         $this->subject->attachMedia($media, 'gallery');
 
@@ -247,7 +247,7 @@ class HasMediaTest extends TestCase
         $this->assertEmpty($media->diff($galleryMedia));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_handle_attempts_to_get_media_from_an_empty_channel()
     {
         $media = $this->subject->getMedia();
@@ -256,10 +256,10 @@ class HasMediaTest extends TestCase
         $this->assertTrue($media->isEmpty());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_the_first_media_from_the_default_channel()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media);
 
@@ -269,10 +269,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals($media->id, $firstMedia->id);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_the_first_media_from_the_specified_channel()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media, 'gallery');
 
@@ -282,11 +282,11 @@ class HasMediaTest extends TestCase
         $this->assertEquals($media->id, $firstMedia->id);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_only_retrieve_media_from_the_specified_channel()
     {
-        $defaultMedia = factory(Media::class)->create();
-        $galleryMedia = factory(Media::class)->create();
+        $defaultMedia = $this->createMedia();
+        $galleryMedia = $this->createMedia();
 
         // Attach media to the default channel...
         $this->subject->attachMedia($defaultMedia->id);
@@ -306,10 +306,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals($galleryMedia->id, $firstGalleryMedia->id);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_the_url_of_the_first_media_item_from_the_default_channel()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media);
 
@@ -318,10 +318,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals($media->getUrl(), $url);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_the_url_of_the_first_media_item_from_the_specified_channel()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media, 'gallery');
 
@@ -330,10 +330,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals($media->getUrl(), $url);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_the_converted_image_url_of_the_first_media_item_from_the_specified_group()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media, 'gallery');
 
@@ -342,10 +342,10 @@ class HasMediaTest extends TestCase
         $this->assertEquals($media->getUrl('conversion-name'), $url);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_determine_if_there_is_media_in_the_default_channel()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media);
 
@@ -353,10 +353,10 @@ class HasMediaTest extends TestCase
         $this->assertFalse($this->subject->hasMedia('empty'));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_determine_if_there_is_any_media_in_the_specified_group()
     {
-        $media = factory(Media::class)->create();
+        $media = $this->createMedia();
 
         $this->subject->attachMedia($media, 'gallery');
 
@@ -364,11 +364,11 @@ class HasMediaTest extends TestCase
         $this->assertFalse($this->subject->hasMedia());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_detach_all_the_media()
     {
-        $mediaOne = factory(Media::class)->create();
-        $mediaTwo = factory(Media::class)->create();
+        $mediaOne = $this->createMedia();
+        $mediaTwo = $this->createMedia();
 
         $this->subject->attachMedia($mediaOne);
         $this->subject->attachMedia($mediaTwo, 'gallery');
@@ -378,11 +378,11 @@ class HasMediaTest extends TestCase
         $this->assertFalse($this->subject->media()->exists());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_detach_specific_media_items()
     {
-        $mediaOne = factory(Media::class)->create();
-        $mediaTwo = factory(Media::class)->create();
+        $mediaOne = $this->createMedia();
+        $mediaTwo = $this->createMedia();
 
         $this->subject->attachMedia([
             $mediaOne->id,
@@ -395,11 +395,11 @@ class HasMediaTest extends TestCase
         $this->assertEquals($mediaTwo->id, $this->subject->getFirstMedia()->id);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_detach_all_the_media_in_a_specified_channel()
     {
-        $mediaOne = factory(Media::class)->create();
-        $mediaTwo = factory(Media::class)->create();
+        $mediaOne = $this->createMedia();
+        $mediaTwo = $this->createMedia();
 
         $this->subject->attachMedia($mediaOne, 'one');
         $this->subject->attachMedia($mediaTwo, 'two');

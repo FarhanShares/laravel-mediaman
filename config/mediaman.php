@@ -31,6 +31,18 @@ return [
 
     'queue' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | UUID primary keys
+    |--------------------------------------------------------------------------
+    |
+    | Set this to true if you want the package models and migration stub to
+    | use UUID primary keys instead of auto-incrementing integers.
+    |
+    */
+
+    'use_uuids' => env('MEDIAMAN_USE_UUIDS', false),
+
 
     /*
     |--------------------------------------------------------------------------

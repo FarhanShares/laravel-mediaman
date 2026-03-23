@@ -4,12 +4,11 @@ namespace FarhanShares\MediaMan\Traits;
 
 use Throwable;
 use FarhanShares\MediaMan\MediaChannel;
-use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Database\Eloquent\Collection;
 use FarhanShares\MediaMan\Jobs\PerformConversions;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait HasMedia
 {
@@ -24,8 +23,18 @@ trait HasMedia
     public function media(): MorphToMany
     {
         return $this
-            ->morphToMany(config('mediaman.models.media'), 'mediable', config('mediaman.tables.mediables'))
+            ->morphToMany($this->mediaModel(), 'mediable', config('mediaman.tables.mediables'))
             ->withPivot('channel');
+    }
+
+    /**
+     * Resolve the configured media model class.
+     *
+     * @return string
+     */
+    protected function mediaModel(): string
+    {
+        return config('mediaman.models.media');
     }
 
     /**
@@ -111,11 +120,13 @@ trait HasMedia
      */
     protected function parseMediaIds($media)
     {
+        $mediaModel = $this->mediaModel();
+
         if ($media instanceof Collection) {
             return $media->modelKeys();
         }
 
-        if ($media instanceof Media) {
+        if ($media instanceof $mediaModel) {
             return [$media->getKey()];
         }
 
@@ -215,7 +226,7 @@ trait HasMedia
         }
 
         if (!empty($conversions)) {
-            $model = config('mediaman.models.media');
+            $model = $this->mediaModel();
 
             $mediaInstances = $model::findMany($ids);
 

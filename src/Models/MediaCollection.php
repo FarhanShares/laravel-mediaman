@@ -2,8 +2,7 @@
 
 namespace FarhanShares\MediaMan\Models;
 
-
-use FarhanShares\MediaMan\Models\Media;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -12,6 +11,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class MediaCollection extends Model
 {
     /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * The data type of the primary key.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -19,6 +31,25 @@ class MediaCollection extends Model
     protected $fillable = [
         'name', 'created_at', 'updated_at',
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        if (config('mediaman.use_uuids')) {
+            $this->incrementing = false;
+            $this->keyType = 'string';
+        }
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($collection) {
+            if (config('mediaman.use_uuids') && empty($collection->getKey())) {
+                $collection->setAttribute($collection->getKeyName(), (string) Str::uuid());
+            }
+        });
+    }
 
 
     /**
@@ -57,7 +88,17 @@ class MediaCollection extends Model
      */
     public function media()
     {
-        return $this->belongsToMany(Media::class, config('mediaman.tables.collection_media'), 'media_id', 'collection_id');
+        return $this->belongsToMany($this->mediaModel(), config('mediaman.tables.collection_media'), 'media_id', 'collection_id');
+    }
+
+    /**
+     * Resolve the configured media model class.
+     *
+     * @return string
+     */
+    protected function mediaModel(): string
+    {
+        return config('mediaman.models.media');
     }
 
 
@@ -79,12 +120,12 @@ class MediaCollection extends Model
         }
 
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id')->all();
+            $ids = $this->extractKeys($fetch);
             return $this->media()->sync($ids, $detaching);
         }
 
-        if (isset($fetch->id)) {
-            return $this->media()->sync($fetch->id);
+        if (method_exists($fetch, 'getKey')) {
+            return $this->media()->sync($fetch->getKey(), $detaching);
         }
 
         return null;
@@ -99,8 +140,6 @@ class MediaCollection extends Model
      */
     public function attachMedia($media): ?int
     {
-        $fetch = $this->fetchMedia($media);
-
         if (!$fetch = $this->fetchMedia($media)) {
             return null;
         }
@@ -108,15 +147,15 @@ class MediaCollection extends Model
         // to be consistent with the return type of detach method
         // which returns number of detached model, we're using sync without detachment
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id')->all();
+            $ids = $this->extractKeys($fetch);
             $res = $this->media()->sync($ids, false);
 
             $attached  = count($res['attached']);
             return $attached > 0 ? $attached : null;
         }
 
-        if (isset($fetch->id)) {
-            $res = $this->media()->sync($fetch->id, false);
+        if (method_exists($fetch, 'getKey')) {
+            $res = $this->media()->sync($fetch->getKey(), false);
 
             $attached  = count($res['attached']);
             return $attached > 0 ? $attached : null;
@@ -143,12 +182,12 @@ class MediaCollection extends Model
         }
 
         if (is_countable($fetch)) {
-            $ids = $fetch->pluck('id')->all();
+            $ids = $this->extractKeys($fetch);
             return $this->media()->detach($ids);
         }
 
-        if (isset($fetch->id)) {
-            return $this->media()->detach($fetch->id);
+        if (method_exists($fetch, 'getKey')) {
+            return $this->media()->detach($fetch->getKey());
         }
 
         return null;
@@ -197,20 +236,20 @@ class MediaCollection extends Model
 
         // todo: check for instance of media model / collection instead?
         if ($media instanceof BaseCollection) {
-            $ids = $media->pluck('id')->all();
-            return Media::find($ids);
+            $ids = $this->extractKeys($media);
+            return $this->mediaModel()::find($ids);
         }
 
-        if (is_object($media) && isset($media->id)) {
-            return Media::find($media->id);
+        if (is_object($media) && method_exists($media, 'getKey')) {
+            return $this->mediaModel()::find($media->getKey());
         }
 
         if (is_numeric($media)) {
-            return MediaCollection::find($media);
+            return $this->mediaModel()::find($media);
         }
 
         if (is_string($media)) {
-            return Media::findByName($media);
+            return $this->findMediaByName($media);
         }
 
         // all array items should be of same type
@@ -221,14 +260,51 @@ class MediaCollection extends Model
             }
 
             if (is_numeric($media[0])) {
-                return Media::find($media);
+                return $this->mediaModel()::find($media);
             }
 
             if (is_string($media[0])) {
-                return Media::findByName($media);
+                return $this->findMediaByName($media);
             }
         }
 
         return null;
+    }
+
+    /**
+     * Find one or many media records by media name.
+     *
+     * @param string|array $names
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null
+     */
+    private function findMediaByName($names)
+    {
+        $model = $this->mediaModel();
+        $query = $model::query();
+
+        if (is_array($names)) {
+            return $query->whereIn('name', $names)->get();
+        }
+
+        return $query->where('name', $names)->first();
+    }
+
+    /**
+     * Extract model keys from a collection of media models or keyed objects.
+     *
+     * @param mixed $items
+     * @return array
+     */
+    private function extractKeys($items): array
+    {
+        if ($items instanceof EloquentCollection) {
+            return $items->modelKeys();
+        }
+
+        return collect($items)
+            ->map(function ($item) {
+                return method_exists($item, 'getKey') ? $item->getKey() : ($item->id ?? $item);
+            })
+            ->all();
     }
 }

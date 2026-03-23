@@ -80,10 +80,11 @@ There are a few key concepts that need to be understood before continuing:
 | v9              | 1.0.0-stable    | 8.0 - 8.2          |
 | v10             | 1.x.x           | 8.1 - 8.3          |
 | v11             | 1.x.x           | 8.2 - 8.4          |
-| v12             | 1.x.x           | 8.2 - 8.4          |
+| v12             | 1.x.x           | 8.2 - 8.5          |
+| v13             | 1.x.x           | 8.3 - 8.5          |
 
 Note: The `1.0.0-stable` and `1.0.0` versions of the package are functionally identical and both considered stable. However, starting from version `1.0.0+` (without the `-stable` suffix), support for Laravel 9 and below has been **dropped**.
-If your project uses Laravel 9 or an earlier version, you should use `1.0.0-stable`. For Laravel 10 and above, you can use the latest `1.x.x` version.
+If your project uses Laravel 9 or an earlier version, you should use `1.0.0-stable`. For Laravel 10 through 13, you can use the latest `1.x.x` version.
 We strongly recommend upgrading your Laravel version to maintain compatibility with future package updates.
 
 ## Installation
@@ -152,6 +153,30 @@ Here's an example configuration to use a dedicated local media disk for MediaMan
 
 Now, run `php artisan storage:link` to create the symbolic link of our newly created media disk.
 
+You can also override the model classes and table names from the same config file.
+If you need UUID primary keys everywhere, enable `use_uuids` before publishing or
+running the package migration.
+
+```php
+// file: config/mediaman.php
+'models' => [
+    'media' => App\Models\Media::class,
+    'collection' => App\Models\MediaCollection::class,
+],
+
+'tables' => [
+    'media' => 'mediaman_media',
+    'collections' => 'mediaman_collections',
+    'collection_media' => 'mediaman_collection_media',
+    'mediables' => 'mediaman_mediables',
+],
+
+'use_uuids' => true,
+```
+
+When `use_uuids` is enabled, the package models generate UUID primary keys and the
+published migration stub creates matching UUID columns and foreign keys.
+
 ## Media
 
 ### Upload media
@@ -185,11 +210,11 @@ If the collection doesn't exist, it'll be created on the fly. You can read more 
 
 **Q: What happens if I don't provide a unique file name in the above process?**
 
-A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stored in the disk in a way that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house.
+A: Don't worry, MediaMan manages uploading in a smart & safe way. Files are stored in the disk in a way that conflicts are barely going to happen. When storing in the disk, MediaMan will create a directory in the disk with a format of: `mediaId-hash` & put the file inside of it. Anything related to the file will have it's own little house. This works with either integer IDs or UUIDs.
 
 **Q: But why? Won't I get a bunch of directories?**
 
-A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. But we recommend sticking to the default, thus you don't need to worry about file conflicts. A hash is added along with the mediaId, hence users won't be able to guess & retrieve a random file. More on customization will be added later.
+A: Yes, you'll. If you want, extend the `FarhanShares\MediaMan\Models\Media` model & you can customize however you like. Finally point your customized model in the mediaman config. You can also switch the package to UUID primary keys by setting `use_uuids` to `true`. We recommend sticking to the default unless you need custom behavior, because a hash is added along with the mediaId, hence users won't be able to guess & retrieve a random file.
 
 **Reminder: MediaMan treats any file (instance of `Illuminate\Http\UploadedFile`) as a media source. If you want a certain file types can be uploaded, you can use Laravel's validator.**
 

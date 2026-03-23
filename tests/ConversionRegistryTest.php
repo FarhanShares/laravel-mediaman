@@ -5,11 +5,11 @@ namespace FarhanShares\MediaMan\Tests;
 
 use FarhanShares\MediaMan\ConversionRegistry;
 use FarhanShares\MediaMan\Exceptions\InvalidConversion;
-
+use PHPUnit\Framework\Attributes\Test;
 
 class ConversionRegistryTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function test_it_can_register_and_retrieve_specific_conversions()
     {
         $conversionRegistry = new ConversionRegistry();
@@ -23,7 +23,7 @@ class ConversionRegistryTest extends TestCase
         $this->assertTrue($conversion());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_all_the_registered_conversions()
     {
         $conversionRegistry = new ConversionRegistry();
@@ -43,7 +43,7 @@ class ConversionRegistryTest extends TestCase
         $this->assertEquals('two', $conversions['two']());
     }
 
-    /** @test */
+    #[Test]
     public function test_there_can_only_be_one_conversion_registered_with_the_same_name()
     {
         $conversionRegistry = new ConversionRegistry();
@@ -60,7 +60,7 @@ class ConversionRegistryTest extends TestCase
         $this->assertEquals('two', $conversionRegistry->get('conversion')());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_determine_if_a_conversion_has_been_registered()
     {
         $conversionRegistry = new ConversionRegistry();
@@ -73,7 +73,7 @@ class ConversionRegistryTest extends TestCase
         $this->assertFalse($conversionRegistry->exists('unregistered'));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_error_when_attempting_to_retrieve_an_unregistered_conversion()
     {
         $this->expectException(InvalidConversion::class);

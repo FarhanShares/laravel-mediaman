@@ -15,7 +15,11 @@ class CreateMediaManTables extends Migration
     {
         // Collections table
         Schema::create(config('mediaman.tables.collections'), function (Blueprint $table) {
-            $table->bigIncrements('id');
+            if (config('mediaman.use_uuids')) {
+                $table->uuid('id')->primary();
+            } else {
+                $table->bigIncrements('id');
+            }
             $table->string('name');
             $table->timestamps();
         });
@@ -28,7 +32,11 @@ class CreateMediaManTables extends Migration
 
         // Media table
         Schema::create(config('mediaman.tables.media'), function (Blueprint $table) {
-            $table->bigIncrements('id');
+            if (config('mediaman.use_uuids')) {
+                $table->uuid('id')->primary();
+            } else {
+                $table->bigIncrements('id');
+            }
             $table->string('disk');
             $table->string('name');
             $table->string('file_name');
@@ -41,12 +49,22 @@ class CreateMediaManTables extends Migration
 
         // Collection & Media pivot table
         Schema::create(config('mediaman.tables.collection_media'), function (Blueprint $table) {
-            $table->unsignedBigInteger('collection_id')
-                ->constraint(config('mediaman.tables.collections'))
+            if (config('mediaman.use_uuids')) {
+                $table->uuid('collection_id');
+                $table->uuid('media_id');
+            } else {
+                $table->unsignedBigInteger('collection_id');
+                $table->unsignedBigInteger('media_id');
+            }
+
+            $table->foreign('collection_id')
+                ->references('id')
+                ->on(config('mediaman.tables.collections'))
                 ->cascadeOnDelete();
 
-            $table->unsignedBigInteger('media_id')
-                ->constraint(config('mediaman.tables.media'))
+            $table->foreign('media_id')
+                ->references('id')
+                ->on(config('mediaman.tables.media'))
                 ->cascadeOnDelete();;
 
             $table->primary(['collection_id', 'media_id']);
@@ -55,9 +73,15 @@ class CreateMediaManTables extends Migration
 
         // Mediable table
         Schema::create(config('mediaman.tables.mediables'), function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('media_id')->index();
-            $table->unsignedBigInteger('mediable_id')->index();
+            if (config('mediaman.use_uuids')) {
+                $table->uuid('id')->primary();
+                $table->uuid('media_id')->index();
+                $table->uuid('mediable_id')->index();
+            } else {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('media_id')->index();
+                $table->unsignedBigInteger('mediable_id')->index();
+            }
             $table->string('mediable_type');
             $table->string('channel');
 
