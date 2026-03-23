@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Storage;
 use FarhanShares\MediaMan\MediaUploader;
 use FarhanShares\MediaMan\Tests\Models\CustomMedia;
 use FarhanShares\MediaMan\Tests\Models\CustomMediaCollection;
+use PHPUnit\Framework\Attributes\Test;
 
 class MediaUploaderTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function test_it_can_upload_a_file_to_the_default_disk()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
@@ -27,7 +28,7 @@ class MediaUploaderTest extends TestCase
         $this->assertTrue($filesystem->exists($media->getPath()));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_upload_a_file_to_a_specific_disk()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
@@ -49,7 +50,7 @@ class MediaUploaderTest extends TestCase
         $this->assertTrue($filesystem->exists($media->getPath()));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_change_the_name_of_the_media_model()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
@@ -61,7 +62,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals($newName, $media->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_rename_the_file_before_it_gets_uploaded()
     {
         $file = UploadedFile::fake()->image('file-name.jpg');
@@ -73,7 +74,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals($newFileName, $media->file_name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_will_sanitize_the_file_name()
     {
         $file = UploadedFile::fake()->image('bad file name#023.jpg');
@@ -83,7 +84,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('bad-file-name-023.jpg', $media->file_name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_save_data_to_the_media_model()
     {
         $file = UploadedFile::fake()->image('image.jpg');
@@ -100,7 +101,7 @@ class MediaUploaderTest extends TestCase
         $this->assertEquals('test data 02', $media->data['test-02']);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_respects_configured_media_and_collection_models()
     {
         config()->set('mediaman.models.media', CustomMedia::class);

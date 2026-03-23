@@ -5,10 +5,11 @@ namespace FarhanShares\MediaMan\Tests;
 
 use FarhanShares\MediaMan\Models\Media;
 use FarhanShares\MediaMan\MediaUploader;
+use PHPUnit\Framework\Attributes\Test;
 
 class MediaCollectionTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function test_it_can_create_a_collection()
     {
         $collection = $this->mediaCollection::firstOrCreate([
@@ -19,7 +20,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals('test-collection', $collection->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_update_a_collection()
     {
         $collection = $this->mediaCollection::firstOrCreate([
@@ -31,7 +32,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals('new name', $collection->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_delete_a_collection_with_associated_pivot_table_data()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
@@ -53,7 +54,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(0, $mediaTwo->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_retrieve_media_of_a_collection()
     {
 
@@ -78,7 +79,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals('file-2', $two->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_sync_media_of_a_collection()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
@@ -144,7 +145,30 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(0, $videoCollection->media()->count());
     }
 
-    /** @test */
+    #[Test]
+    public function test_it_can_sync_single_media_without_detaching_existing_media()
+    {
+        $mediaOne = MediaUploader::source($this->fileOne)
+            ->useName('image-1')
+            ->useCollection('Images')
+            ->upload();
+
+        $mediaTwo = MediaUploader::source($this->fileTwo)
+            ->useName('image-2')
+            ->useCollection('Images')
+            ->upload();
+
+        $imageCollection = $this->mediaCollection->with('media')->findByName('Images');
+        $imageCollection->syncMedia($mediaOne->getKey());
+
+        $syncStatus = $imageCollection->syncMedia($mediaTwo->getKey(), false);
+
+        $this->assertEquals([$mediaTwo->getKey()], $syncStatus['attached']);
+        $this->assertEmpty($syncStatus['detached']);
+        $this->assertCount(2, $imageCollection->fresh()->media);
+    }
+
+    #[Test]
     public function test_it_can_attach_media_to_a_collection()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
@@ -190,7 +214,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(2, $imageCollection->media()->count());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_detach_media_from_a_collection()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
@@ -241,7 +265,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(0, $imageCollection->media()->count());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_false_for_non_existing_or_already_attached_media_when_attaching()
     {
         MediaUploader::source($this->fileOne)
@@ -257,7 +281,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(false, $a2);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_number_of_attached_media_if_at_least_one_of_these_is_existing_media_and_not_already_attached_when_attaching()
     {
         MediaUploader::source($this->fileOne)
@@ -288,7 +312,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(2, $a3);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_false_if_all_are_non_existing_or_already_detached_media_when_detaching()
     {
         MediaUploader::source($this->fileOne)
@@ -305,7 +329,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(false, $b2);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_number_of_detached_media_if_at_least_one_of_these_is_existing_attached_media_and_not_already_detached_when_detaching()
     {
         MediaUploader::source($this->fileOne)
@@ -329,7 +353,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(2, $b2);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_false_if_it_is_a_non_existing_media_when_synchronizing()
     {
         MediaUploader::source($this->fileOne)
@@ -344,7 +368,7 @@ class MediaCollectionTest extends TestCase
         $this->assertEquals(false, $b1);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_returns_detailed_array_when_synchronizing_with_existing_non_existing_and_already_attached_media_array()
     {
         MediaUploader::source($this->fileOne)

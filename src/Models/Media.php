@@ -164,16 +164,17 @@ class Media extends Model
     public function getFriendlySizeAttribute()
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $size = $this->size;
 
-        if ($this->size == 0) {
+        if ($size == 0) {
             return '0 ' . $units[1];
         }
 
-        for ($i = 0; $this->size > 1024; $i++) {
-            $this->size /= 1024;
+        for ($i = 0; $size > 1024; $i++) {
+            $size /= 1024;
         }
 
-        return round($this->size, 2) . ' ' . $units[$i];
+        return round($size, 2) . ' ' . $units[$i];
     }
 
     /**
@@ -495,7 +496,7 @@ class Media extends Model
         if (is_string($collections)) {
             $model = $this->collectionModel();
 
-            return $model::findByName($collections);
+            return $this->findCollectionsByName($collections);
         }
 
         // all array items should be of same type
@@ -508,13 +509,29 @@ class Media extends Model
             }
 
             if (is_string($collections[0])) {
-                $model = $this->collectionModel();
-
-                return $model::findByName($collections);
+                return $this->findCollectionsByName($collections);
             }
         }
 
         return null;
+    }
+
+    /**
+     * Find one or many collections by collection name.
+     *
+     * @param string|array $names
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null
+     */
+    private function findCollectionsByName($names)
+    {
+        $model = $this->collectionModel();
+        $query = $model::query();
+
+        if (is_array($names)) {
+            return $query->whereIn('name', $names)->get();
+        }
+
+        return $query->where('name', $names)->first();
     }
 
     /**

@@ -14,6 +14,7 @@ use FarhanShares\MediaMan\Tests\TestCase;
 use FarhanShares\MediaMan\Tests\Models\CustomMedia;
 use FarhanShares\MediaMan\Tests\Models\CustomMediaCollection;
 use Illuminate\Database\Eloquent\Collection as ElCollection;
+use PHPUnit\Framework\Attributes\Test;
 
 class MediaTest extends TestCase
 {
@@ -23,7 +24,7 @@ class MediaTest extends TestCase
     }
 
 
-    /** @test */
+    #[Test]
     public function test_it_can_create_a_media_record_with_media_uploader()
     {
         // use api
@@ -57,7 +58,7 @@ class MediaTest extends TestCase
         $this->assertEquals('anything else?', $fetch->data['something-else']);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_update_a_media_record()
     {
         $mediaOne = MediaUploader::source($this->fileOne)
@@ -95,7 +96,7 @@ class MediaTest extends TestCase
         //     ->store();
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_delete_a_media_record()
     {
         $media = MediaUploader::source($this->fileOne)
@@ -107,11 +108,11 @@ class MediaTest extends TestCase
         $mediaFile = $media->file_name;
         $media->delete();
 
-        $this->assertEquals(null, Media::find($mediaId));
+        $this->assertNull(Media::find($mediaId));
         $this->assertEquals(false, Storage::disk('default')->exists($mediaFile));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_deletes_media_and_related_files_from_storage_when_media_is_deleted()
     {
         $media = MediaUploader::source($this->fileOne)
@@ -126,7 +127,7 @@ class MediaTest extends TestCase
         Storage::disk($media->disk)->assertMissing($mediaFilePath);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_moves_file_to_new_disk_on_disk_update()
     {
         $newDiskName = 'newValidDisk';
@@ -151,7 +152,7 @@ class MediaTest extends TestCase
         Storage::disk($newDiskName)->assertExists($media->getPath());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_renames_file_in_storage_on_filename_update()
     {
         $media = MediaUploader::source($this->fileOne)
@@ -167,7 +168,7 @@ class MediaTest extends TestCase
         Storage::disk($media->disk)->assertExists($newPath);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_validates_disk_usability_for_valid_disk()
     {
         Storage::fake('newValidDisk');
@@ -180,7 +181,7 @@ class MediaTest extends TestCase
         $this->assertNull(Media::ensureDiskUsability('newValidDisk'));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_throws_exception_for_invalid_disk_in_disk_usability_check()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -188,7 +189,7 @@ class MediaTest extends TestCase
         Media::ensureDiskUsability('invalidDisk');
     }
 
-    /** @test */
+    #[Test]
     public function it_has_an_extension_accessor()
     {
         $image = new Media();
@@ -201,7 +202,7 @@ class MediaTest extends TestCase
         $this->assertEquals('mov', $video->extension);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_has_a_type_accessor()
     {
         $image = new Media();
@@ -214,7 +215,7 @@ class MediaTest extends TestCase
         $this->assertEquals('video', $video->type);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_determine_its_type()
     {
         $media = new Media();
@@ -224,7 +225,17 @@ class MediaTest extends TestCase
         $this->assertFalse($media->isOfType('video'));
     }
 
-    /** @test */
+    #[Test]
+    public function test_it_does_not_mutate_size_when_getting_friendly_size()
+    {
+        $media = new Media();
+        $media->size = 2048;
+
+        $this->assertEquals('2 KB', $media->friendly_size);
+        $this->assertEquals(2048, $media->size);
+    }
+
+    #[Test]
     public function test_it_can_get_the_path_on_disk_to_the_file()
     {
         $media = new Media();
@@ -235,7 +246,7 @@ class MediaTest extends TestCase
         $this->assertEquals($path . '/image.jpg', $media->getPath());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_get_the_path_on_disk_to_a_converted_image()
     {
         $media = new Media();
@@ -249,7 +260,7 @@ class MediaTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_get_the_full_path_to_the_file()
     {
         $media = Mockery::mock(Media::class)->makePartial();
@@ -264,7 +275,7 @@ class MediaTest extends TestCase
         $this->assertEquals('path', $media->getFullPath());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_get_the_full_path_to_a_converted_image()
     {
         $media = Mockery::mock(Media::class)->makePartial();
@@ -279,7 +290,7 @@ class MediaTest extends TestCase
         $this->assertEquals('path', $media->getFullPath('thumbnail'));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_get_the_url_to_the_file()
     {
         $media = Mockery::mock(Media::class)->makePartial();
@@ -294,7 +305,7 @@ class MediaTest extends TestCase
         $this->assertEquals('url', $media->getUrl());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_get_the_url_to_a_converted_image()
     {
         $media = Mockery::mock(Media::class)->makePartial();
@@ -309,7 +320,7 @@ class MediaTest extends TestCase
         $this->assertEquals('url', $media->getUrl('thumbnail'));
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_sync_a_collection_by_id()
     {
         $collection = $this->mediaCollection::firstOrCreate([
@@ -325,7 +336,7 @@ class MediaTest extends TestCase
     }
 
 
-    /** @test */
+    #[Test]
     public function test_it_can_sync_a_collection_by_name()
     {
         $collection = $this->mediaCollection::firstOrCreate([
@@ -340,7 +351,7 @@ class MediaTest extends TestCase
         $this->assertEquals($collection->name, $media->collections[0]->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_sync_multiple_collections_by_name()
     {
         $this->mediaCollection::firstOrCreate([
@@ -356,7 +367,7 @@ class MediaTest extends TestCase
         $this->assertEquals('Test Collection', $media->collections[1]->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_sync_multiple_collections_by_id()
     {
         $this->mediaCollection::firstOrCreate([
@@ -372,7 +383,7 @@ class MediaTest extends TestCase
         $this->assertEquals('Test Collection', $media->collections[1]->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_attach_a_media_to_a_collection_using_collection_id()
     {
         $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
@@ -389,7 +400,7 @@ class MediaTest extends TestCase
         $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_attach_a_media_to_a_collection_using_collection_name()
     {
         $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
@@ -406,7 +417,7 @@ class MediaTest extends TestCase
         $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
-    /** @test */
+    #[Test]
     public function test_it_can_attach_a_media_to_a_collection_using_collection_object()
     {
         $collection = $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
@@ -423,7 +434,7 @@ class MediaTest extends TestCase
         $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_attach_a_media_to_multiple_collections_using_collection_ids()
     {
         $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
@@ -440,7 +451,7 @@ class MediaTest extends TestCase
         $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_attach_a_media_to_multiple_collections_using_collection_names()
     {
         $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
@@ -457,7 +468,7 @@ class MediaTest extends TestCase
         $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_attach_a_media_to_multiple_collections_using_collection_object()
     {
         $media = MediaUploader::source($this->fileOne)->upload();
@@ -482,7 +493,7 @@ class MediaTest extends TestCase
         $this->assertEquals('another-collection', $media->collections[2]->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detach_a_media_to_a_collection_using_collection_id()
     {
         $collection = $this->mediaCollection::first(); // default collection
@@ -494,7 +505,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detach_a_collection_from_a_media_using_collection_name()
     {
         $collection = $this->mediaCollection::first(); // default collection
@@ -506,7 +517,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detach_a_collection_from_a_media_using_collection_object()
     {
         $collection = $this->mediaCollection::first(); // default collection
@@ -518,7 +529,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detach_multiple_collections_from_a_media_using_collection_ids()
     {
         $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
@@ -534,7 +545,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detach_multiple_collections_from_a_media_using_collection_names()
     {
         $this->mediaCollection::firstOrCreate(['name' => 'my-collection']);
@@ -556,7 +567,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_sync_collection()
     {
         $media = MediaUploader::source($this->fileOne)->upload();
@@ -597,7 +608,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_detach_multiple_collections_from_a_media_using_collection_object()
     {
         $collections = $this->mediaCollection->all();
@@ -612,7 +623,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_sync()
     {
         $media = MediaUploader::source($this->fileOne)->upload();
@@ -662,7 +673,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_detach_collection()
     {
         $media = MediaUploader::source($this->fileOne)->upload();
@@ -703,7 +714,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_remove_collections_if_its_bool_null_empty_string_or_empty_array_with_detach_collections()
     {
         $media = MediaUploader::source($this->fileOne)->upload();
@@ -753,7 +764,7 @@ class MediaTest extends TestCase
         $this->assertEquals(0, $media->collections()->count());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_respects_configured_collection_model_when_syncing_collections()
     {
         config()->set('mediaman.models.media', CustomMedia::class);
@@ -772,7 +783,7 @@ class MediaTest extends TestCase
         $this->assertEquals($collection->getKey(), $media->collections()->first()->getKey());
     }
 
-    /** @test */
+    #[Test]
     public function test_it_generates_uuid_keys_for_default_models_when_configured()
     {
         config()->set('mediaman.use_uuids', true);

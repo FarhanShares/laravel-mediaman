@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use FarhanShares\MediaMan\MediaManServiceProvider;
+use FarhanShares\MediaMan\Tests\Factories\MediaFactory;
 
 class TestCase extends BaseTestCase
 {
@@ -29,7 +30,6 @@ class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-        $this->withFactories(__DIR__ . '/database/factories');
 
         // Use a test disk as the default disk...
         Config::set('mediaman.disk', self::DEFAULT_DISK);
@@ -44,6 +44,28 @@ class TestCase extends BaseTestCase
         // Fake uploaded files
         $this->fileOne = UploadedFile::fake()->image('file-one.jpg');
         $this->fileTwo = UploadedFile::fake()->image('file-two.jpg');
+    }
+
+    /**
+     * Create one or more media records using the class-based test factory.
+     *
+     * @param int $count
+     * @param array $attributes
+     * @return \Illuminate\Database\Eloquent\Collection|\FarhanShares\MediaMan\Models\Media
+     */
+    protected function createMedia(int $count = 1, array $attributes = [])
+    {
+        $factory = MediaFactory::new();
+
+        if (!empty($attributes)) {
+            $factory = $factory->state($attributes);
+        }
+
+        if ($count > 1) {
+            return $factory->count($count)->create();
+        }
+
+        return $factory->create();
     }
 
     protected function getPackageProviders($app)

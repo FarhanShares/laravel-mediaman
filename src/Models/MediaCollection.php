@@ -125,7 +125,7 @@ class MediaCollection extends Model
         }
 
         if (method_exists($fetch, 'getKey')) {
-            return $this->media()->sync($fetch->getKey());
+            return $this->media()->sync($fetch->getKey(), $detaching);
         }
 
         return null;
@@ -140,8 +140,6 @@ class MediaCollection extends Model
      */
     public function attachMedia($media): ?int
     {
-        $fetch = $this->fetchMedia($media);
-
         if (!$fetch = $this->fetchMedia($media)) {
             return null;
         }
@@ -251,7 +249,7 @@ class MediaCollection extends Model
         }
 
         if (is_string($media)) {
-            return $this->mediaModel()::findByName($media);
+            return $this->findMediaByName($media);
         }
 
         // all array items should be of same type
@@ -266,11 +264,29 @@ class MediaCollection extends Model
             }
 
             if (is_string($media[0])) {
-                return $this->mediaModel()::findByName($media);
+                return $this->findMediaByName($media);
             }
         }
 
         return null;
+    }
+
+    /**
+     * Find one or many media records by media name.
+     *
+     * @param string|array $names
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null
+     */
+    private function findMediaByName($names)
+    {
+        $model = $this->mediaModel();
+        $query = $model::query();
+
+        if (is_array($names)) {
+            return $query->whereIn('name', $names)->get();
+        }
+
+        return $query->where('name', $names)->first();
     }
 
     /**
