@@ -190,6 +190,8 @@ $media = MediaUploader::source($file)->upload();
 
 The file will be stored in the default disk & bundled in the default collection specified in the mediaman config. The file size will be stored in the database & the file name will be sanitized automatically.
 
+`upload()` runs database writes in a transaction and treats storage write failures as hard failures. If file writing or later collection attachment fails, the media row is rolled back and MediaMan performs best-effort storage cleanup to avoid orphaned records/files.
+
 However, you can do a lot more, not just stick to the defaults.
 
 ```php

@@ -7,9 +7,12 @@ use Illuminate\Http\UploadedFile;
 use FarhanShares\MediaMan\Models\Media;
 use Illuminate\Support\Facades\Storage;
 use FarhanShares\MediaMan\MediaUploader;
+use Illuminate\Database\QueryException;
 use FarhanShares\MediaMan\Tests\Models\CustomMedia;
 use FarhanShares\MediaMan\Tests\Models\CustomMediaCollection;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 
 class MediaUploaderTest extends TestCase
 {
@@ -111,5 +114,80 @@ class MediaUploaderTest extends TestCase
 
         $this->assertInstanceOf(CustomMedia::class, $media);
         $this->assertInstanceOf(CustomMediaCollection::class, $media->collections()->first());
+    }
+
+    #[Test]
+    public function test_it_rolls_back_media_and_cleans_storage_when_write_throws()
+    {
+        $filesystem = Mockery::mock();
+        $filesystem->shouldReceive('putFileAs')
+            ->once()
+            ->andThrow(new RuntimeException('Unable to write file'));
+        $filesystem->shouldReceive('deleteDirectory')->once()->andReturn(true);
+        $filesystem->shouldNotReceive('delete');
+
+        Storage::shouldReceive('disk')->andReturn($filesystem);
+
+        try {
+            MediaUploader::source(UploadedFile::fake()->image('image.jpg'))->upload();
+            $this->fail('Expected upload to throw.');
+        } catch (RuntimeException $e) {
+            $this->assertSame('Unable to write file', $e->getMessage());
+        }
+
+        $mediaModel = config('mediaman.models.media');
+        $this->assertSame(0, $mediaModel::query()->count());
+    }
+
+    #[Test]
+    public function test_it_treats_false_return_from_write_as_failure_and_rolls_back()
+    {
+        $filesystem = Mockery::mock();
+        $filesystem->shouldReceive('putFileAs')->once()->andReturn(false);
+        $filesystem->shouldReceive('deleteDirectory')->once()->andReturn(true);
+        $filesystem->shouldNotReceive('delete');
+
+        Storage::shouldReceive('disk')->andReturn($filesystem);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to write media file to storage.');
+
+        try {
+            MediaUploader::source(UploadedFile::fake()->image('image.jpg'))->upload();
+        } finally {
+            $mediaModel = config('mediaman.models.media');
+            $this->assertSame(0, $mediaModel::query()->count());
+        }
+    }
+
+    #[Test]
+    public function test_it_rolls_back_and_cleans_written_file_when_collection_attach_fails()
+    {
+        config()->set('mediaman.tables.collection_media', 'missing_collection_media');
+
+        $this->expectException(QueryException::class);
+
+        try {
+            MediaUploader::source(UploadedFile::fake()->image('image.jpg'))->upload();
+        } finally {
+            $mediaModel = config('mediaman.models.media');
+            $this->assertSame(0, $mediaModel::query()->count());
+            $this->assertSame([], Storage::disk(self::DEFAULT_DISK)->allFiles());
+        }
+    }
+
+    #[Test]
+    public function test_successful_upload_persists_media_file_and_collection_attachment()
+    {
+        $media = MediaUploader::source(UploadedFile::fake()->image('image.jpg'))->upload();
+
+        $mediaModel = config('mediaman.models.media');
+        $this->assertSame(1, $mediaModel::query()->count());
+        $this->assertTrue(Storage::disk(self::DEFAULT_DISK)->exists($media->getPath()));
+
+        $freshMedia = $media->fresh('collections');
+        $this->assertNotNull($freshMedia);
+        $this->assertCount(1, $freshMedia->collections);
+        $this->assertSame(config('mediaman.collection'), $freshMedia->collections->first()->name);
     }
 }
