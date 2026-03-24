@@ -15,6 +15,7 @@ use FarhanShares\MediaMan\Tests\Models\CustomMedia;
 use FarhanShares\MediaMan\Tests\Models\CustomMediaCollection;
 use Illuminate\Database\Eloquent\Collection as ElCollection;
 use PHPUnit\Framework\Attributes\Test;
+use RuntimeException;
 
 class MediaTest extends TestCase
 {
@@ -318,6 +319,46 @@ class MediaTest extends TestCase
         $media->shouldReceive('filesystem')->once()->andReturn($filesystem);
 
         $this->assertEquals('url', $media->getUrl('thumbnail'));
+    }
+
+    #[Test]
+    public function test_it_uses_temporary_url_for_private_disks()
+    {
+        $media = Mockery::mock(Media::class)->makePartial();
+        $media->disk = 'private-media';
+
+        config()->set('filesystems.disks.private-media.visibility', 'private');
+
+        $filesystem = Mockery::mock();
+        $filesystem->shouldReceive('temporaryUrl')
+            ->with($media->getPath(), Mockery::type(\DateTimeInterface::class))
+            ->once()
+            ->andReturn('signed-url');
+        $filesystem->shouldNotReceive('url');
+
+        $media->shouldReceive('filesystem')->once()->andReturn($filesystem);
+
+        $this->assertEquals('signed-url', $media->getUrl());
+    }
+
+    #[Test]
+    public function test_it_falls_back_to_standard_url_when_temporary_url_fails()
+    {
+        $media = Mockery::mock(Media::class)->makePartial();
+        $media->disk = 'private-media';
+
+        config()->set('filesystems.disks.private-media.visibility', 'private');
+
+        $filesystem = Mockery::mock();
+        $filesystem->shouldReceive('temporaryUrl')
+            ->with($media->getPath(), Mockery::type(\DateTimeInterface::class))
+            ->once()
+            ->andThrow(new RuntimeException('temporary url unavailable'));
+        $filesystem->shouldReceive('url')->with($media->getPath())->once()->andReturn('url');
+
+        $media->shouldReceive('filesystem')->once()->andReturn($filesystem);
+
+        $this->assertEquals('url', $media->getUrl());
     }
 
     #[Test]

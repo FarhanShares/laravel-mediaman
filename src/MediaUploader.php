@@ -3,6 +3,9 @@
 namespace FarhanShares\MediaMan;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
+use Throwable;
 
 class MediaUploader
 {
@@ -205,8 +208,30 @@ class MediaUploader
      */
     public function upload()
     {
-        $model = $this->mediaModel();
+        return DB::transaction(function () {
+            $media = $this->persistMediaModel();
 
+            try {
+                $this->writeMediaFile($media);
+                $this->attachCollections($media);
+            } catch (Throwable $e) {
+                $this->cleanupStorageAfterFailure($media);
+
+                throw $e;
+            }
+
+            return $media;
+        });
+    }
+
+    /**
+     * Persist and return a new media model instance.
+     *
+     * @return mixed
+     */
+    private function persistMediaModel()
+    {
+        $model = $this->mediaModel();
         $media = new $model();
 
         $media->name = $this->name;
@@ -215,15 +240,38 @@ class MediaUploader
         $media->mime_type = $this->file->getMimeType();
         $media->size = $this->file->getSize();
         $media->data = $this->data;
-
         $media->save();
 
-        $media->filesystem()->putFileAs(
+        return $media;
+    }
+
+    /**
+     * Write the uploaded file to the media storage path.
+     *
+     * @param mixed $media
+     * @return void
+     */
+    private function writeMediaFile($media): void
+    {
+        $written = $media->filesystem()->putFileAs(
             $media->getDirectory(),
             $this->file,
             $this->fileName
         );
 
+        if ($written === false) {
+            throw new RuntimeException('Failed to write media file to storage.');
+        }
+    }
+
+    /**
+     * Attach media to the configured collection(s).
+     *
+     * @param mixed $media
+     * @return void
+     */
+    private function attachCollections($media): void
+    {
         if (count($this->collections) > 0) {
             // todo: support multiple collections
             $collectionModel = $this->collectionModel();
@@ -233,19 +281,39 @@ class MediaUploader
             ]);
 
             $media->collections()->attach($collection->getKey());
-        } else {
-            // add to the default collection
-            // todo: allow not to add in the default collection
-            $collectionModel = $this->collectionModel();
-            $collection = $collectionModel::query()
-                ->where('name', config('mediaman.collection'))
-                ->first();
-            if ($collection) {
-                $media->collections()->attach($collection->getKey());
-            }
+
+            return;
         }
 
-        return $media;
+        // add to the default collection
+        // todo: allow not to add in the default collection
+        $collectionModel = $this->collectionModel();
+        $collection = $collectionModel::query()
+            ->where('name', config('mediaman.collection'))
+            ->first();
+
+        if ($collection) {
+            $media->collections()->attach($collection->getKey());
+        }
+    }
+
+    /**
+     * Best-effort cleanup for storage writes that occurred before failure.
+     *
+     * @param mixed $media
+     * @return void
+     */
+    private function cleanupStorageAfterFailure($media): void
+    {
+        try {
+            $deleted = $media->filesystem()->deleteDirectory($media->getDirectory());
+
+            if (!$deleted) {
+                $media->filesystem()->delete($media->getPath());
+            }
+        } catch (Throwable $ignored) {
+            // best effort cleanup only
+        }
     }
 
     /**
