@@ -3,6 +3,7 @@
 namespace FarhanShares\MediaMan\Models;
 
 use Illuminate\Support\Str;
+use Throwable;
 use FarhanShares\MediaMan\Casts\Json;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -184,7 +185,7 @@ class Media extends Model
      */
     public function getMediaUrlAttribute()
     {
-        return asset($this->filesystem()->url($this->getPath()));
+        return asset($this->getUrl());
     }
 
     /**
@@ -194,7 +195,7 @@ class Media extends Model
      */
     public function getMediaUriAttribute()
     {
-        return $this->filesystem()->url($this->getPath());
+        return $this->getUrl();
     }
 
     /**
@@ -205,9 +206,18 @@ class Media extends Model
      */
     public function getUrl(string $conversion = '')
     {
-        return $this->filesystem()->url(
-            $this->getPath($conversion)
-        );
+        $path = $this->getPath($conversion);
+        $filesystem = $this->filesystem();
+
+        if ($this->shouldUseTemporaryUrl()) {
+            try {
+                return $filesystem->temporaryUrl($path, now()->addMinutes(5));
+            } catch (Throwable $ignored) {
+                // Fallback to regular URL generation when temporary URLs are unavailable.
+            }
+        }
+
+        return $filesystem->url($path);
     }
 
     /**
@@ -258,6 +268,16 @@ class Media extends Model
     public function filesystem()
     {
         return Storage::disk($this->disk);
+    }
+
+    /**
+     * Determine if this media should resolve URLs using temporary signed URLs.
+     *
+     * @return bool
+     */
+    protected function shouldUseTemporaryUrl(): bool
+    {
+        return config("filesystems.disks.{$this->disk}.visibility") === 'private';
     }
 
 

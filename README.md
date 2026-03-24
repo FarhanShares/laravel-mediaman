@@ -409,6 +409,8 @@ $media =  $post->getMedia('featured-image');
 $mediaOneUrl = $media[0]->getUrl();
 ```
 
+When the media disk is configured with `visibility => private`, `getUrl()` attempts to return a temporary signed URL (when supported by the disk driver), and falls back to the regular URL method otherwise.
+
 It might be a common scenario for most of the Laravel apps to use the first media item more often, hence MediaMan has dedicated methods to retrieve the first item among all associated media.
 
 ```php
